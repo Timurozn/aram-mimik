@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Barlow+Semi+Condensed:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: header band (brand, tab rail, sync status) · Glücksrad = wheel stage left, option ledger right · Punkte = verdict cards, full-width score ledger, Mimik ranking */
+/* Layout: header band (brand, tab rail, sync status) · Glücksrad = wheel stage left, option ledger right · Punkte = verdict cards, game ledger, end-of-round panel · Rangliste = leader cards, sortable table, history */
 :root {
   --abyss: #070E1A;
   --deep: #0B1828;
@@ -40,8 +40,8 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 18px 56px;
 }
-button { font-family: inherit; }
-button:focus-visible, input:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
+button, select, input { font-family: inherit; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--ice); outline-offset: 2px; }
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 input[type=number] { -moz-appearance: textfield; appearance: textfield; }
@@ -55,20 +55,25 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   margin: 0; font-family: var(--f-display); font-weight: 700; color: var(--gold);
   font-size: clamp(28px, 4.2vw, 40px); letter-spacing: .07em; line-height: 1; text-wrap: balance;
 }
-.brand p {
-  margin: 6px 0 0; color: var(--mute); font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
-}
-.rail { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.brand p { margin: 6px 0 0; color: var(--mute); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; }
+.rail { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; min-width: 0; }
 .tabs {
   display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--deep);
+  max-width: 100%; overflow-x: auto;
 }
 .tab {
-  appearance: none; border: 0; background: transparent; color: var(--mute); cursor: pointer;
+  appearance: none; border: 0; background: transparent; color: var(--mute); cursor: pointer; flex: none;
   font-weight: 700; font-size: 15px; letter-spacing: .1em; text-transform: uppercase;
-  padding: 10px 20px; border-radius: 999px;
+  padding: 10px 18px; border-radius: 999px;
 }
 .tab:hover { color: var(--gold-hi); }
 .tab[aria-selected="true"] { background: var(--gold); color: var(--gold-ink); }
+.tab.q {
+  width: 40px; padding: 0; display: grid; place-items: center; background: var(--gold-hi); color: #000;
+  font-family: var(--f-display); font-size: 22px; letter-spacing: 0;
+}
+.tab.q[aria-selected="true"] { background: var(--gold-hi); box-shadow: 0 0 0 2px var(--gold); color: #000; }
+@media (max-width: 480px) { .tab { font-size: 13px; padding: 9px 12px; letter-spacing: .06em; } .tab.q { width: 36px; } }
 .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mute); }
 .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mute); flex: none; }
 .status[data-s="live"] .dot { background: var(--win); }
@@ -76,7 +81,7 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .status[data-s="readonly"] .dot { background: var(--ice); }
 .status[data-s="slow"] .dot, .status[data-s="error"] .dot { background: var(--blood); }
 
-/* shared bits */
+/* shared */
 h2 {
   margin: 0; font-family: var(--f-display); font-weight: 700; color: var(--gold-hi);
   font-size: 21px; letter-spacing: .06em; text-wrap: balance;
@@ -98,15 +103,35 @@ h2 {
   color: var(--ink); text-align: center; font: 700 17px/1 var(--f-body); font-variant-numeric: tabular-nums;
 }
 .step input:disabled { color: var(--mute); }
-.ghost-btn {
-  appearance: none; border: 1px solid var(--line); background: transparent; color: var(--mute);
-  border-radius: 8px; padding: 9px 14px; font-weight: 600; font-size: 14px; letter-spacing: .06em;
-  text-transform: uppercase; cursor: pointer;
+.btn {
+  appearance: none; height: 42px; padding: 0 18px; border-radius: 8px; cursor: pointer;
+  font-weight: 700; font-size: 15px; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--gold); background: var(--gold); color: var(--gold-ink);
 }
-.ghost-btn:hover:not(:disabled) { color: var(--gold-hi); border-color: var(--gold); }
-.ghost-btn[data-armed="1"] { color: var(--blood); border-color: var(--blood); }
-.ghost-btn:disabled { opacity: .5; cursor: default; }
+.btn:hover:not(:disabled) { background: var(--gold-hi); border-color: var(--gold-hi); }
+.btn.ghost { background: transparent; color: var(--mute); border-color: var(--line); }
+.btn.ghost:hover:not(:disabled) { color: var(--gold-hi); border-color: var(--gold); background: transparent; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn[data-armed="1"] { color: var(--blood); border-color: var(--blood); background: transparent; }
 .view[hidden] { display: none !important; }
+.del {
+  width: 32px; height: 32px; border-radius: 8px; border: 1px solid transparent; background: transparent;
+  color: var(--mute); cursor: pointer; font-size: 18px; line-height: 1; flex: none;
+}
+.del:hover:not(:disabled) { color: var(--blood); border-color: var(--blood); }
+.del:disabled { opacity: .35; cursor: default; }
+.del[data-armed="1"] { width: auto; padding: 0 8px; font-size: 13px; color: var(--blood); border-color: var(--blood); }
+.av {
+  width: 38px; height: 38px; border-radius: 50%; flex: none; padding: 0; overflow: hidden;
+  display: grid; place-items: center; border: 1px solid var(--gold); background: var(--raise);
+  color: var(--gold-hi); font-weight: 700; font-size: 15px; letter-spacing: .02em;
+}
+button.av { cursor: pointer; }
+button.av:hover:not(:disabled) { box-shadow: 0 0 0 2px var(--ice); }
+button.av:disabled { cursor: default; }
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.pname { font-weight: 700; font-size: 18px; color: var(--ink); overflow-wrap: anywhere; }
 
 /* Glücksrad */
 .stage {
@@ -135,9 +160,7 @@ h2 {
 .verdict .odds { color: var(--mute); font-size: 14px; font-variant-numeric: tabular-nums; }
 .verdict.fresh { border-color: var(--gold); }
 .history { width: 100%; max-width: 600px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.history span {
-  font-size: 13px; color: var(--mute); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px;
-}
+.history span { font-size: 13px; color: var(--mute); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
 .ledger { padding: 20px; min-width: 0; }
 .ledger-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 .ledger-head .eyebrow { font-variant-numeric: tabular-nums; }
@@ -146,6 +169,8 @@ h2 {
   display: grid; grid-template-columns: 12px minmax(0, 1fr) auto 46px 32px;
   gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line);
 }
+.opt-row.off .opt-label { color: var(--mute); text-decoration: line-through; text-decoration-color: var(--line); }
+.opt-row.off .sw { opacity: .25; }
 .sw { width: 12px; height: 36px; border-radius: 3px; }
 .opt-label {
   width: 100%; min-width: 0; height: 38px; border: 1px solid var(--line); border-radius: 8px;
@@ -153,12 +178,6 @@ h2 {
 }
 .opt-label:focus { border-color: var(--gold); }
 .pct { text-align: right; color: var(--mute); font-size: 14px; font-variant-numeric: tabular-nums; }
-.del {
-  width: 32px; height: 32px; border-radius: 8px; border: 1px solid transparent; background: transparent;
-  color: var(--mute); cursor: pointer; font-size: 18px; line-height: 1;
-}
-.del:hover:not(:disabled) { color: var(--blood); border-color: var(--blood); }
-.del:disabled { opacity: .35; cursor: default; }
 .add {
   width: 100%; margin-top: 14px; padding: 12px; border: 1px dashed var(--gold); border-radius: 8px;
   background: transparent; color: var(--gold); cursor: pointer;
@@ -175,21 +194,26 @@ h2 {
 }
 
 /* Punkte */
-.points { padding-top: 28px; display: flex; flex-direction: column; gap: 22px; }
+.points, .ranking { padding-top: 28px; display: flex; flex-direction: column; gap: 22px; }
 .rules { color: var(--mute); font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; }
 .rules b { color: var(--gold-hi); font-weight: 600; }
 .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.cards.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 760px) { .cards.three { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 560px) { .cards { grid-template-columns: minmax(0, 1fr); } }
-.card { padding: 14px 18px; }
+.card { padding: 14px 18px; min-width: 0; }
 .card .v {
   font-family: var(--f-display); font-weight: 700; font-size: 26px; color: var(--gold-hi);
   margin-top: 4px; line-height: 1.2; overflow-wrap: anywhere;
 }
+.card .sub { color: var(--mute); font-size: 14px; margin-top: 2px; font-variant-numeric: tabular-nums; }
 .card.loser { border-color: var(--blood); background: var(--blood-bg); }
 .card.loser .v { color: var(--blood); }
+.card.best { border-color: var(--gold); }
 .tbl-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
-.score { min-width: 1000px; }
+.score { min-width: 780px; }
+.rank-tbl { min-width: 720px; }
 th {
   background: var(--panel); color: var(--mute); font-weight: 700; font-size: 13px; letter-spacing: .12em;
   text-transform: uppercase; padding: 12px 8px; text-align: center; border-bottom: 1px solid var(--line);
@@ -199,16 +223,28 @@ td { padding: 8px; text-align: center; border-bottom: 1px solid var(--line); }
 tbody tr:last-child td { border-bottom: 0; }
 .name-cell {
   position: sticky; left: 0; z-index: 1; background: var(--deep); text-align: left;
-  min-width: 150px; padding-left: 16px;
+  min-width: 190px; padding-left: 14px;
 }
 th.name-cell { background: var(--panel); z-index: 2; }
+@media (max-width: 480px) { .name-cell { min-width: 150px; padding-left: 10px; } .pname { font-size: 16px; } }
 .name-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.pname { font-weight: 700; font-size: 18px; color: var(--ink); }
 .tag {
-  display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em;
   text-transform: uppercase; color: var(--blood); border: 1px solid var(--blood); border-radius: 999px; padding: 1px 7px;
-  vertical-align: 2px;
+  vertical-align: 2px; white-space: nowrap;
 }
+.game { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.pl-sel {
+  appearance: none; -webkit-appearance: none; height: 38px; width: 96px; border: 1px solid var(--line); border-radius: 8px;
+  background-color: var(--abyss); color: var(--ink); font: 700 16px var(--f-body); padding: 0 26px 0 12px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23C8AA6E' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+.pl-sel:disabled { opacity: .55; cursor: default; }
+.pl-sel.dup { border-color: var(--blood); color: var(--blood); }
+.pl-sel option { background: var(--deep); color: var(--ink); }
+.pts { font-size: 13px; color: var(--mute); min-height: 18px; }
+.pts.on { color: var(--gold); font-weight: 600; }
 .sum { font-family: var(--f-display); font-weight: 700; font-size: 22px; color: var(--gold-hi); }
 .rank {
   display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
@@ -218,28 +254,73 @@ th.name-cell { background: var(--panel); z-index: 2; }
 .rank.last { border-color: var(--blood); color: var(--blood); }
 tr.is-last .name-cell { box-shadow: inset 3px 0 0 var(--blood); }
 tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
-.mim-step input { color: var(--blood); }
+.warn { color: var(--blood); font-size: 14px; margin: 0; }
+.warn:empty { display: none; }
 .foot-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
-.add-player { display: flex; gap: 8px; flex-wrap: wrap; }
+.add-player { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 .add-player input {
-  height: 40px; min-width: 0; width: 200px; max-width: 100%; border: 1px solid var(--line); border-radius: 8px;
+  height: 42px; min-width: 0; width: 200px; max-width: 100%; border: 1px solid var(--line); border-radius: 8px;
   background: var(--abyss); color: var(--ink); padding: 0 12px; font: 600 16px var(--f-body);
 }
-.add-player button {
-  height: 40px; padding: 0 16px; border-radius: 8px; border: 1px solid var(--gold); background: var(--gold);
-  color: var(--gold-ink); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+.add-player input:disabled { opacity: .45; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.endbox { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; border-color: var(--gold); }
+.endbox[hidden] { display: none; }
+.endbox .lead { font-size: 17px; color: var(--ink); margin: 0; }
+.endbox .lead b { color: var(--blood); font-family: var(--f-display); font-size: 22px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 14px; color: var(--mute);
+  font-variant-numeric: tabular-nums;
 }
-.add-player button:disabled, .add-player input:disabled { opacity: .45; cursor: default; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 10px; }
+.chip b { color: var(--ink); font-weight: 600; }
+.pick {
+  appearance: none; border: 1px solid var(--blood); border-radius: 999px; padding: 7px 14px; cursor: pointer;
+  background: transparent; color: var(--blood); font-weight: 700; font-size: 15px;
+}
+.pick[aria-pressed="true"] { background: var(--blood); color: #fff; }
+.flash {
+  padding: 14px 18px; border-color: var(--win); color: var(--ink); font-size: 16px;
+}
+.flash[hidden] { display: none; }
+.flash b { color: var(--win); }
+
+/* Rangliste */
+.sort-btn {
+  appearance: none; border: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit;
+  text-transform: inherit; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 4px;
+}
+.sort-btn:hover { color: var(--gold-hi); }
+th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { color: var(--gold); }
 .rank-tbl td { font-size: 17px; }
+.rank-tbl .num1 { color: var(--gold-hi); font-weight: 700; font-family: var(--f-display); font-size: 20px; }
 .rank-tbl .mim { color: var(--blood); font-weight: 700; font-size: 20px; }
-.rank-tbl .q { color: var(--gold-hi); font-weight: 600; }
+.bar { display: inline-flex; align-items: center; gap: 8px; }
+.bar i { display: block; width: 64px; height: 6px; border-radius: 3px; background: var(--raise); overflow: hidden; }
+.bar i span { display: block; height: 100%; background: var(--gold); }
+.pos { color: var(--mute); font-weight: 700; width: 22px; text-align: right; flex: none; }
+.hist { list-style: none; margin: 0; padding: 0; }
+.hist li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 14px; align-items: center;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+}
+.hist li:last-child { border-bottom: 0; }
+.hist .when { color: var(--mute); font-size: 13px; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+.hist .what { font-size: 16px; }
+.hist .what b { color: var(--blood); }
+.hist .what em { font-style: normal; color: var(--gold-hi); }
 .note { color: var(--mute); font-size: 14px; margin: 0; }
 .empty-cell { color: var(--mute); padding: 22px 16px; text-align: left; }
 
-@media (prefers-reduced-motion: reduce) {
-  .hub { transition: none; }
+/* ? */
+.mystery { display: grid; place-items: center; padding-block: 80px; }
+.mystery div {
+  width: min(320px, 70vw); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  background: var(--gold-hi); color: #000; box-shadow: 0 0 0 6px var(--deep), 0 0 0 8px var(--gold);
+  font-family: var(--f-display); font-weight: 700; font-size: min(220px, 48vw); line-height: 1;
 }
+
+@media (prefers-reduced-motion: reduce) { .hub { transition: none; } }
 </style>
 
 <div class="wrap">
@@ -252,6 +333,8 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       <nav class="tabs" role="tablist" aria-label="Bereiche">
         <button class="tab" role="tab" id="tab-rad" aria-controls="view-rad" aria-selected="true" data-view="rad">Glücksrad</button>
         <button class="tab" role="tab" id="tab-punkte" aria-controls="view-punkte" aria-selected="false" data-view="punkte">Punkte</button>
+        <button class="tab" role="tab" id="tab-rangliste" aria-controls="view-rangliste" aria-selected="false" data-view="rangliste">Rangliste</button>
+        <button class="tab q" role="tab" id="tab-super" aria-controls="view-super" aria-selected="false" data-view="super" aria-label="Super-Mimik">?</button>
       </nav>
       <div class="status" id="status" data-s="loading" role="status"><span class="dot"></span><span id="status-text">Verbinde…</span></div>
     </div>
@@ -261,7 +344,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     <div class="stage">
       <div class="wheel-col">
         <div class="wheel-box" id="wheel-box">
-          <canvas id="wheel" aria-label="Glücksrad mit allen Optionen"></canvas>
+          <canvas id="wheel" aria-label="Glücksrad mit allen aktiven Optionen"></canvas>
           <button class="hub" id="hub" type="button">DREHEN</button>
         </div>
         <div class="verdict panel" id="verdict" aria-live="polite">
@@ -275,23 +358,25 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       <aside class="ledger panel">
         <div class="ledger-head">
           <h2>Optionen</h2>
-          <span class="eyebrow"><span id="seg-total">0</span> Felder</span>
+          <span class="eyebrow"><span id="seg-total">0</span> Felder im Rad</span>
         </div>
         <ul class="opt-list" id="opt-list"></ul>
         <p class="empty" id="opt-empty" hidden>Noch keine Optionen. Leg mit dem Button unten die erste an.</p>
         <button class="add" id="opt-add" type="button">+ Option hinzufügen</button>
-        <p class="fair"><b>Fair:</b> Jedes Feld ist gleich groß. Eine Option mit Anzahl 3 bekommt drei Felder und damit die dreifache Chance. Das Ergebnis kommt aus dem Zufallsgenerator des Browsers, die Drehung zeigt es nur an.</p>
+        <p class="fair"><b>Fair:</b> Jedes Feld ist gleich groß. Anzahl 3 heißt drei Felder und damit die dreifache Chance, Anzahl 0 nimmt die Option aus dem Rad, sie bleibt aber in der Liste. Das Ergebnis kommt aus dem Zufallsgenerator des Browsers, die Drehung zeigt es nur an.</p>
       </aside>
     </div>
   </section>
 
   <section class="view" id="view-punkte" role="tabpanel" aria-labelledby="tab-punkte" hidden>
     <div class="points">
-      <div class="rules"><b>Punkte je Runde:</b> <span>Erster 5</span><span>Zweiter 4</span><span>Dritter 3</span><span>Vierter 2</span><span>Letzter 1</span></div>
+      <div class="rules"><b>Platz nach Schaden:</b> <span>1. = 5 P</span><span>2. = 4 P</span><span>3. = 3 P</span><span>4. = 2 P</span><span>5. = 1 P</span><span>· eine Runde = bis zu 4 Spiele</span></div>
+
+      <div class="panel flash" id="flash" hidden aria-live="polite"></div>
 
       <div class="cards">
-        <div class="card panel"><div class="eyebrow">Führt den Abend an</div><div class="v" id="c-first">—</div></div>
-        <div class="card panel loser"><div class="eyebrow">Letzter · macht die Mimik</div><div class="v" id="c-last">—</div></div>
+        <div class="card panel best"><div class="eyebrow">Führt die Runde an</div><div class="v" id="c-first">—</div><div class="sub" id="c-first-s"></div></div>
+        <div class="card panel loser"><div class="eyebrow">Letzter · macht die Mimik</div><div class="v" id="c-last">—</div><div class="sub" id="c-last-s"></div></div>
       </div>
 
       <div class="tbl-wrap panel">
@@ -299,39 +384,84 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
           <thead>
             <tr>
               <th class="name-cell" scope="col">Spieler</th>
-              <th scope="col">Runde 1</th><th scope="col">Runde 2</th><th scope="col">Runde 3</th><th scope="col">Runde 4</th>
-              <th scope="col">Gesamt</th><th scope="col">Platz</th><th scope="col">Spiele</th><th scope="col">Mimiks</th>
+              <th scope="col">Spiel 1</th><th scope="col">Spiel 2</th><th scope="col">Spiel 3</th><th scope="col">Spiel 4</th>
+              <th scope="col">Gesamt</th><th scope="col">Platz</th>
             </tr>
           </thead>
           <tbody id="score-body"></tbody>
         </table>
       </div>
+      <p class="warn" id="dup-warn"></p>
 
       <div class="foot-row">
         <form class="add-player" id="add-player" autocomplete="off">
-          <label class="eyebrow" for="new-player" style="align-self:center">Neuer Spieler</label>
+          <label class="eyebrow" for="new-player">Neuer Spieler</label>
           <input id="new-player" maxlength="24" placeholder="Name">
-          <button type="submit" id="add-player-btn">Hinzufügen</button>
+          <button class="btn ghost" type="submit" id="add-player-btn">Hinzufügen</button>
         </form>
-        <button class="ghost-btn" id="reset-rounds" type="button">Runden leeren</button>
+        <div class="actions">
+          <button class="btn ghost" id="clear-games" type="button">Spiele leeren</button>
+          <button class="btn" id="end-round" type="button">Runde beenden</button>
+        </div>
       </div>
 
-      <div class="section-head">
-        <h2>Mimik-Ranking</h2>
-        <span class="eyebrow">Quote = Mimiks ÷ Spiele</span>
+      <div class="panel endbox" id="endbox" hidden>
+        <p class="lead" id="end-lead"></p>
+        <div class="chips" id="end-picks"></div>
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px">Wird in die Rangliste übertragen</div>
+          <div class="chips" id="end-chips"></div>
+        </div>
+        <p class="warn" id="end-warn"></p>
+        <div class="actions">
+          <button class="btn" id="end-confirm" type="button">Eintragen</button>
+          <button class="btn ghost" id="end-cancel" type="button">Abbrechen</button>
+        </div>
       </div>
-      <div class="cards">
-        <div class="card panel loser"><div class="eyebrow">Spitzenreiter · meiste Mimiks</div><div class="v" id="c-top">—</div></div>
-        <div class="card panel"><div class="eyebrow">Sauberste Weste</div><div class="v" id="c-clean">—</div></div>
+      <p class="note">Tipp: Aufs Bild oder die Initialen tippen, um ein Profilbild hochzuladen.</p>
+      <input type="file" id="avatar-file" accept="image/*" hidden>
+    </div>
+  </section>
+
+  <section class="view" id="view-rangliste" role="tabpanel" aria-labelledby="tab-rangliste" hidden>
+    <div class="ranking">
+      <div class="cards three">
+        <div class="card panel best"><div class="eyebrow">Bester Schnitt</div><div class="v" id="r-best">—</div><div class="sub" id="r-best-s"></div></div>
+        <div class="card panel loser"><div class="eyebrow">Meiste Mimiks</div><div class="v" id="r-top">—</div><div class="sub" id="r-top-s"></div></div>
+        <div class="card panel"><div class="eyebrow">Sauberste Weste</div><div class="v" id="r-clean">—</div><div class="sub" id="r-clean-s"></div></div>
       </div>
+
       <div class="tbl-wrap panel">
         <table class="rank-tbl">
-          <thead><tr><th class="name-cell" scope="col">Spieler</th><th scope="col">Spiele</th><th scope="col">Mimiks</th><th scope="col">Quote</th></tr></thead>
+          <thead>
+            <tr id="rank-head">
+              <th class="name-cell" scope="col">Spieler</th>
+              <th scope="col" data-k="spiele"><button class="sort-btn" type="button">Spiele</button></th>
+              <th scope="col" data-k="runden"><button class="sort-btn" type="button">Runden</button></th>
+              <th scope="col" data-k="punkte"><button class="sort-btn" type="button">Punkte</button></th>
+              <th scope="col" data-k="pct"><button class="sort-btn" type="button">Punkte %</button></th>
+              <th scope="col" data-k="mimiks"><button class="sort-btn" type="button">Mimiks</button></th>
+              <th scope="col" data-k="quote"><button class="sort-btn" type="button">Mimik-Quote</button></th>
+            </tr>
+          </thead>
           <tbody id="rank-body"></tbody>
         </table>
       </div>
+      <p class="note">Punkte % = erreichte Punkte von maximal möglichen (5 je Spiel). Mimik-Quote = Mimiks je gespielter Runde. Spaltenköpfe antippen zum Sortieren.</p>
+
+      <div class="section-head" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding-top:8px">
+        <h2>Verlauf</h2>
+        <span class="eyebrow" id="hist-count"></span>
+      </div>
+      <div class="panel">
+        <ul class="hist" id="hist"></ul>
+      </div>
       <p class="note" id="mode-note"></p>
     </div>
+  </section>
+
+  <section class="view" id="view-super" role="tabpanel" aria-labelledby="tab-super" hidden>
+    <div class="mystery"><div aria-label="Super-Mimik, kommt noch">?</div></div>
   </section>
 </div>
 
@@ -340,9 +470,11 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   "use strict";
   var DEFAULT_PLAYERS = ["Fabian", "Marci", "Tugrap", "Jetmir", "Besnik", "Mergim", "Timur"];
   var DEFAULT_WHEEL = ["Bestrafung 1", "Bestrafung 2", "Bestrafung 3"];
-  var LS_KEY = "aram-mimik-v1";
+  var LS_KEY = "aram-mimik-v2";
+  var LS_OLD = "aram-mimik-v1";
   var TAU = Math.PI * 2;
   var MAX_COUNT = 20;
+  var GAMES = 4;
   var SEG = [
     { bg: "#1C4E7A", fg: "#EAF2FA" }, { bg: "#C8AA6E", fg: "#1A1205" },
     { bg: "#0E6E68", fg: "#E6FBF8" }, { bg: "#7E2B36", fg: "#FBEFF0" },
@@ -352,7 +484,11 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   ];
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  var S = { mode: "init", readOnly: false, players: [], wheel: [], rot: 0, spinning: false, spinSegs: null, history: [], fresh: false };
+  var S = {
+    mode: "init", readOnly: false, players: [], wheel: [], rounds: [],
+    rot: 0, spinning: false, spinSegs: null, spinHistory: [],
+    ending: false, endPick: [], sortKey: "pct", sortDir: -1, flash: ""
+  };
   var DB = null;
   var dirty = new Set();
   var writers = {};
@@ -360,11 +496,31 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   function $(s) { return document.querySelector(s); }
   function uid() { return Math.random().toString(36).slice(2, 10); }
   function num(v) { v = Number(v); return isFinite(v) && v > 0 ? Math.floor(v) : 0; }
-  function clampCount(v) { v = Math.floor(Number(v)); return isFinite(v) ? Math.min(MAX_COUNT, Math.max(1, v)) : 1; }
-  function normRound(v) { if (v === null || v === undefined || v === "") return null; v = Math.floor(Number(v)); return isFinite(v) ? Math.min(5, Math.max(1, v)) : null; }
-  function normR(arr) { var out = [null, null, null, null]; if (Array.isArray(arr)) for (var i = 0; i < 4; i++) out[i] = normRound(arr[i]); return out; }
-  function normPlayer(p, i) { return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, r: normR(p.r), spiele: num(p.spiele), mimiks: num(p.mimiks) }; }
-  function normOpt(o) { return { id: String(o.id || uid()), label: String(o.label == null ? "" : o.label).slice(0, 40), count: clampCount(o.count) }; }
+  function clampCount(v) { v = Math.floor(Number(v)); return isFinite(v) ? Math.min(MAX_COUNT, Math.max(0, v)) : 1; }
+  function normPlace(v) { if (v === null || v === undefined || v === "") return null; v = Math.floor(Number(v)); return isFinite(v) && v >= 1 && v <= 5 ? v : null; }
+  function pts(pl) { return pl ? 6 - pl : 0; }
+  function safeAvatar(a) { return typeof a === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(a) && a.length < 200000 ? a : ""; }
+  function normPlayer(p, i) {
+    var pl = [null, null, null, null];
+    if (Array.isArray(p.p)) for (var k = 0; k < GAMES; k++) pl[k] = normPlace(p.p[k]);
+    else if (Array.isArray(p.r)) for (var j = 0; j < GAMES; j++) { var x = Number(p.r[j]); pl[j] = x >= 1 && x <= 5 ? 6 - Math.floor(x) : null; }
+    return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, p: pl, avatar: safeAvatar(p.avatar) };
+  }
+  function normOpt(o) { var c = Number(o.count); return { id: String(o.id || uid()), label: String(o.label == null ? "" : o.label).slice(0, 40), count: isFinite(c) ? Math.min(MAX_COUNT, Math.max(0, Math.floor(c))) : 1 }; }
+  function normRound(r) {
+    var entries = Array.isArray(r.entries) ? r.entries.map(function (e) { return { id: String(e.id || ""), name: String(e.name || ""), spiele: num(e.spiele), punkte: num(e.punkte) }; }).filter(function (e) { return e.id; }) : [];
+    var mimik = Array.isArray(r.mimik) ? r.mimik.map(String) : [];
+    return { id: String(r.id || uid()), at: String(r.at || ""), entries: entries, mimik: mimik };
+  }
+  function initials(name) {
+    var parts = name.trim().split(/\s+/);
+    return ((parts[0] || "?").charAt(0) + (parts[1] ? parts[1].charAt(0) : "")).toUpperCase();
+  }
+  function setAvatar(el, p) {
+    el.textContent = "";
+    if (p.avatar) { var img = document.createElement("img"); img.alt = ""; img.src = p.avatar; el.appendChild(img); }
+    else el.textContent = initials(p.name);
+  }
 
   /* fair randomness: uniform integer in [0, n) without modulo bias */
   function randInt(n) {
@@ -405,7 +561,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   var lsTimer = null;
   function lsLoad() {
     try {
-      var raw = localStorage.getItem(LS_KEY);
+      var raw = localStorage.getItem(LS_KEY) || localStorage.getItem(LS_OLD);
       if (!raw) return null;
       var d = JSON.parse(raw);
       if (d && Array.isArray(d.players) && Array.isArray(d.wheel)) return d;
@@ -415,10 +571,11 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   function lsSaveSoon() {
     clearTimeout(lsTimer);
     lsTimer = setTimeout(function () {
-      try { localStorage.setItem(LS_KEY, JSON.stringify({ players: S.players, wheel: S.wheel })); } catch (e) {}
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ players: S.players, wheel: S.wheel, rounds: S.rounds })); }
+      catch (e) { flash("Speichern im Browser fehlgeschlagen – evtl. ist der Speicher voll (Profilbilder verkleinern oder löschen)."); }
     }, 250);
   }
-  function playerBody(p) { return { name: p.name, order: p.order, r: p.r.slice(), spiele: p.spiele, mimiks: p.mimiks }; }
+  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.slice(), avatar: p.avatar || "" }; }
   function wheelBody() { return { items: S.wheel.map(function (o) { return { id: o.id, label: o.label, count: o.count }; }) }; }
 
   function queueWrite(path, bodyFn, delay) {
@@ -426,7 +583,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     w.body = bodyFn;
     dirty.add(path);
     clearTimeout(w.t);
-    w.t = setTimeout(function () { w.t = null; flush(path); }, delay || 350);
+    w.t = setTimeout(function () { w.t = null; flush(path); }, delay == null ? 350 : delay);
   }
   function flush(path) {
     var w = writers[path];
@@ -449,12 +606,12 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   function onWriteError(e) {
     var code = e && e.code;
     if (code === "invalid_argument") setReadOnly(true);
-    else if (code === "quota_exceeded") $("#status-text").textContent = "Speicher voll – bitte Einträge löschen";
+    else if (code === "quota_exceeded") $("#status-text").textContent = "Speicher voll – bitte alte Runden löschen";
     else setStatus("error");
   }
-  function persistPlayer(p) {
+  function persistPlayer(p, delay) {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("spieler/" + p.id, function () { return playerBody(p); });
+    else if (S.mode === "db") queueWrite("spieler/" + p.id, function () { return playerBody(p); }, delay);
   }
   function persistWheel(delay) {
     if (S.mode === "local") lsSaveSoon();
@@ -463,11 +620,23 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   function removePlayer(id) {
     S.players = S.players.filter(function (p) { return p.id !== id; });
     if (S.mode === "local") lsSaveSoon();
+    else if (S.mode === "db") { cancelWrite("spieler/" + id); DB.doc("spieler/" + id).delete().catch(onWriteError); }
+    renderPoints(); renderRanking();
+  }
+  function saveRound(r) {
+    S.rounds.push(r);
+    if (S.mode === "local") lsSaveSoon();
     else if (S.mode === "db") {
-      cancelWrite("spieler/" + id);
-      DB.doc("spieler/" + id).delete().catch(onWriteError);
+      dirty.add("runden/" + r.id);
+      DB.collection("runden").doc(r.id).set({ at: r.at, entries: r.entries, mimik: r.mimik })
+        .then(function () { dirty.delete("runden/" + r.id); }, function (e) { dirty.delete("runden/" + r.id); onWriteError(e); });
     }
-    renderPoints();
+  }
+  function deleteRound(id) {
+    S.rounds = S.rounds.filter(function (r) { return r.id !== id; });
+    if (S.mode === "local") lsSaveSoon();
+    else if (S.mode === "db") DB.doc("runden/" + id).delete().catch(onWriteError);
+    renderRanking();
   }
 
   /* ---------- boot ---------- */
@@ -477,9 +646,11 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     if (d) {
       S.players = d.players.map(normPlayer);
       S.wheel = d.wheel.map(normOpt);
+      S.rounds = Array.isArray(d.rounds) ? d.rounds.map(normRound) : [];
     } else {
-      S.players = DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, r: [null, null, null, null], spiele: 0, mimiks: 0 }; });
+      S.players = DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, p: [null, null, null, null], avatar: "" }; });
       S.wheel = DEFAULT_WHEEL.map(function (l) { return { id: uid(), label: l, count: 1 }; });
+      S.rounds = [];
     }
     setStatus("local");
     renderAll();
@@ -489,15 +660,16 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     DB = db;
     S.mode = "db";
     setStatus(S.readOnly ? "readonly" : "loading");
-    var gotP = false, gotW = false;
-    var timer = setTimeout(function () { if (!gotP || !gotW) setStatus("slow"); }, 10000);
-    function maybeLive() { if (gotP && gotW) { clearTimeout(timer); setStatus(S.readOnly ? "readonly" : "live"); } }
+    var got = { p: false, w: false, r: false };
+    var timer = setTimeout(function () { if (!got.p || !got.w || !got.r) setStatus("slow"); }, 10000);
+    function mark(k) { got[k] = true; if (got.p && got.w && got.r) { clearTimeout(timer); setStatus(S.readOnly ? "readonly" : "live"); } }
+    function fail() { clearTimeout(timer); setStatus("error"); }
 
     DB.collection("spieler").onSnapshot(function (snap) {
       var mine = new Map(S.players.map(function (p) { return [p.id, p]; }));
       var incoming = snap.docs.filter(function (d) { return d.exists; }).map(function (d, i) {
         var x = d.data() || {};
-        return normPlayer({ id: d.id, name: x.name, order: x.order, r: x.r, spiele: x.spiele, mimiks: x.mimiks }, i);
+        return normPlayer({ id: d.id, name: x.name, order: x.order, p: x.p, r: x.r, avatar: x.avatar }, i);
       });
       var next = incoming.map(function (p) { return dirty.has("spieler/" + p.id) && mine.has(p.id) ? mine.get(p.id) : p; });
       mine.forEach(function (p) {
@@ -505,18 +677,31 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       });
       next.sort(function (a, b) { return a.order - b.order; });
       S.players = next;
-      if (!snap.metadata.fromCache) { gotP = true; maybeLive(); }
-      renderPoints();
-    }, function () { clearTimeout(timer); setStatus("error"); });
+      if (!snap.metadata.fromCache) mark("p");
+      renderPoints(); renderRanking();
+    }, fail);
 
     DB.doc("rad/optionen").onSnapshot(function (snap) {
       if (!dirty.has("rad/optionen")) {
         var data = snap.exists ? (snap.data() || {}) : {};
         S.wheel = Array.isArray(data.items) ? data.items.map(normOpt) : [];
       }
-      if (!snap.metadata.fromCache) { gotW = true; maybeLive(); }
+      if (!snap.metadata.fromCache) mark("w");
       renderWheelPanel();
-    }, function () { clearTimeout(timer); setStatus("error"); });
+    }, fail);
+
+    DB.collection("runden").onSnapshot(function (snap) {
+      var incoming = snap.docs.filter(function (d) { return d.exists; }).map(function (d) {
+        var x = d.data() || {};
+        return normRound({ id: d.id, at: x.at, entries: x.entries, mimik: x.mimik });
+      });
+      S.rounds.forEach(function (r) {
+        if (dirty.has("runden/" + r.id) && !incoming.some(function (q) { return q.id === r.id; })) incoming.push(r);
+      });
+      S.rounds = incoming;
+      if (!snap.metadata.fromCache) mark("r");
+      renderRanking();
+    }, fail);
   }
 
   function boot() {
@@ -614,7 +799,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     var turns = reduceMotion ? 1 : 6 + randInt(3);
     var end = start + delta + turns * TAU;
     var dur = reduceMotion ? 1200 : 5600;
-    S.spinning = true; S.spinSegs = segs; S.fresh = false;
+    S.spinning = true; S.spinSegs = segs;
     $("#verdict-k").textContent = "Das Rad dreht sich";
     $("#verdict-v").textContent = "…";
     $("#verdict-odds").textContent = n + " Felder im Spiel";
@@ -637,18 +822,18 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       $("#verdict-v").textContent = w.label;
       $("#verdict-odds").textContent = "Chance: " + hits + " von " + n + " Feldern (" + Math.round(hits / n * 100) + " %)";
       $("#verdict").classList.add("fresh");
-      S.history.unshift(w.label);
-      S.history = S.history.slice(0, 6);
-      renderHistory();
+      S.spinHistory.unshift(w.label);
+      S.spinHistory = S.spinHistory.slice(0, 6);
+      renderSpinHistory();
       renderWheelPanel();
     }
     requestAnimationFrame(frame);
   }
 
-  function renderHistory() {
+  function renderSpinHistory() {
     var h = $("#history");
     h.textContent = "";
-    S.history.forEach(function (l, i) {
+    S.spinHistory.forEach(function (l, i) {
       var s = document.createElement("span");
       s.textContent = (i === 0 ? "Zuletzt: " : "") + l;
       h.appendChild(s);
@@ -663,7 +848,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       '<span class="sw" aria-hidden="true"></span>' +
       '<input class="opt-label" maxlength="40" aria-label="Option">' +
       '<span class="step"><button type="button" data-act="dec" aria-label="Anzahl verringern">−</button>' +
-      '<input class="opt-count" type="number" inputmode="numeric" min="1" max="' + MAX_COUNT + '" aria-label="Anzahl">' +
+      '<input class="opt-count" type="number" inputmode="numeric" min="0" max="' + MAX_COUNT + '" aria-label="Anzahl">' +
       '<button type="button" data-act="inc" aria-label="Anzahl erhöhen">+</button></span>' +
       '<span class="pct"></span>' +
       '<button type="button" class="del" data-act="del" aria-label="Option löschen">×</button>';
@@ -688,10 +873,11 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       if (document.activeElement !== lab && lab.value !== o.label) lab.value = o.label;
       if (document.activeElement !== cnt) cnt.value = o.count;
       lab.setAttribute("aria-label", "Option " + (i + 1));
+      row.classList.toggle("off", o.count === 0);
       row.querySelector(".sw").style.background = SEG[i % SEG.length].bg;
-      row.querySelector(".pct").textContent = total ? Math.round(o.count / total * 100) + " %" : "–";
+      row.querySelector(".pct").textContent = total && o.count ? Math.round(o.count / total * 100) + " %" : "–";
       lab.disabled = locked; cnt.disabled = locked;
-      row.querySelector('[data-act="dec"]').disabled = locked || o.count <= 1;
+      row.querySelector('[data-act="dec"]').disabled = locked || o.count <= 0;
       row.querySelector('[data-act="inc"]').disabled = locked || o.count >= MAX_COUNT;
       row.querySelector('[data-act="del"]').disabled = locked;
     });
@@ -748,38 +934,52 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   $("#hub").addEventListener("click", spin);
 
   /* ---------- points ---------- */
-  function totals() { return S.players.map(function (p) {
-    var v = p.r.filter(function (x) { return x !== null; });
-    return v.length ? v.reduce(function (a, b) { return a + b; }, 0) : null;
-  }); }
+  function standings() {
+    var rows = S.players.map(function (p) {
+      var games = 0, total = 0;
+      p.p.forEach(function (pl) { if (pl) { games++; total += pts(pl); } });
+      return { p: p, games: games, total: games ? total : null };
+    });
+    var played = rows.filter(function (r) { return r.games > 0; });
+    var maxT = played.length ? Math.max.apply(null, played.map(function (r) { return r.total; })) : null;
+    var minT = played.length > 1 ? Math.min.apply(null, played.map(function (r) { return r.total; })) : null;
+    if (minT !== null && minT === maxT) minT = null;
+    var dups = [];
+    for (var k = 0; k < GAMES; k++) {
+      var seen = {};
+      S.players.forEach(function (p) { var v = p.p[k]; if (v) (seen[v] = seen[v] || []).push(p.id); });
+      Object.keys(seen).forEach(function (v) { if (seen[v].length > 1) dups.push({ game: k, place: Number(v), ids: seen[v] }); });
+    }
+    return { rows: rows, played: played, maxT: maxT, minT: minT, dups: dups };
+  }
 
-  function stepper(field, min, max, label, extra) {
-    return '<span class="step ' + (extra || "") + '"><button type="button" data-act="dec" data-f="' + field + '" aria-label="' + label + ' verringern">−</button>' +
-      '<input type="number" inputmode="numeric" data-f="' + field + '" data-l="' + label + '" min="' + min + '" max="' + max + '" aria-label="' + label + '">' +
-      '<button type="button" data-act="inc" data-f="' + field + '" aria-label="' + label + ' erhöhen">+</button></span>';
+  function placeOptions() {
+    var h = '<option value="">—</option>';
+    for (var v = 1; v <= 5; v++) h += '<option value="' + v + '">' + v + ". Platz</option>";
+    return h;
   }
   function makePlayerRow(p) {
     var tr = document.createElement("tr");
     tr.dataset.id = p.id;
-    var html = '<td class="name-cell"><div class="name-wrap"><span><span class="pname"></span><span class="tag" hidden>Mimik</span></span>' +
+    var html = '<td class="name-cell"><div class="name-wrap"><div class="who">' +
+      '<button type="button" class="av" data-act="avatar" aria-label="Profilbild ändern"></button>' +
+      '<span><span class="pname"></span><span class="tag" hidden>Mimik</span></span></div>' +
       '<button type="button" class="del" data-act="delp" aria-label="Spieler löschen">×</button></div></td>';
-    for (var k = 0; k < 4; k++) html += "<td>" + stepper("r" + k, 1, 5, "Runde " + (k + 1)) + "</td>";
+    for (var k = 0; k < GAMES; k++) {
+      html += '<td><div class="game"><select class="pl-sel" data-k="' + k + '">' + placeOptions() + '</select><span class="pts"></span></div></td>';
+    }
     html += '<td><span class="sum"></span></td><td><span class="rank"></span></td>';
-    html += "<td>" + stepper("spiele", 0, 9999, "Spiele") + "</td>";
-    html += "<td>" + stepper("mimiks", 0, 9999, "Mimiks", "mim-step") + "</td>";
     tr.innerHTML = html;
-    tr.querySelectorAll("input[data-f]").forEach(function (inp) { inp.id = "f-" + p.id + "-" + inp.dataset.f; });
+    tr.querySelectorAll("select").forEach(function (s) { s.id = "pl-" + p.id + "-" + s.dataset.k; });
     return tr;
   }
-  function fieldVal(p, f) { return f.charAt(0) === "r" && f.length === 2 ? p.r[Number(f.charAt(1))] : p[f]; }
 
   function renderPoints() {
     var body = $("#score-body");
-    var tot = totals();
-    var valid = tot.filter(function (t) { return t !== null; });
-    var maxT = valid.length ? Math.max.apply(null, valid) : null;
-    var minT = valid.length > 1 ? Math.min.apply(null, valid) : null;
+    var st = standings();
     var locked = S.readOnly || S.mode === "init";
+    var dupIds = {};
+    st.dups.forEach(function (d) { d.ids.forEach(function (id) { dupIds[id + "-" + d.game] = true; }); });
 
     var emptyRow = body.querySelector(".empty-row");
     if (!S.players.length) {
@@ -787,7 +987,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       if (!emptyRow) {
         emptyRow = document.createElement("tr");
         emptyRow.className = "empty-row";
-        emptyRow.innerHTML = '<td class="empty-cell" colspan="9"></td>';
+        emptyRow.innerHTML = '<td class="empty-cell" colspan="7"></td>';
         body.appendChild(emptyRow);
       }
       emptyRow.firstChild.textContent = S.mode === "init" ? "Lade Spieler…" : "Noch keine Spieler. Trag unten den ersten Namen ein.";
@@ -795,76 +995,121 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
       if (emptyRow) emptyRow.remove();
       var existing = new Map();
       Array.prototype.forEach.call(body.children, function (el) { existing.set(el.dataset.id, el); });
-      S.players.forEach(function (p, i) {
+      st.rows.forEach(function (r, i) {
+        var p = r.p;
         var tr = existing.get(p.id) || makePlayerRow(p);
         existing.delete(p.id);
         if (body.children[i] !== tr) body.insertBefore(tr, body.children[i] || null);
-        var t = tot[i];
         tr.querySelector(".pname").textContent = p.name;
-        tr.querySelector(".sum").textContent = t === null ? "–" : t;
+        var av = tr.querySelector(".av");
+        if (av.dataset.src !== (p.avatar || p.name)) { setAvatar(av, p); av.dataset.src = p.avatar || p.name; }
+        av.disabled = locked;
+        av.setAttribute("aria-label", "Profilbild von " + p.name + " ändern");
+        tr.querySelector(".sum").textContent = r.total === null ? "–" : r.total;
         var rk = tr.querySelector(".rank");
-        var place = t === null ? "" : 1 + valid.filter(function (x) { return x > t; }).length;
+        var place = r.total === null ? "" : 1 + st.played.filter(function (x) { return x.total > r.total; }).length;
         rk.textContent = place || "–";
-        var isFirst = t !== null && t === maxT && valid.length > 0;
-        var isLast = t !== null && minT !== null && t === minT && minT !== maxT;
+        var isFirst = r.total !== null && r.total === st.maxT;
+        var isLast = r.total !== null && st.minT !== null && r.total === st.minT;
         rk.classList.toggle("first", isFirst);
         rk.classList.toggle("last", isLast);
         tr.classList.toggle("is-first", isFirst);
         tr.classList.toggle("is-last", isLast);
         tr.querySelector(".tag").hidden = !isLast;
-        tr.querySelectorAll("input[data-f]").forEach(function (inp) {
-          var v = fieldVal(p, inp.dataset.f);
-          if (document.activeElement !== inp) inp.value = v === null ? "" : v;
-          inp.disabled = locked;
-          inp.setAttribute("aria-label", p.name + " " + inp.dataset.l);
+        tr.querySelectorAll("select.pl-sel").forEach(function (sel) {
+          var k = Number(sel.dataset.k), v = p.p[k];
+          var want = v === null ? "" : String(v);
+          if (sel.value !== want) sel.value = want;
+          sel.disabled = locked || S.ending;
+          sel.classList.toggle("dup", !!dupIds[p.id + "-" + k]);
+          sel.setAttribute("aria-label", p.name + ", Spiel " + (k + 1) + ", Platz");
+          var ptsEl = sel.nextElementSibling;
+          ptsEl.textContent = v ? pts(v) + (pts(v) === 1 ? " Punkt" : " Punkte") : "";
+          ptsEl.classList.toggle("on", !!v);
         });
-        tr.querySelectorAll("button[data-f]").forEach(function (b) {
-          var f = b.dataset.f, v = fieldVal(p, f), isR = f.charAt(0) === "r" && f.length === 2;
-          if (b.dataset.act === "dec") b.disabled = locked || (isR ? v === null : v <= 0);
-          else b.disabled = locked || (isR ? v === 5 : false);
-        });
-        tr.querySelector('[data-act="delp"]').disabled = locked;
+        tr.querySelector('[data-act="delp"]').disabled = locked || S.ending;
       });
       existing.forEach(function (el) { el.remove(); });
     }
 
-    function namesWhere(fn) { return S.players.filter(function (p, i) { return fn(tot[i]); }).map(function (p) { return p.name; }).join(" & "); }
-    $("#c-first").textContent = maxT === null ? "—" : namesWhere(function (t) { return t === maxT; });
-    $("#c-last").textContent = minT === null || minT === maxT ? "—" : namesWhere(function (t) { return t === minT; });
+    function names(fn) { return st.played.filter(fn).map(function (r) { return r.p.name; }).join(" & "); }
+    $("#c-first").textContent = st.maxT === null ? "—" : names(function (r) { return r.total === st.maxT; });
+    $("#c-first-s").textContent = st.maxT === null ? "Noch kein Spiel eingetragen" : st.maxT + " Punkte";
+    $("#c-last").textContent = st.minT === null ? "—" : names(function (r) { return r.total === st.minT; });
+    $("#c-last-s").textContent = st.minT === null ? (st.played.length > 1 ? "Alle gleichauf" : "Steht nach dem ersten Spiel fest") : st.minT + " Punkte";
+
+    var dupMsgs = st.dups.map(function (d) { return "Spiel " + (d.game + 1) + ": " + d.place + ". Platz ist doppelt vergeben."; });
+    $("#dup-warn").textContent = dupMsgs.join(" ");
 
     $("#add-player-btn").disabled = locked;
     $("#new-player").disabled = locked;
-    $("#reset-rounds").disabled = locked || !valid.length;
-    renderRanking();
+    $("#clear-games").disabled = locked || S.ending || !st.played.length;
+    $("#end-round").disabled = locked || S.ending || st.played.length < 2;
+    $("#end-round").hidden = S.ending;
+    $("#flash").hidden = !S.flash;
+    $("#flash").innerHTML = S.flash;
+    renderEndBox(st);
   }
 
-  function renderRanking() {
-    var sorted = S.players.slice().sort(function (a, b) { return b.mimiks - a.mimiks || a.order - b.order; });
-    var rb = $("#rank-body");
-    rb.textContent = "";
-    if (!sorted.length) {
-      var tr0 = document.createElement("tr");
-      tr0.innerHTML = '<td class="empty-cell" colspan="4"></td>';
-      tr0.firstChild.textContent = "Sobald Spieler eingetragen sind, erscheint hier das Ranking.";
-      rb.appendChild(tr0);
+  function flash(html) {
+    S.flash = html;
+    clearTimeout(flash.t);
+    flash.t = setTimeout(function () { S.flash = ""; renderPoints(); }, 9000);
+    renderPoints();
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function renderEndBox(st) {
+    var box = $("#endbox");
+    box.hidden = !S.ending;
+    if (!S.ending) return;
+    var losers = st.played.filter(function (r) { return st.minT !== null ? r.total === st.minT : true; });
+    var lead = $("#end-lead"), picks = $("#end-picks"), warn = $("#end-warn");
+    picks.textContent = "";
+    if (losers.length === 1) {
+      S.endPick = [losers[0].p.id];
+      lead.innerHTML = "Die Mimik macht <b>" + esc(losers[0].p.name) + "</b> mit " + losers[0].total + " Punkten.";
+    } else {
+      lead.textContent = "Gleichstand mit " + losers[0].total + " Punkten – wer macht die Mimik?";
+      S.endPick = S.endPick.filter(function (id) { return losers.some(function (r) { return r.p.id === id; }); });
+      losers.forEach(function (r) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "pick"; b.dataset.id = r.p.id; b.textContent = r.p.name;
+        b.setAttribute("aria-pressed", String(S.endPick.indexOf(r.p.id) >= 0));
+        picks.appendChild(b);
+      });
     }
-    sorted.forEach(function (p) {
-      var tr = document.createElement("tr");
-      tr.innerHTML = '<td class="name-cell"><span class="pname"></span></td><td></td><td class="mim"></td><td class="q"></td>';
-      tr.children[0].firstChild.textContent = p.name;
-      tr.children[1].textContent = p.spiele;
-      tr.children[2].textContent = p.mimiks;
-      tr.children[3].textContent = p.spiele > 0 ? Math.round(p.mimiks / p.spiele * 100) + " %" : "–";
-      rb.appendChild(tr);
+    var chips = $("#end-chips");
+    chips.textContent = "";
+    st.played.forEach(function (r) {
+      var s = document.createElement("span");
+      s.className = "chip";
+      s.innerHTML = "<b>" + esc(r.p.name) + "</b> · " + r.games + (r.games === 1 ? " Spiel" : " Spiele") + " · " + r.total + " P";
+      chips.appendChild(s);
     });
-    var any = S.players.some(function (p) { return p.mimiks > 0; });
-    if (!S.players.length) { $("#c-top").textContent = "—"; $("#c-clean").textContent = "—"; return; }
-    var maxM = sorted[0].mimiks, minM = sorted[sorted.length - 1].mimiks;
-    $("#c-top").textContent = any ? sorted.filter(function (p) { return p.mimiks === maxM; }).map(function (p) { return p.name; }).join(" & ") : "Noch keine Mimik";
-    var clean = sorted.filter(function (p) { return p.mimiks === minM; });
-    $("#c-clean").textContent = !any ? "Alle noch sauber"
-      : clean.length > 3 ? clean.length + " Spieler gleichauf (" + minM + ")"
-      : clean.map(function (p) { return p.name; }).join(" & ");
+    var problem = "";
+    if (st.played.length < 2) problem = "Es brauchen mindestens zwei Spieler ein Ergebnis.";
+    else if (st.dups.length) problem = "Erst die doppelt vergebenen Plätze korrigieren.";
+    else if (!S.endPick.length) problem = "Bitte auswählen, wer die Mimik macht (mehrere möglich).";
+    warn.textContent = problem;
+    $("#end-confirm").disabled = !!problem || S.readOnly;
+  }
+
+  function confirmEnd() {
+    var st = standings();
+    if (st.played.length < 2 || st.dups.length || !S.endPick.length) return;
+    var r = {
+      id: "r" + Date.now().toString(36) + uid().slice(0, 4),
+      at: new Date().toISOString(),
+      entries: st.played.map(function (x) { return { id: x.p.id, name: x.p.name, spiele: x.games, punkte: x.total }; }),
+      mimik: S.endPick.slice()
+    };
+    saveRound(r);
+    st.played.forEach(function (x) { x.p.p = [null, null, null, null]; persistPlayer(x.p, 0); });
+    var mNames = S.players.filter(function (p) { return r.mimik.indexOf(p.id) >= 0; }).map(function (p) { return esc(p.name); }).join(" & ");
+    S.ending = false; S.endPick = [];
+    flash("Runde eingetragen. Die Mimik macht <b>" + mNames + "</b>. Spiele und Punkte stehen jetzt in der Rangliste.");
+    renderRanking();
   }
 
   function findPlayer(el) {
@@ -872,10 +1117,6 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     if (!tr) return null;
     for (var i = 0; i < S.players.length; i++) if (S.players[i].id === tr.dataset.id) return S.players[i];
     return null;
-  }
-  function setField(p, f, v) {
-    if (f.charAt(0) === "r" && f.length === 2) p.r[Number(f.charAt(1))] = normRound(v);
-    else p[f] = num(v);
   }
 
   function arm(btn, armedLabel, action) {
@@ -892,35 +1133,43 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     btn._t = setTimeout(function () { btn.dataset.armed = ""; btn.textContent = btn.dataset.orig; }, 3500);
   }
 
+  var avatarTarget = null;
   $("#score-body").addEventListener("click", function (e) {
     var b = e.target.closest("button[data-act]");
     if (!b || b.disabled) return;
     var p = findPlayer(b);
     if (!p) return;
-    if (b.dataset.act === "delp") {
-      arm(b, "Löschen?", function () { removePlayer(p.id); });
-      return;
-    }
-    var f = b.dataset.f, v = fieldVal(p, f), isR = f.charAt(0) === "r" && f.length === 2;
-    if (b.dataset.act === "inc") setField(p, f, isR ? (v === null ? 1 : Math.min(5, v + 1)) : v + 1);
-    else setField(p, f, isR ? (v === null || v <= 1 ? null : v - 1) : Math.max(0, v - 1));
-    persistPlayer(p);
-    renderPoints();
-  });
-  $("#score-body").addEventListener("input", function (e) {
-    var inp = e.target;
-    if (!inp.dataset || !inp.dataset.f) return;
-    var p = findPlayer(inp);
-    if (!p) return;
-    setField(p, inp.dataset.f, inp.value === "" ? null : inp.value);
-    persistPlayer(p);
-    renderPoints();
+    if (b.dataset.act === "delp") arm(b, "Löschen?", function () { removePlayer(p.id); });
+    else if (b.dataset.act === "avatar") { avatarTarget = p.id; $("#avatar-file").value = ""; $("#avatar-file").click(); }
   });
   $("#score-body").addEventListener("change", function (e) {
-    var inp = e.target;
-    if (!inp.dataset || !inp.dataset.f) return;
-    var p = findPlayer(inp);
-    if (p) { var v = fieldVal(p, inp.dataset.f); inp.value = v === null ? "" : v; }
+    var sel = e.target;
+    if (!sel.classList || !sel.classList.contains("pl-sel")) return;
+    var p = findPlayer(sel);
+    if (!p) return;
+    p.p[Number(sel.dataset.k)] = normPlace(sel.value);
+    persistPlayer(p);
+    renderPoints();
+  });
+
+  $("#avatar-file").addEventListener("change", function () {
+    var file = this.files && this.files[0];
+    var p = S.players.filter(function (x) { return x.id === avatarTarget; })[0];
+    if (!file || !p) return;
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      var size = 160, cv = document.createElement("canvas");
+      cv.width = size; cv.height = size;
+      var s = Math.min(img.naturalWidth, img.naturalHeight);
+      cv.getContext("2d").drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      p.avatar = cv.toDataURL("image/jpeg", 0.82);
+      persistPlayer(p, 0);
+      renderPoints(); renderRanking();
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); flash("Das Bild ließ sich nicht öffnen. Bitte ein JPG oder PNG nehmen."); };
+    img.src = url;
   });
 
   $("#add-player").addEventListener("submit", function (e) {
@@ -929,29 +1178,167 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
     var inp = $("#new-player"), name = inp.value.trim().slice(0, 24);
     if (!name) { inp.focus(); return; }
     var maxOrder = S.players.reduce(function (m, p) { return Math.max(m, p.order); }, -1);
-    var p = { id: "p" + uid(), name: name, order: maxOrder + 1, r: [null, null, null, null], spiele: 0, mimiks: 0 };
+    var p = { id: "p" + uid(), name: name, order: maxOrder + 1, p: [null, null, null, null], avatar: "" };
     S.players.push(p);
     inp.value = "";
     persistPlayer(p);
-    renderPoints();
+    renderPoints(); renderRanking();
   });
 
-  $("#reset-rounds").addEventListener("click", function () {
-    var b = this;
-    arm(b, "Wirklich leeren?", function () {
+  $("#clear-games").addEventListener("click", function () {
+    arm(this, "Wirklich leeren?", function () {
       S.players.forEach(function (p) {
-        if (p.r.some(function (x) { return x !== null; })) { p.r = [null, null, null, null]; persistPlayer(p); }
+        if (p.p.some(function (x) { return x !== null; })) { p.p = [null, null, null, null]; persistPlayer(p); }
       });
       renderPoints();
     });
   });
+  $("#end-round").addEventListener("click", function () { S.ending = true; S.endPick = []; renderPoints(); $("#endbox").scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" }); });
+  $("#end-cancel").addEventListener("click", function () { S.ending = false; S.endPick = []; renderPoints(); });
+  $("#end-confirm").addEventListener("click", confirmEnd);
+  $("#end-picks").addEventListener("click", function (e) {
+    var b = e.target.closest(".pick");
+    if (!b) return;
+    var id = b.dataset.id, i = S.endPick.indexOf(id);
+    if (i >= 0) S.endPick.splice(i, 1); else S.endPick.push(id);
+    renderPoints();
+  });
+
+  /* ---------- ranking ---------- */
+  function aggregate() {
+    var m = new Map(S.players.map(function (p) { return [p.id, { p: p, spiele: 0, runden: 0, punkte: 0, mimiks: 0 }]; }));
+    S.rounds.forEach(function (r) {
+      r.entries.forEach(function (e) { var a = m.get(e.id); if (a) { a.spiele += e.spiele; a.runden += 1; a.punkte += e.punkte; } });
+      r.mimik.forEach(function (id) { var a = m.get(id); if (a) a.mimiks += 1; });
+    });
+    return Array.from(m.values()).map(function (a) {
+      a.pct = a.spiele ? a.punkte / (a.spiele * 5) : null;
+      a.quote = a.runden ? a.mimiks / a.runden : null;
+      return a;
+    });
+  }
+  function fmtPct(v) { return v === null ? "–" : Math.round(v * 100) + " %"; }
+
+  function renderRanking() {
+    var rows = aggregate();
+    var key = S.sortKey, dir = S.sortDir;
+    rows.sort(function (a, b) {
+      var x = a[key], y = b[key];
+      if (x === null && y === null) return a.p.order - b.p.order;
+      if (x === null) return 1;
+      if (y === null) return -1;
+      return (x - y) * dir || b.punkte - a.punkte || a.p.order - b.p.order;
+    });
+    document.querySelectorAll("#rank-head th[data-k]").forEach(function (th) {
+      th.setAttribute("aria-sort", th.dataset.k === key ? (dir < 0 ? "descending" : "ascending") : "none");
+      th.querySelector(".sort-btn").dataset.arrow = th.dataset.k === key ? (dir < 0 ? " ↓" : " ↑") : "";
+      var b = th.querySelector(".sort-btn");
+      b.textContent = b.textContent.replace(/ [↓↑]$/, "") + b.dataset.arrow;
+    });
+    var body = $("#rank-body");
+    body.textContent = "";
+    if (!rows.length) {
+      var tr0 = document.createElement("tr");
+      tr0.innerHTML = '<td class="empty-cell" colspan="7"></td>';
+      tr0.firstChild.textContent = S.mode === "init" ? "Lade Rangliste…" : "Sobald Spieler eingetragen sind, erscheinen sie hier.";
+      body.appendChild(tr0);
+    }
+    rows.forEach(function (a, i) {
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="name-cell"><div class="who"><span class="pos"></span><span class="av"></span><span class="pname"></span></div></td>' +
+        '<td></td><td></td><td class="num1"></td>' +
+        '<td><span class="bar"><i><span></span></i><b></b></span></td>' +
+        '<td class="mim"></td><td></td>';
+      var c = tr.children;
+      c[0].querySelector(".pos").textContent = (i + 1) + ".";
+      setAvatar(c[0].querySelector(".av"), a.p);
+      c[0].querySelector(".pname").textContent = a.p.name;
+      c[1].textContent = a.spiele;
+      c[2].textContent = a.runden;
+      c[3].textContent = a.punkte;
+      c[4].querySelector("i span").style.width = (a.pct === null ? 0 : Math.round(a.pct * 100)) + "%";
+      c[4].querySelector("b").textContent = fmtPct(a.pct);
+      c[5].textContent = a.mimiks;
+      c[6].textContent = fmtPct(a.quote);
+      body.appendChild(tr);
+    });
+
+    var played = rows.filter(function (a) { return a.spiele > 0; });
+    function joinNames(list) { return list.length > 3 ? list.length + " Spieler gleichauf" : list.map(function (a) { return a.p.name; }).join(" & "); }
+    if (played.length) {
+      var bestPct = Math.max.apply(null, played.map(function (a) { return a.pct; }));
+      var best = played.filter(function (a) { return a.pct === bestPct; });
+      $("#r-best").textContent = joinNames(best);
+      $("#r-best-s").textContent = fmtPct(bestPct) + " der möglichen Punkte";
+      var maxM = Math.max.apply(null, played.map(function (a) { return a.mimiks; }));
+      var top = played.filter(function (a) { return a.mimiks === maxM; });
+      $("#r-top").textContent = maxM ? joinNames(top) : "Noch keine Mimik";
+      $("#r-top-s").textContent = maxM ? maxM + (maxM === 1 ? " Mimik" : " Mimiks") : "";
+      var minM = Math.min.apply(null, played.map(function (a) { return a.mimiks; }));
+      var clean = played.filter(function (a) { return a.mimiks === minM; });
+      $("#r-clean").textContent = joinNames(clean);
+      $("#r-clean-s").textContent = minM === 0 ? "Noch nie eine Mimik" : minM + (minM === 1 ? " Mimik" : " Mimiks");
+    } else {
+      ["#r-best", "#r-top", "#r-clean"].forEach(function (s) { $(s).textContent = "—"; });
+      ["#r-best-s", "#r-top-s", "#r-clean-s"].forEach(function (s) { $(s).textContent = "Erscheint nach der ersten Runde"; });
+    }
+    renderHistoryList();
+  }
+
+  function renderHistoryList() {
+    var list = $("#hist");
+    list.textContent = "";
+    var rounds = S.rounds.slice().sort(function (a, b) { return a.at < b.at ? 1 : -1; });
+    $("#hist-count").textContent = rounds.length + (rounds.length === 1 ? " Runde" : " Runden");
+    if (!rounds.length) {
+      var li0 = document.createElement("li");
+      li0.innerHTML = '<span class="note">Noch keine Runde beendet. Im Reiter „Punkte" Plätze eintragen und „Runde beenden" drücken.</span>';
+      list.appendChild(li0);
+      return;
+    }
+    var names = new Map(S.players.map(function (p) { return [p.id, p.name]; }));
+    rounds.forEach(function (r) {
+      var li = document.createElement("li");
+      var nameOf = function (id) {
+        var e = r.entries.filter(function (x) { return x.id === id; })[0];
+        return names.get(id) || (e ? e.name : "?");
+      };
+      var bestE = r.entries.slice().sort(function (a, b) { return b.punkte - a.punkte; })[0];
+      var d = new Date(r.at);
+      var when = isNaN(d) ? "" : d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }) + ", " + d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }) + " Uhr";
+      li.innerHTML = '<div><div class="when"></div><div class="what">Mimik: <b></b>' + (bestE ? ' · Bester: <em></em>' : "") + ' · <span class="cnt"></span></div></div>' +
+        '<button type="button" class="del" data-id="" aria-label="Runde löschen">×</button>';
+      li.querySelector(".when").textContent = when;
+      li.querySelector(".what b").textContent = r.mimik.map(nameOf).join(" & ") || "—";
+      if (bestE) li.querySelector(".what em").textContent = nameOf(bestE.id) + " (" + bestE.punkte + " P)";
+      var games = r.entries.reduce(function (m, e) { return Math.max(m, e.spiele); }, 0);
+      li.querySelector(".cnt").textContent = r.entries.length + " Spieler, " + games + (games === 1 ? " Spiel" : " Spiele");
+      var del = li.querySelector(".del");
+      del.dataset.id = r.id;
+      del.disabled = S.readOnly;
+      list.appendChild(li);
+    });
+  }
+  $("#hist").addEventListener("click", function (e) {
+    var b = e.target.closest(".del");
+    if (!b || b.disabled) return;
+    arm(b, "Löschen?", function () { deleteRound(b.dataset.id); });
+  });
+  document.querySelectorAll("#rank-head th[data-k] .sort-btn").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var k = b.parentNode.dataset.k;
+      if (S.sortKey === k) S.sortDir = -S.sortDir; else { S.sortKey = k; S.sortDir = -1; }
+      renderRanking();
+    });
+  });
 
   /* ---------- tabs ---------- */
+  var VIEWS = ["rad", "punkte", "rangliste", "super"];
   function showView(v) {
-    if (v !== "punkte") v = "rad";
+    if (VIEWS.indexOf(v) < 0) v = "rad";
     document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.view === v)); });
-    $("#view-rad").hidden = v !== "rad";
-    $("#view-punkte").hidden = v !== "punkte";
+    VIEWS.forEach(function (x) { $("#view-" + x).hidden = x !== v; });
     if (v === "rad") requestAnimationFrame(draw);
   }
   document.querySelectorAll(".tab").forEach(function (t) {
@@ -963,7 +1350,7 @@ tr.is-first .name-cell { box-shadow: inset 3px 0 0 var(--gold); }
   });
   window.addEventListener("hashchange", function () { showView(location.hash.replace("#", "")); });
 
-  function renderAll() { renderWheelPanel(); renderPoints(); }
+  function renderAll() { renderWheelPanel(); renderPoints(); renderRanking(); }
 
   if (window.ResizeObserver) new ResizeObserver(function () { if (!S.spinning) draw(); }).observe($("#wheel-box"));
   else window.addEventListener("resize", draw);

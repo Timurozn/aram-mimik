@@ -1,8 +1,10 @@
 # ARAM Mimik
 
-Strafen-Glücksrad und Punktetabelle für unsere ARAM-Runden.
+Strafen-Glücksrad, Punktetabelle und Rangliste für unsere ARAM-Runden.
 
-- **Glücksrad:** Optionen mit Anzahl eintragen, jedes Feld ist gleich groß, der Zufall kommt aus dem Browser (`crypto.getRandomValues`).
-- **Punkte:** Runde 1–4 (Erster 5 … Letzter 1), Gesamt und Platz automatisch, Spiele- und Mimik-Zähler mit Ranking und Quote.
+- **Glücksrad:** Optionen mit Anzahl 0–20. Jedes Feld ist gleich groß, Anzahl 0 nimmt eine Option aus dem Rad. Der Zufall kommt aus dem Browser (`crypto.getRandomValues`).
+- **Punkte:** Platz nach Schaden je Spiel (1. = 5 P … 5. = 1 P), bis zu 4 Spiele pro Runde. „Runde beenden" ermittelt die Mimik und überträgt Spiele und Punkte in die Rangliste.
+- **Rangliste:** Spiele, Runden, Punkte, Punkte-%, Mimiks, Mimik-Quote, dazu der Verlauf aller Runden.
+- **?:** kommt noch.
 
 Die Seite ist eine einzelne `index.html` ohne Abhängigkeiten. Auf GitHub Pages speichert sie die Eingaben im Browser des jeweiligen Geräts.
