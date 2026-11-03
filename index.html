@@ -608,6 +608,10 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 <script>
 (function () {
   "use strict";
+  /* Online-Datenbank für die GitHub-Seite. Leer lassen = jedes Gerät speichert für sich. */
+  var FIREBASE_CONFIG = null;
+  var FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
+
   var DEFAULT_PLAYERS = ["Fabian", "Marci", "Tugrap", "Jetmir", "Besnik", "Mergim", "Timur"];
   var DEFAULT_WHEEL = ["Bestrafung 1", "Bestrafung 2", "Bestrafung 3"];
   var LS_KEY = "aram-mimik-v2";
@@ -676,7 +680,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
   /* ---------- status ---------- */
   var STATUS = {
     loading: "Verbinde…",
-    live: "Live · für alle Bearbeiter geteilt",
+    live: "Live · für alle geteilt",
     readonly: "Nur Ansicht",
     local: "Auf diesem Gerät gespeichert",
     slow: "Daten gerade nicht erreichbar",
@@ -721,7 +725,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
       catch (e) { flash("Speichern im Browser fehlgeschlagen – evtl. ist der Speicher voll (Profilbilder verkleinern oder löschen)."); }
     }, 250);
   }
-  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.slice(), avatar: p.avatar || "" }; }
+  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.map(function (x) { return x || 0; }), avatar: p.avatar || "" }; }
   function wheelBody() { return { items: S.wheel.map(function (o) { return { id: o.id, label: o.label, count: o.count }; }) }; }
 
   function queueWrite(path, bodyFn, delay) {
@@ -786,21 +790,91 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
   }
 
   /* ---------- boot ---------- */
+  function startingData() {
+    var d = lsLoad();
+    if (d) return {
+      players: d.players.map(normPlayer), wheel: d.wheel.map(normOpt),
+      rounds: Array.isArray(d.rounds) ? d.rounds.map(normRound) : [],
+      superDone: Array.isArray(d.superDone) ? d.superDone.map(String) : []
+    };
+    return {
+      players: DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, p: [null, null, null, null], avatar: "" }; }),
+      wheel: DEFAULT_WHEEL.map(function (l, i) { return { id: "o" + (i + 1), label: l, count: 1 }; }),
+      rounds: [], superDone: []
+    };
+  }
   function startLocal() {
     S.mode = "local";
-    var d = lsLoad();
-    if (d) {
-      S.players = d.players.map(normPlayer);
-      S.wheel = d.wheel.map(normOpt);
-      S.rounds = Array.isArray(d.rounds) ? d.rounds.map(normRound) : [];
-      S.superDone = Array.isArray(d.superDone) ? d.superDone.map(String) : [];
-    } else {
-      S.players = DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, p: [null, null, null, null], avatar: "" }; });
-      S.wheel = DEFAULT_WHEEL.map(function (l) { return { id: uid(), label: l, count: 1 }; });
-      S.rounds = [];
-    }
+    var d = startingData();
+    S.players = d.players; S.wheel = d.wheel; S.rounds = d.rounds; S.superDone = d.superDone;
     setStatus("local");
     renderAll();
+  }
+  /* first visit to an empty online store: upload this device's data (or the defaults) once */
+  var seeded = false;
+  function seedIfEmpty() {
+    if (seeded || S.readOnly) return;
+    seeded = true;
+    if (S.players.length || S.wheel.length || S.rounds.length) return;
+    var d = startingData();
+    S.players = d.players; S.wheel = d.wheel; S.rounds = d.rounds; S.superDone = d.superDone;
+    S.players.forEach(function (p) { persistPlayer(p, 0); });
+    persistWheel(0);
+    S.rounds.forEach(function (r) { DB.collection("runden").doc(r.id).set({ at: r.at, entries: r.entries, mimik: r.mimik }).catch(onWriteError); });
+    if (S.superDone.length) persistSuper();
+    renderAll();
+  }
+
+  /* Firebase Realtime Database behind the same small API the page already uses */
+  function rtdbAdapter(fdb) {
+    function wrap(v, key) { return { id: key, exists: v !== null && v !== undefined, data: function () { return v; }, metadata: { fromCache: false, hasPendingWrites: false } }; }
+    function err(cb) { return function (e) { if (cb) cb({ code: "unavailable", message: String(e && e.message || e) }); }; }
+    function docRef(path) {
+      return {
+        set: function (body) { return fdb.ref(path).set(JSON.parse(JSON.stringify(body))); },
+        delete: function () { return fdb.ref(path).remove(); },
+        onSnapshot: function (next, onErr) {
+          var ref = fdb.ref(path);
+          var h = ref.on("value", function (snap) { next(wrap(snap.val(), snap.key)); }, err(onErr));
+          return function () { ref.off("value", h); };
+        }
+      };
+    }
+    function colRef(path) {
+      return {
+        doc: function (id) { return docRef(path + "/" + id); },
+        onSnapshot: function (next, onErr) {
+          var ref = fdb.ref(path);
+          var h = ref.on("value", function (snap) {
+            var docs = [];
+            snap.forEach(function (c) { docs.push(wrap(c.val(), c.key)); });
+            next({ docs: docs, size: docs.length, empty: !docs.length, metadata: { fromCache: false, hasPendingWrites: false } });
+          }, err(onErr));
+          return function () { ref.off("value", h); };
+        }
+      };
+    }
+    return { doc: docRef, collection: colRef };
+  }
+  function loadScript(src) {
+    return new Promise(function (res, rej) {
+      var el = document.createElement("script");
+      el.src = src; el.async = true; el.onload = res; el.onerror = rej;
+      document.head.appendChild(el);
+    });
+  }
+  function startFirebase() {
+    setStatus("loading");
+    loadScript(FIREBASE_SDK + "firebase-app-compat.js")
+      .then(function () { return loadScript(FIREBASE_SDK + "firebase-database-compat.js"); })
+      .then(function () {
+        var app = window.firebase.initializeApp(FIREBASE_CONFIG);
+        startDb(rtdbAdapter(window.firebase.database(app)));
+      })
+      .catch(function () {
+        startLocal();
+        $("#status-text").textContent = "Server nicht erreichbar · nur auf diesem Gerät";
+      });
   }
 
   function startDb(db) {
@@ -809,7 +883,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     setStatus(S.readOnly ? "readonly" : "loading");
     var got = { p: false, w: false, r: false };
     var timer = setTimeout(function () { if (!got.p || !got.w || !got.r) setStatus("slow"); }, 10000);
-    function mark(k) { got[k] = true; if (got.p && got.w && got.r) { clearTimeout(timer); setStatus(S.readOnly ? "readonly" : "live"); } }
+    function mark(k) { got[k] = true; if (got.p && got.w && got.r) { clearTimeout(timer); setStatus(S.readOnly ? "readonly" : "live"); seedIfEmpty(); } }
     function fail() { clearTimeout(timer); setStatus("error"); }
 
     DB.collection("spieler").onSnapshot(function (snap) {
@@ -862,7 +936,10 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
   function boot() {
     renderAll();
     var c = window.claude;
-    if (!c || typeof c.use !== "function") { startLocal(); return; }
+    if (!c || typeof c.use !== "function") {
+      if (FIREBASE_CONFIG && FIREBASE_CONFIG.databaseURL) startFirebase(); else startLocal();
+      return;
+    }
     setStatus("loading");
     c.use("db").then(function (db) {
       if (!db) { startLocal(); return; }
