@@ -609,7 +609,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 (function () {
   "use strict";
   /* Online-Datenbank für die GitHub-Seite. Leer lassen = jedes Gerät speichert für sich. */
-  var FIREBASE_CONFIG = null;
+  var FIREBASE_CONFIG = { databaseURL: "https://aram-mimik-default-rtdb.europe-west1.firebasedatabase.app" };
   var FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 
   var DEFAULT_PLAYERS = ["Fabian", "Marci", "Tugrap", "Jetmir", "Besnik", "Mergim", "Timur"];
