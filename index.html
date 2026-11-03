@@ -318,13 +318,33 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 .note { color: var(--mute); font-size: 14px; margin: 0; }
 .empty-cell { color: var(--mute); padding: 22px 16px; text-align: left; }
 
-/* ? */
-.mystery { display: grid; place-items: center; padding-block: 80px; }
-.mystery div {
-  width: min(320px, 70vw); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
-  background: var(--gold-hi); color: #000; box-shadow: 0 0 0 6px var(--deep), 0 0 0 8px var(--gold);
-  font-family: var(--f-display); font-weight: 700; font-size: min(220px, 48vw); line-height: 1;
+/* Super-Mimik */
+.super-hub {
+  background: var(--gold-hi); color: #000; border-color: var(--blood);
+  font-size: clamp(34px, 5.4vw, 64px); letter-spacing: 0;
+  box-shadow: 0 0 0 6px var(--deep), 0 0 30px rgba(229, 88, 95, .35);
 }
+.super-hub:hover:not(:disabled) { box-shadow: 0 0 0 6px var(--deep), 0 0 44px rgba(229, 88, 95, .6); }
+.super-hub:disabled { color: rgba(0, 0, 0, .35); }
+.super-box.spinning::before { animation-name: wheel-pulse-red; }
+@keyframes wheel-pulse-red { to { box-shadow: 0 0 80px 10px rgba(229, 88, 95, .5); } }
+.super-ledger { border-color: var(--blood); }
+.super-ledger h2 { color: var(--blood); }
+.super-list { list-style: none; margin: 0; padding: 0; }
+.super-list li {
+  display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 11px 0; border-bottom: 1px solid var(--line); font-weight: 600; font-size: 17px; color: var(--ink);
+}
+.super-list li .sl { overflow-wrap: anywhere; }
+.super-list .sw { box-shadow: inset 0 0 0 1px var(--line); }
+.super-list li.fin { color: var(--gold-hi); }
+.super-list .badge {
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap;
+  color: var(--gold-ink); background: var(--gold); border-radius: 999px; padding: 2px 9px;
+}
+.super-ex { margin: 14px 0 0; color: var(--mute); font-size: 14px; }
+.super-ex:empty { display: none; }
+.super-verdict.fresh { border-color: var(--blood); }
 
 .wheel-tools { width: 100%; max-width: 820px; display: flex; justify-content: center; gap: 10px; }
 .sound-btn { display: inline-flex; align-items: center; gap: 8px; }
@@ -515,13 +535,35 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
   </section>
 
   <section class="view" id="view-super" role="tabpanel" aria-labelledby="tab-super" hidden>
-    <div class="mystery"><div aria-label="Super-Mimik, kommt noch">?</div></div>
+    <div class="stage">
+      <div class="wheel-col">
+        <div class="wheel-box super-box" id="swheel-box">
+          <canvas id="swheel" aria-label="Super-Mimik-Rad"></canvas>
+          <button class="hub super-hub" id="shub" type="button" aria-label="Super-Mimik drehen">?</button>
+        </div>
+        <div class="verdict panel super-verdict" id="sverdict" aria-live="polite">
+          <div class="eyebrow" id="sverdict-k">Super-Mimik</div>
+          <div class="v" id="sverdict-v">Wer traut sich?</div>
+          <div class="odds" id="sverdict-odds">Aufs Fragezeichen tippen zum Drehen.</div>
+        </div>
+      </div>
+
+      <aside class="ledger panel super-ledger">
+        <div class="ledger-head">
+          <h2>Super-Mimik</h2>
+          <span class="eyebrow"><span id="s-total">0</span> Felder</span>
+        </div>
+        <ul class="super-list" id="super-list"></ul>
+        <p class="super-ex" id="super-ex"></p>
+        <p class="fair"><b>Automatisch:</b> Jede Option aus dem Glücksrad kommt hier einmal rein, egal welche Anzahl sie dort hat. Alles mit „doppelt" im Namen bleibt draußen. „Flasche sitzen" ist immer als letztes Feld dabei. Jedes Feld hat die gleiche Chance.</p>
+      </aside>
+    </div>
   </section>
 </div>
 
 <div class="win" id="win" hidden role="dialog" aria-modal="true" aria-labelledby="win-v">
   <div class="win-card" id="win-card">
-    <div class="win-k">Das Rad hat entschieden</div>
+    <div class="win-k" id="win-k">Das Rad hat entschieden</div>
     <div class="win-v" id="win-v"></div>
     <div class="win-odds" id="win-odds"></div>
     <button class="btn" id="win-close" type="button">Weiter</button>
@@ -554,6 +596,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     rot: 0, spinning: false, spinSegs: null, spinHistory: [],
     ending: false, endPick: [], sortKey: "pct", sortDir: -1, flash: ""
   };
+  var SS = { rot: 0, spinning: false, spinSegs: null };
   var DB = null;
   var dirty = new Set();
   var writers = {};
@@ -804,8 +847,8 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     while (t.length > 1 && ctx.measureText(t + "…").width > maxW) t = t.slice(0, -1);
     return t + "…";
   }
-  function draw() {
-    var cv = $("#wheel"), box = $("#wheel-box");
+  function drawWheel(wh) {
+    var cv = wh.cv, box = wh.box, st = wh.st;
     var size = box.clientWidth;
     if (!size) return;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -815,19 +858,19 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, size, size);
     var c = size / 2, R = c * 0.86;
-    var segs = S.spinning ? S.spinSegs : computeSegs(S.wheel);
+    var segs = st.spinning ? st.spinSegs : wh.segs();
 
     ctx.beginPath(); ctx.arc(c, c, R + c * 0.06, 0, TAU);
     ctx.fillStyle = "#0B1828"; ctx.fill();
-    ctx.lineWidth = Math.max(2, c * 0.018); ctx.strokeStyle = "#C8AA6E"; ctx.stroke();
+    ctx.lineWidth = Math.max(2, c * 0.018); ctx.strokeStyle = wh.rim; ctx.stroke();
 
     if (!segs.length) {
       ctx.beginPath(); ctx.arc(c, c, R, 0, TAU); ctx.fillStyle = "#102238"; ctx.fill();
     } else {
       var seg = TAU / segs.length;
-      ctx.save(); ctx.translate(c, c); ctx.rotate(S.rot);
+      ctx.save(); ctx.translate(c, c); ctx.rotate(st.rot);
       for (var i = 0; i < segs.length; i++) {
-        var s = segs[i], col = SEG[s.ci % SEG.length], a0 = i * seg;
+        var s = segs[i], col = wh.color(s, i), a0 = i * seg;
         ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, R, a0, a0 + seg); ctx.closePath();
         ctx.fillStyle = col.bg; ctx.fill();
         ctx.lineWidth = Math.max(1, c * 0.006); ctx.strokeStyle = "#070E1A"; ctx.stroke();
@@ -842,7 +885,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
           ctx.font = "700 " + fs + "px 'Barlow Semi Condensed', 'Arial Narrow', Arial, sans-serif";
         }
         var label = fitText(ctx, s.label, maxW), pad = c * 0.05;
-        if (Math.cos(mid + S.rot) < 0) { ctx.rotate(Math.PI); ctx.textAlign = "left"; ctx.fillText(label, -(R - pad), 0); }
+        if (Math.cos(mid + st.rot) < 0) { ctx.rotate(Math.PI); ctx.textAlign = "left"; ctx.fillText(label, -(R - pad), 0); }
         else { ctx.textAlign = "right"; ctx.fillText(label, R - pad, 0); }
         ctx.restore();
       }
@@ -860,56 +903,123 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     ctx.lineWidth = Math.max(2, c * 0.012); ctx.strokeStyle = "#C8AA6E"; ctx.stroke();
   }
 
-  function spin() {
-    if (S.spinning) return;
-    var segs = computeSegs(S.wheel);
-    if (!segs.length) return;
-    var n = segs.length, seg = TAU / n;
+  var SUPER_SEG = [
+    { bg: "#7A1E2A", fg: "#FBEFF0" }, { bg: "#141C2B", fg: "#F0E6D2" },
+    { bg: "#9A5418", fg: "#FFF3E6" }, { bg: "#3A1830", fg: "#FBEAF5" }
+  ];
+  var FLASCHE = { bg: "#F0C96A", fg: "#1A1205" };
+  function superSegs() {
+    var out = [], seen = {};
+    S.wheel.forEach(function (o, i) {
+      var l = o.label.trim(), k = l.toLowerCase();
+      if (!l || /doppelt/i.test(l) || /^flasche\s*sitzen$/i.test(l) || seen[k]) return;
+      seen[k] = true;
+      out.push({ id: "s-" + o.id, label: l, ci: i });
+    });
+    out.push({ id: "flasche", label: "Flasche sitzen", ci: -1, fin: true });
+    return out;
+  }
+  function superColor(s, i) { return s.fin ? FLASCHE : SUPER_SEG[i % SUPER_SEG.length]; }
+
+  var MAIN = { cv: $("#wheel"), box: $("#wheel-box"), st: S, rim: "#C8AA6E",
+    segs: function () { return computeSegs(S.wheel); }, color: function (s) { return SEG[s.ci % SEG.length]; } };
+  var SUP = { cv: $("#swheel"), box: $("#swheel-box"), st: SS, rim: "#E5585F", segs: superSegs, color: superColor };
+  function draw() { drawWheel(MAIN); }
+  function drawSuper() { drawWheel(SUP); }
+  function anySpinning() { return S.spinning || SS.spinning; }
+
+  function runSpin(wh, segs, onDone) {
+    var st = wh.st, n = segs.length, seg = TAU / n;
     var win = randInt(n);
     var target = -Math.PI / 2 - (win + 0.15 + 0.7 * rand01()) * seg;
-    var start = S.rot;
+    var start = st.rot;
     var delta = ((target - start) % TAU + TAU) % TAU;
     var turns = reduceMotion ? 1 : 6 + randInt(3);
     var end = start + delta + turns * TAU;
     var dur = reduceMotion ? 1200 : 7000;
-    S.spinning = true; S.spinSegs = segs;
+    st.spinning = true; st.spinSegs = segs;
     var crowd = Sound.ooh(dur / 1000);
-    var lastIdx = -1, box = $("#wheel-box");
-    box.classList.add("spinning");
-    $("#verdict-k").textContent = "Das Rad dreht sich";
-    $("#verdict-v").textContent = "…";
-    $("#verdict-odds").textContent = n + " Felder im Spiel";
-    $("#verdict").classList.remove("fresh");
-    renderWheelPanel();
+    var lastIdx = -1;
+    wh.box.classList.add("spinning");
     var t0 = performance.now();
     function frame(now) {
       var t = Math.min(1, (now - t0) / dur);
       var e = 1 - Math.pow(1 - t, 4);
-      S.rot = start + (end - start) * e;
-      draw();
-      var local = ((-Math.PI / 2 - S.rot) % TAU + TAU) % TAU;
+      st.rot = start + (end - start) * e;
+      drawWheel(wh);
+      var local = ((-Math.PI / 2 - st.rot) % TAU + TAU) % TAU;
       var idx = Math.floor(local / seg) % n;
       if (idx !== lastIdx) { if (lastIdx !== -1) Sound.tick(); lastIdx = idx; }
       if (t < 1) requestAnimationFrame(frame); else finish();
     }
     function finish() {
-      S.rot = ((S.rot % TAU) + TAU) % TAU;
+      st.rot = ((st.rot % TAU) + TAU) % TAU;
+      st.spinning = false; st.spinSegs = null;
+      wh.box.classList.remove("spinning");
+      if (crowd) crowd.stop();
       var w = segs[win];
       var hits = segs.filter(function (x) { return x.id === w.id; }).length;
-      S.spinning = false; S.spinSegs = null;
+      onDone(w, "Chance: " + hits + " von " + n + " Feldern (" + Math.round(hits / n * 100) + " %)");
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function spin() {
+    if (anySpinning()) return;
+    var segs = computeSegs(S.wheel);
+    if (!segs.length) return;
+    runSpin(MAIN, segs, function (w, odds) {
       $("#verdict-k").textContent = "Das Rad hat entschieden";
       $("#verdict-v").textContent = w.label;
-      $("#verdict-odds").textContent = "Chance: " + hits + " von " + n + " Feldern (" + Math.round(hits / n * 100) + " %)";
+      $("#verdict-odds").textContent = odds;
       $("#verdict").classList.add("fresh");
       S.spinHistory.unshift(w.label);
       S.spinHistory = S.spinHistory.slice(0, 6);
       renderSpinHistory();
       renderWheelPanel();
-      box.classList.remove("spinning");
-      if (crowd) crowd.stop();
-      celebrate(w.label, "Chance: " + hits + " von " + n + " Feldern (" + Math.round(hits / n * 100) + " %)");
-    }
-    requestAnimationFrame(frame);
+      celebrate(w.label, odds, "Das Rad hat entschieden", false);
+    });
+    $("#verdict-k").textContent = "Das Rad dreht sich";
+    $("#verdict-v").textContent = "…";
+    $("#verdict-odds").textContent = segs.length + " Felder im Spiel";
+    $("#verdict").classList.remove("fresh");
+    renderWheelPanel();
+  }
+
+  function spinSuper() {
+    if (anySpinning() || S.mode === "init") return;
+    var segs = superSegs();
+    runSpin(SUP, segs, function (w, odds) {
+      $("#sverdict-k").textContent = "Die Super-Mimik ist";
+      $("#sverdict-v").textContent = w.label;
+      $("#sverdict-odds").textContent = odds;
+      $("#sverdict").classList.add("fresh");
+      renderWheelPanel();
+      celebrate(w.label, odds, "Super-Mimik", true);
+    });
+    $("#sverdict-k").textContent = "Das Super-Rad dreht sich";
+    $("#sverdict-v").textContent = "…";
+    $("#sverdict-odds").textContent = segs.length + " Felder im Spiel";
+    $("#sverdict").classList.remove("fresh");
+    renderWheelPanel();
+  }
+
+  function renderSuper() {
+    var segs = superSegs(), list = $("#super-list");
+    list.textContent = "";
+    segs.forEach(function (sg, i) {
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="sw" aria-hidden="true"></span><span class="sl"></span>' + (sg.fin ? '<span class="badge">Immer dabei</span>' : "<span></span>");
+      if (sg.fin) li.className = "fin";
+      li.querySelector(".sw").style.background = superColor(sg, i).bg;
+      li.querySelector(".sl").textContent = sg.label;
+      list.appendChild(li);
+    });
+    $("#s-total").textContent = segs.length;
+    var ex = S.wheel.map(function (o) { return o.label.trim(); }).filter(function (l) { return l && /doppelt/i.test(l); });
+    $("#super-ex").textContent = ex.length ? "Nicht dabei: " + ex.join(", ") : "";
+    $("#shub").disabled = anySpinning() || S.mode === "init";
+    if (!SS.spinning) drawSuper();
   }
 
   /* ---------- sound (Web Audio, synthesised, starts from the spin click) ---------- */
@@ -1165,7 +1275,8 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
   })();
 
   var lastFocus = null;
-  function celebrate(label, odds) {
+  function celebrate(label, odds, kicker, big) {
+    $("#win-k").textContent = kicker || "Das Rad hat entschieden";
     $("#win-v").textContent = label;
     $("#win-odds").textContent = odds;
     var win = $("#win");
@@ -1180,7 +1291,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     if (!reduceMotion) {
       var wrap = $(".wrap");
       wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
-      FX.start(5200);
+      FX.start(big ? 7500 : 5200);
     }
   }
   function closeWin() {
@@ -1245,8 +1356,9 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     });
     existing.forEach(function (el) { el.remove(); });
     $("#opt-add").disabled = locked;
-    $("#hub").disabled = S.spinning || !total;
+    $("#hub").disabled = anySpinning() || !total;
     if (!S.spinning) draw();
+    renderSuper();
   }
 
   function findOpt(el) {
@@ -1275,6 +1387,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
       o.label = e.target.value.slice(0, 40);
       persistWheel(600);
       draw();
+      renderSuper();
     } else if (e.target.classList.contains("opt-count")) {
       if (e.target.value === "") return;
       o.count = clampCount(e.target.value);
@@ -1294,6 +1407,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     if (inp) { inp.focus(); inp.select(); }
   });
   $("#hub").addEventListener("click", spin);
+  $("#shub").addEventListener("click", spinSuper);
 
   /* ---------- points ---------- */
   function standings() {
@@ -1702,6 +1816,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
     document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.view === v)); });
     VIEWS.forEach(function (x) { $("#view-" + x).hidden = x !== v; });
     if (v === "rad") requestAnimationFrame(draw);
+    if (v === "super") requestAnimationFrame(drawSuper);
   }
   document.querySelectorAll(".tab").forEach(function (t) {
     t.addEventListener("click", function () {
@@ -1714,9 +1829,11 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 
   function renderAll() { renderWheelPanel(); renderPoints(); renderRanking(); }
 
-  if (window.ResizeObserver) new ResizeObserver(function () { if (!S.spinning) draw(); }).observe($("#wheel-box"));
-  else window.addEventListener("resize", draw);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () { if (!S.spinning) draw(); }).observe($("#wheel-box"));
+    new ResizeObserver(function () { if (!SS.spinning) drawSuper(); }).observe($("#swheel-box"));
+  } else window.addEventListener("resize", function () { draw(); drawSuper(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { draw(); drawSuper(); });
 
   showView(location.hash.replace("#", ""));
   boot();
