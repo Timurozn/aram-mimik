@@ -78,6 +78,33 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .status[data-s="live"] .dot { background: var(--win); }
 .status[data-s="local"] .dot { background: var(--gold); }
 .status[data-s="readonly"] .dot { background: var(--ice); }
+.status[data-s="test"] .dot { background: #FFD36B; box-shadow: 0 0 0 3px rgba(255, 211, 107, .25); }
+.status[data-s="test"] { color: #FFD36B; }
+.test-btn {
+  appearance: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 999px; padding: 6px 12px;
+  border: 1px dashed var(--gold); background: transparent; color: var(--gold); font: 700 12px var(--f-body); letter-spacing: .14em; text-transform: uppercase;
+}
+.test-btn svg { width: 16px; height: 16px; }
+.test-btn:hover { color: var(--gold-hi); border-color: var(--gold-hi); }
+.test-btn[aria-pressed="true"] { background: #FFD36B; border-style: solid; border-color: #FFD36B; color: var(--gold-ink); }
+.testbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; margin-top: 14px; padding: 12px 16px; border-radius: 10px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px;
+  border: 1px solid #FFD36B; background: repeating-linear-gradient(-45deg, #2B230B 0 14px, #211B08 14px 28px); color: #FFF3D1;
+}
+.testbar[hidden] { display: none; }
+.tb-txt { font-size: 15px; min-width: 0; }
+.tb-txt b { display: inline-block; margin-right: 8px; padding: 1px 8px; border-radius: 4px; background: #FFD36B; color: var(--gold-ink); letter-spacing: .1em; text-transform: uppercase; font-size: 12px; vertical-align: 1px; }
+.tb-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.testbar .tb-btn { height: 36px; padding: 0 12px; font-size: 13px; }
+.testbar .btn.ghost { color: #FFF3D1; border-color: rgba(255, 211, 107, .5); }
+body.testing::after { content: ""; position: fixed; inset: 0; z-index: 29; pointer-events: none; border: 3px solid #FFD36B; }
+@media (max-width: 640px) {
+  .testbar { position: static; padding: 10px 12px; }
+  .tb-txt { font-size: 14px; }
+  .tb-actions { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+  .testbar .tb-btn { height: auto; min-height: 38px; padding: 6px 8px; font-size: 12px; line-height: 1.2; letter-spacing: .04em; }
+}
 .status[data-s="slow"] .dot, .status[data-s="error"] .dot { background: var(--blood); }
 
 /* shared */
@@ -445,6 +472,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 .switch[aria-checked="true"] { background: var(--win); box-shadow: inset 0 0 0 1px var(--win); }
 .switch[aria-checked="true"] .knob { transform: translateX(22px); }
 .switch:disabled { opacity: .45; cursor: default; }
+.dbl-row { display: inline-flex; align-items: center; gap: 8px; }
 .dbl-cell .x2 {
   display: inline-block; font-family: var(--f-display); font-weight: 700; font-size: 16px; color: var(--gold-ink);
   background: var(--gold); border-radius: 999px; padding: 2px 11px; opacity: 0; transform: scale(.5); transition: opacity .25s, transform .3s cubic-bezier(.2, 1.6, .4, 1);
@@ -655,9 +683,23 @@ td.extra { background: rgba(229, 88, 95, .07); }
         <button class="tab" role="tab" id="tab-rangliste" aria-controls="view-rangliste" aria-selected="false" data-view="rangliste">Rangliste</button>
         <button class="tab sm" role="tab" id="tab-super" aria-controls="view-super" aria-selected="false" data-view="super"><span class="emb-mini" aria-hidden="true"></span><span>Super<span class="sm-b">-Mimik</span></span></button>
       </nav>
+      <button class="test-btn" id="test-btn" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7.5 15h9"/></svg>
+        <span>Testversion</span>
+      </button>
       <div class="status" id="status" data-s="loading" role="status"><span class="dot"></span><span id="status-text">Verbinde…</span></div>
     </div>
   </header>
+
+  <div class="testbar" id="testbar" hidden>
+    <div class="tb-txt"><b>Testmodus</b> Probier alles aus – nichts wird gespeichert oder geteilt. Beim Beenden ist alles wieder wie vorher.</div>
+    <div class="tb-actions">
+      <button class="btn ghost tb-btn" type="button" data-prev="duel">1 gegen 1 ansehen</button>
+      <button class="btn ghost tb-btn" type="button" data-prev="reveal">Enthüllung ansehen</button>
+      <button class="btn ghost tb-btn" type="button" data-prev="end">Rangliste beenden testen</button>
+      <button class="btn tb-btn" type="button" id="test-exit">Testmodus beenden</button>
+    </div>
+  </div>
 
   <section class="view" id="view-rad" role="tabpanel" aria-labelledby="tab-rad">
     <div class="stage">
@@ -695,7 +737,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
 
   <section class="view" id="view-punkte" role="tabpanel" aria-labelledby="tab-punkte" hidden>
     <div class="points">
-      <div class="rules"><b>Platz nach Schaden:</b> <span>1. = 5 P</span><span>2. = 4 P</span><span>3. = 3 P</span><span>4. = 2 P</span><span>5. = 1 P</span><span>· eine Runde = 4 Spiele</span><span>· Gleichstand Letzter: 2 Spieler = 1 gegen 1, ab 3 = Zusatzspiel</span></div>
+      <div class="rules"><b>Platz nach Schaden:</b> <span>1. = 5 P</span><span>2. = 4 P</span><span>3. = 3 P</span><span>4. = 2 P</span><span>5. = 1 P</span><span>· eine Runde = 4 Spiele</span><span>· Doppelt pro Spieler: Mimik zählt ×2</span><span>· Gleichstand Letzter: 2 Spieler = 1 gegen 1, ab 3 = Zusatzspiel</span></div>
 
       <div class="panel flash" id="flash" hidden aria-live="polite"></div>
 
@@ -910,16 +952,17 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var pl = emptyP();
     if (p.p && typeof p.p === "object") for (var k = 0; k < MAX_GAMES; k++) pl[k] = normPlace(p.p[k]);
     else if (Array.isArray(p.r)) for (var j = 0; j < BASE_GAMES; j++) { var x = Number(p.r[j]); pl[j] = x >= 1 && x <= 5 ? 6 - Math.floor(x) : null; }
-    return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, p: pl, avatar: safeAvatar(p.avatar) };
+    return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, p: pl, avatar: safeAvatar(p.avatar), dbl: !!p.dbl };
   }
   function normOpt(o) { var c = Number(o.count); return { id: String(o.id || uid()), label: String(o.label == null ? "" : o.label).slice(0, 40), count: isFinite(c) ? Math.min(MAX_COUNT, Math.max(0, Math.floor(c))) : 1 }; }
   function normRound(r) {
     var entries = Array.isArray(r.entries) ? r.entries.map(function (e) { return { id: String(e.id || ""), name: String(e.name || ""), spiele: num(e.spiele), punkte: num(e.punkte) }; }).filter(function (e) { return e.id; }) : [];
     var mimik = Array.isArray(r.mimik) ? r.mimik.map(String) : [];
     return { id: String(r.id || uid()), at: String(r.at || ""), entries: entries, mimik: mimik,
-      doppelt: !!r.doppelt, duel: !!r.duel, games: num(r.games) || 0, saison: r.saison ? String(r.saison) : "" };
+      doppelt: !!r.doppelt, dbl: strList(r.dbl), duel: !!r.duel, games: num(r.games) || 0, saison: r.saison ? String(r.saison) : "" };
   }
-  function roundBody(r) { return { at: r.at, entries: r.entries, mimik: r.mimik, doppelt: !!r.doppelt, duel: !!r.duel, games: r.games || 0, saison: r.saison || "" }; }
+  function roundBody(r) { return { at: r.at, entries: r.entries, mimik: r.mimik, doppelt: !!r.doppelt, dbl: (r.dbl || []).slice(), duel: !!r.duel, games: r.games || 0, saison: r.saison || "" }; }
+  function isDbl(r, id) { return r.dbl && r.dbl.length ? r.dbl.indexOf(id) >= 0 : !!r.doppelt; }
   function strList(v) { return Array.isArray(v) ? v.map(String) : (v && typeof v === "object" ? Object.keys(v).sort().map(function (k) { return String(v[k]); }) : []); }
   function normSeason(x) {
     return { id: String(x.id || uid()), at: String(x.at || ""), who: strList(x.who), names: strList(x.names), runden: num(x.runden), mimiks: num(x.mimiks) };
@@ -959,6 +1002,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     loading: "Verbinde…",
     live: "Live · für alle geteilt",
     readonly: "Nur Ansicht",
+    test: "Testmodus · nichts wird gespeichert",
     local: "Auf diesem Gerät gespeichert",
     slow: "Daten gerade nicht erreichbar",
     error: "Verbindung unterbrochen"
@@ -993,24 +1037,28 @@ td.extra { background: rgba(229, 88, 95, .07); }
     return { players: S.players, wheel: S.wheel, rounds: S.rounds, superDone: S.superDone, games: S.games, doppelt: S.doppelt,
       seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince };
   }
+  function live() { return S.mode === "db" && !S.test; }
   function lsSaveNow() {
+    if (S.test) return;
     clearTimeout(lsTimer);
     try { localStorage.setItem(LS_KEY, JSON.stringify(lsBody())); } catch (e) {}
   }
   window.addEventListener("pagehide", function () { if (S.mode === "local") lsSaveNow(); });
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden" && S.mode === "local") lsSaveNow(); });
   function lsSaveSoon() {
+    if (S.test) return;
     clearTimeout(lsTimer);
     lsTimer = setTimeout(function () {
       try { localStorage.setItem(LS_KEY, JSON.stringify(lsBody())); }
       catch (e) { flash("Speichern im Browser fehlgeschlagen – evtl. ist der Speicher voll (Profilbilder verkleinern oder löschen)."); }
     }, 250);
   }
-  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.map(function (x) { return x || 0; }), avatar: p.avatar || "" }; }
+  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.map(function (x) { return x || 0; }), avatar: p.avatar || "", dbl: !!p.dbl }; }
   function superBody() { return { done: S.superDone.slice(), who: S.superWho.slice(), names: S.superNames.slice(), since: S.superSince || "" }; }
   function wheelBody() { return { items: S.wheel.map(function (o) { return { id: o.id, label: o.label, count: o.count }; }) }; }
 
   function queueWrite(path, bodyFn, delay) {
+    if (S.test) return;
     var w = writers[path] || (writers[path] = { t: null, busy: false, again: false, body: null });
     w.body = bodyFn;
     dirty.add(path);
@@ -1043,22 +1091,22 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function persistPlayer(p, delay) {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("spieler/" + p.id, function () { return playerBody(p); }, delay);
+    else if (live()) queueWrite("spieler/" + p.id, function () { return playerBody(p); }, delay);
   }
   function persistWheel(delay) {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("rad/optionen", wheelBody, delay);
+    else if (live()) queueWrite("rad/optionen", wheelBody, delay);
   }
   function removePlayer(id) {
     S.players = S.players.filter(function (p) { return p.id !== id; });
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") { cancelWrite("spieler/" + id); DB.doc("spieler/" + id).delete().catch(onWriteError); }
+    else if (live()) { cancelWrite("spieler/" + id); DB.doc("spieler/" + id).delete().catch(onWriteError); }
     renderPoints(); renderRanking();
   }
   function saveRound(r) {
     S.rounds.push(r);
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") {
+    else if (live()) {
       dirty.add("runden/" + r.id);
       DB.collection("runden").doc(r.id).set(roundBody(r))
         .then(function () { dirty.delete("runden/" + r.id); }, function (e) { dirty.delete("runden/" + r.id); onWriteError(e); });
@@ -1066,20 +1114,20 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function writeRound(r) {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") DB.doc("runden/" + r.id).set(roundBody(r)).catch(onWriteError);
+    else if (live()) DB.doc("runden/" + r.id).set(roundBody(r)).catch(onWriteError);
   }
   function persistRunde() {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("rad/runde", function () { return { games: S.games, doppelt: !!S.doppelt }; }, 0);
+    else if (live()) queueWrite("rad/runde", function () { return { games: S.games }; }, 0);
   }
   function persistSeasons() {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("super/historie", function () { return { list: S.seasons.map(function (x) { return Object.assign({}, x); }) }; }, 0);
+    else if (live()) queueWrite("super/historie", function () { return { list: S.seasons.map(function (x) { return Object.assign({}, x); }) }; }, 0);
   }
   function deleteRound(id) {
     S.rounds = S.rounds.filter(function (r) { return r.id !== id; });
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") DB.doc("runden/" + id).delete().catch(onWriteError);
+    else if (live()) DB.doc("runden/" + id).delete().catch(onWriteError);
     renderRanking();
   }
 
@@ -1178,6 +1226,12 @@ td.extra { background: rgba(229, 88, 95, .07); }
       });
   }
 
+  function guard(key, fn) {
+    return function (snap) {
+      if (S.test) { TEST.pending[key] = { fn: fn, snap: snap }; return; }
+      fn(snap);
+    };
+  }
   function startDb(db) {
     DB = db;
     S.mode = "db";
@@ -1187,11 +1241,11 @@ td.extra { background: rgba(229, 88, 95, .07); }
     function mark(k) { got[k] = true; if (got.p && got.w && got.r) { clearTimeout(timer); setStatus(S.readOnly ? "readonly" : "live"); seedIfEmpty(); } }
     function fail() { clearTimeout(timer); setStatus("error"); }
 
-    DB.collection("spieler").onSnapshot(function (snap) {
+    DB.collection("spieler").onSnapshot(guard("spieler", function (snap) {
       var mine = new Map(S.players.map(function (p) { return [p.id, p]; }));
       var incoming = snap.docs.filter(function (d) { return d.exists; }).map(function (d, i) {
         var x = d.data() || {};
-        return normPlayer({ id: d.id, name: x.name, order: x.order, p: x.p, r: x.r, avatar: x.avatar }, i);
+        return normPlayer({ id: d.id, name: x.name, order: x.order, p: x.p, r: x.r, avatar: x.avatar, dbl: x.dbl }, i);
       });
       var next = incoming.map(function (p) { return dirty.has("spieler/" + p.id) && mine.has(p.id) ? mine.get(p.id) : p; });
       mine.forEach(function (p) {
@@ -1201,9 +1255,9 @@ td.extra { background: rgba(229, 88, 95, .07); }
       S.players = next;
       if (!snap.metadata.fromCache) mark("p");
       renderPoints(); renderRanking();
-    }, fail);
+    }), fail);
 
-    DB.doc("super/stand").onSnapshot(function (snap) {
+    DB.doc("super/stand").onSnapshot(guard("stand", function (snap) {
       if (!dirty.has("super/stand")) {
         var data = snap.exists ? (snap.data() || {}) : {};
         S.superDone = strList(data.done);
@@ -1212,9 +1266,9 @@ td.extra { background: rgba(229, 88, 95, .07); }
         S.superSince = String(data.since || "");
       }
       renderSuper();
-    }, fail);
+    }), fail);
 
-    DB.doc("super/historie").onSnapshot(function (snap) {
+    DB.doc("super/historie").onSnapshot(guard("historie", function (snap) {
       if (!dirty.has("super/historie")) {
         var data = snap.exists ? (snap.data() || {}) : {};
         var list = data.list;
@@ -1222,27 +1276,27 @@ td.extra { background: rgba(229, 88, 95, .07); }
         S.seasons = Array.isArray(list) ? list.filter(Boolean).map(normSeason) : [];
       }
       renderRanking();
-    }, fail);
+    }), fail);
 
-    DB.doc("rad/runde").onSnapshot(function (snap) {
+    DB.doc("rad/runde").onSnapshot(guard("runde", function (snap) {
       if (!dirty.has("rad/runde")) {
         var data = snap.exists ? (snap.data() || {}) : {};
         S.games = clampGames(data.games);
         S.doppelt = !!data.doppelt;
       }
       renderPoints();
-    }, fail);
+    }), fail);
 
-    DB.doc("rad/optionen").onSnapshot(function (snap) {
+    DB.doc("rad/optionen").onSnapshot(guard("optionen", function (snap) {
       if (!dirty.has("rad/optionen")) {
         var data = snap.exists ? (snap.data() || {}) : {};
         S.wheel = Array.isArray(data.items) ? data.items.map(normOpt) : [];
       }
       if (!snap.metadata.fromCache) mark("w");
       renderWheelPanel();
-    }, fail);
+    }), fail);
 
-    DB.collection("runden").onSnapshot(function (snap) {
+    DB.collection("runden").onSnapshot(guard("runden", function (snap) {
       var incoming = snap.docs.filter(function (d) { return d.exists; }).map(function (d) {
         var x = d.data() || {};
         return normRound(Object.assign({}, x, { id: d.id }));
@@ -1253,7 +1307,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       S.rounds = incoming;
       if (!snap.metadata.fromCache) mark("r");
       renderRanking();
-    }, fail);
+    }), fail);
   }
 
   function boot() {
@@ -1453,7 +1507,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   var CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   function persistSuper() {
     if (S.mode === "local") lsSaveSoon();
-    else if (S.mode === "db") queueWrite("super/stand", superBody, 0);
+    else if (live()) queueWrite("super/stand", superBody, 0);
   }
   function superState() {
     var items = superItems(), done = {};
@@ -2261,23 +2315,10 @@ td.extra { background: rgba(229, 88, 95, .07); }
         h += k >= BASE_GAMES ? '<th scope="col" class="extra-th" data-col="' + k + '">Spiel ' + (k + 1) + '<small>Entscheidung</small></th>'
                              : '<th scope="col" data-col="' + k + '">Spiel ' + (k + 1) + '</th>';
       }
-      h += '<th scope="col">Gesamt</th><th scope="col">Platz</th>' +
-        '<th scope="col" class="dbl-th"><div class="dbl-wrap"><span id="dbl-label">Doppelt</span>' +
-        '<button type="button" class="switch" id="dbl-switch" role="switch" aria-checked="false" aria-labelledby="dbl-label"' + (locked ? " disabled" : "") + '><span class="knob"></span></button></div></th></tr>';
+      h += '<th scope="col">Gesamt</th><th scope="col">Platz</th><th scope="col" class="dbl-th">Doppelt</th></tr>';
       head.innerHTML = h;
     }
-    var sw = $("#dbl-switch");
-    sw.setAttribute("aria-checked", S.doppelt ? "true" : "false");
-    sw.disabled = locked;
   }
-  $("#score-head").addEventListener("click", function (e) {
-    var sw = e.target.closest("#dbl-switch");
-    if (!sw || sw.disabled) return;
-    S.doppelt = !S.doppelt;
-    persistRunde();
-    if (S.doppelt) Sound.hit(0.5);
-    renderPoints();
-  });
 
   function makePlayerRow(p) {
     var tr = document.createElement("tr");
@@ -2290,7 +2331,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     for (var k = 0; k < S.games; k++) {
       html += '<td' + (k >= BASE_GAMES ? ' class="extra"' : "") + ' data-col="' + k + '"><div class="game"><select class="pl-sel" data-k="' + k + '">' + placeOptions() + '</select><span class="pts"></span></div></td>';
     }
-    html += '<td><span class="sum"></span></td><td><span class="rank"></span></td><td class="dbl-cell"><span class="x2" aria-hidden="true">×2</span></td>';
+    html += '<td><span class="sum"></span></td><td><span class="rank"></span></td><td class="dbl-cell"><div class="dbl-row"><button type="button" class="switch" data-act="dbl" role="switch" aria-checked="false"><span class="knob"></span></button><span class="x2" aria-hidden="true">×2</span></div></td>';
     tr.innerHTML = html;
     tr.querySelectorAll("select").forEach(function (s) { s.id = "pl-" + p.id + "-" + s.dataset.k; });
     return tr;
@@ -2344,7 +2385,11 @@ td.extra { background: rgba(229, 88, 95, .07); }
         var tag = tr.querySelector(".tag");
         tag.hidden = !isLast;
         tag.textContent = st.bottom.length > 1 ? "Gleichstand" : "Mimik";
-        tr.querySelector(".dbl-cell").classList.toggle("on", !!S.doppelt);
+        tr.querySelector(".dbl-cell").classList.toggle("on", !!p.dbl);
+        var dsw = tr.querySelector('[data-act="dbl"]');
+        dsw.setAttribute("aria-checked", p.dbl ? "true" : "false");
+        dsw.setAttribute("aria-label", p.name + ": Mimik zählt doppelt");
+        dsw.disabled = locked || S.ending;
         tr.querySelectorAll("select.pl-sel").forEach(function (sel) {
           var k = Number(sel.dataset.k), v = p.p[k];
           var want = v === null ? "" : String(v);
@@ -2367,7 +2412,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var nb = st.bottom.length;
     $("#c-last").textContent = nb ? st.bottom.map(function (r) { return r.p.name; }).join(" & ") : "—";
     $("#c-last-s").textContent = !nb ? "Steht nach dem ersten Spiel fest"
-      : nb === 1 ? st.minAll + " Punkte" + (S.doppelt ? " · zählt doppelt (×2)" : "")
+      : nb === 1 ? st.minAll + " Punkte" + (st.bottom[0].p.dbl ? " · zählt doppelt (×2)" : "")
       : "Gleichstand mit " + st.minAll + " Punkten · " + (st.pending ? "erst Spiel " + S.games + " eintragen"
         : nb === 2 ? "1 gegen 1 entscheidet" : (S.games < MAX_GAMES ? "Spiel " + (S.games + 1) + " entscheidet" : "Duell entscheidet"));
 
@@ -2401,7 +2446,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     S.endPick = loser ? [loser.p.id] : [];
     if (loser) {
       lead.innerHTML = "Die Mimik macht <b>" + esc(loser.p.name) + "</b> mit " + loser.total + " Punkten." +
-        (S.doppelt ? ' <span class="x2-inline">Doppelte Runde · zählt als 2 Mimiks</span>' : "");
+        (loser.p.dbl ? ' <span class="x2-inline">Doppelt · zählt als 2 Mimiks</span>' : "");
     } else {
       lead.textContent = "Es gibt gerade einen Gleichstand.";
     }
@@ -2425,20 +2470,24 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var st = standings();
     ids = ids || S.endPick;
     if (st.played.length < 2 || st.dups.length || !ids || !ids.length) return;
-    var wasDouble = !!S.doppelt, games = S.games;
+    var dblIds = S.players.filter(function (x) { return x.dbl; }).map(function (x) { return x.id; });
+    var wasDouble = ids.some(function (id) { return dblIds.indexOf(id) >= 0; }), games = S.games;
     var r = {
       id: "r" + Date.now().toString(36) + uid().slice(0, 4),
       at: new Date().toISOString(),
       entries: st.played.map(function (x) { return { id: x.p.id, name: x.p.name, spiele: x.games, punkte: x.total }; }),
-      mimik: ids.slice(), doppelt: wasDouble, duel: !!viaDuel, games: games, saison: ""
+      mimik: ids.slice(), doppelt: wasDouble, dbl: dblIds, duel: !!viaDuel, games: games, saison: ""
     };
     saveRound(r);
-    st.played.forEach(function (x) { x.p.p = emptyP(); persistPlayer(x.p, 0); });
-    S.games = BASE_GAMES; S.doppelt = false; persistRunde();
+    S.players.forEach(function (x) {
+      var used = x.p.some(function (v) { return v !== null; });
+      if (used || x.dbl) { x.p = emptyP(); x.dbl = false; persistPlayer(x, 0); }
+    });
+    S.games = BASE_GAMES; persistRunde();
     var mNames = ids.map(function (id) { return esc(playerName(id)); }).join(" & ");
     S.ending = false; S.endPick = [];
     flash("Runde eingetragen. Die Mimik macht <b>" + mNames + "</b>" + (viaDuel ? " nach dem Duell" : "") +
-      (wasDouble ? " – <b>doppelte Runde, zählt als 2 Mimiks</b>" : "") + ". Alles steht jetzt in der Rangliste.");
+      (wasDouble ? " – <b>doppelt, zählt als 2 Mimiks</b>" : "") + ". Alles steht jetzt in der Rangliste.");
     renderRanking();
   }
 
@@ -2495,7 +2544,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       card.style.setProperty("--fc", FCOLS[i % FCOLS.length]);
       card.style.setProperty("--fi", String(i));
       card.innerHTML = '<div class="hp" aria-hidden="true"><span></span></div><div class="f-av" aria-hidden="true"></div><div class="f-name"></div>' +
-        '<div class="f-tag">P' + (i + 1) + '</div><button type="button" class="f-lose">Verloren</button>';
+        '<div class="f-tag">P' + (i + 1) + (opts.showDbl && p.dbl ? ' · ×2' : "") + '</div><button type="button" class="f-lose">Verloren</button>';
       setAvatar(card.querySelector(".f-av"), p);
       card.querySelector(".f-name").textContent = p.name;
       card.querySelector(".f-lose").setAttribute("aria-label", p.name + " hat verloren");
@@ -2579,6 +2628,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var p = findPlayer(b);
     if (!p) return;
     if (b.dataset.act === "delp") arm(b, "Löschen?", function () { removePlayer(p.id); });
+    else if (b.dataset.act === "dbl") { p.dbl = !p.dbl; persistPlayer(p, 0); if (p.dbl) Sound.hit(0.5); renderPoints(); }
     else if (b.dataset.act === "avatar") { avatarTarget = p.id; $("#avatar-file").value = ""; $("#avatar-file").click(); }
   });
   $("#score-body").addEventListener("change", function (e) {
@@ -2648,7 +2698,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
       openFight(bottom.map(function (r) { return r.p; }), {
         kicker: "Gleichstand mit " + bottom[0].total + " Punkten",
         title: bottom.length === 2 ? "1 gegen 1" : "Jeder gegen jeden",
-        hint: "Spielt es aus. Wer verliert, macht die Mimik" + (S.doppelt ? " – doppelt" : "") + ". Den „Verloren“-Knopf zweimal antippen.",
+        hint: "Spielt es aus. Wer verliert, macht die Mimik. Den „Verloren“-Knopf zweimal antippen." + (bottom.some(function (r) { return r.p.dbl; }) ? " ×2 heißt: zählt doppelt." : ""),
+        showDbl: true,
         onLoser: function (ids) { confirmEnd(ids, true); }
       });
       return;
@@ -2665,7 +2716,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var m = new Map(S.players.map(function (p) { return [p.id, { p: p, spiele: 0, runden: 0, punkte: 0, mimiks: 0, dbl: 0, supers: 0 }]; }));
     rounds.forEach(function (r) {
       r.entries.forEach(function (e) { var a = m.get(e.id); if (a) { a.spiele += e.spiele; a.runden += 1; a.punkte += e.punkte; } });
-      r.mimik.forEach(function (id) { var a = m.get(id); if (a) { a.mimiks += r.doppelt ? 2 : 1; if (r.doppelt) a.dbl += 1; } });
+      r.mimik.forEach(function (id) { var a = m.get(id); if (a) { var d = isDbl(r, id); a.mimiks += d ? 2 : 1; if (d) a.dbl += 1; } });
     });
     return Array.from(m.values()).map(function (a) {
       a.pct = a.spiele ? a.punkte / (a.spiele * 5) : null;
@@ -2769,8 +2820,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
       ["#r-best-s", "#r-top-s", "#r-clean-s"].forEach(function (x) { $(x).textContent = best ? "Erscheint nach der ersten Runde" : "Erscheint nach der ersten Runde dieser Rangliste"; });
     }
     $("#rank-note").textContent = best
-      ? "Bestenliste = alle Runden aller Ranglisten zusammen. Doppelte Runden zählen als 2 Mimiks."
-      : "Punkte % = erreichte Punkte von maximal möglichen (5 je Spiel). Mimik-Quote = Mimiks je Runde. Doppelte Runden zählen als 2 Mimiks. Spaltenköpfe antippen zum Sortieren.";
+      ? "Bestenliste = alle Runden aller Ranglisten zusammen. Doppelte Mimiks zählen ×2."
+      : "Punkte % = erreichte Punkte von maximal möglichen (5 je Spiel). Mimik-Quote = Mimiks je Runde. Doppelte Mimiks zählen ×2. Spaltenköpfe antippen zum Sortieren.";
 
     var es = $("#end-season"), t = seasonTop();
     es.hidden = best;
@@ -2827,7 +2878,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       li.querySelector(".when").textContent = when;
       li.querySelector(".what b").textContent = r.mimik.map(nameOf).join(" & ") || "—";
       var bd = li.querySelector(".badges");
-      if (r.doppelt) bd.insertAdjacentHTML("beforeend", '<span class="badge2 x2">×2</span>');
+      if (r.mimik.some(function (id) { return isDbl(r, id); })) bd.insertAdjacentHTML("beforeend", '<span class="badge2 x2">×2</span>');
       if (r.duel) bd.insertAdjacentHTML("beforeend", '<span class="badge2 duel">Duell</span>');
       if (r.games > BASE_GAMES) bd.insertAdjacentHTML("beforeend", '<span class="badge2 extra">Spiel ' + r.games + '</span>');
       if (bestE) li.querySelector(".what em").textContent = nameOf(bestE.id) + " (" + bestE.punkte + " P)";
@@ -2992,6 +3043,71 @@ td.extra { background: rgba(229, 88, 95, .07); }
     if (!$("#reveal").hidden) closeReveal();
     else if (!$("#fight").hidden && !Fight.done) closeFight();
     else if (!$("#confirm").hidden) closeConfirm();
+  });
+
+  /* ---------- Testmodus ---------- */
+  var TEST = { backup: null, pending: {}, readOnly: false };
+  function dataCopy() {
+    return JSON.parse(JSON.stringify({ players: S.players, wheel: S.wheel, rounds: S.rounds, superDone: S.superDone, games: S.games,
+      seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince }));
+  }
+  function renderTestUI() {
+    var on = !!S.test;
+    var b = $("#test-btn");
+    b.setAttribute("aria-pressed", String(on));
+    b.querySelector("span").textContent = on ? "Test läuft" : "Testversion";
+    $("#testbar").hidden = !on;
+    document.body.classList.toggle("testing", on);
+  }
+  function enterTest() {
+    if (S.test || S.mode === "init") return;
+    TEST.backup = dataCopy(); TEST.pending = {}; TEST.readOnly = S.readOnly;
+    S.test = true; S.readOnly = false;
+    setStatus("test");
+    renderTestUI();
+    renderAll(); renderSuper();
+  }
+  function exitTest() {
+    if (!S.test) return;
+    if (!$("#fight").hidden) closeFight();
+    if (!$("#reveal").hidden) closeReveal();
+    if (!$("#confirm").hidden) closeConfirm();
+    if (!$("#win").hidden) closeWin();
+    var b = TEST.backup;
+    S.test = false; S.readOnly = TEST.readOnly;
+    S.players = b.players; S.wheel = b.wheel; S.rounds = b.rounds; S.superDone = b.superDone; S.games = b.games;
+    S.seasons = b.seasons; S.superWho = b.superWho; S.superNames = b.superNames; S.superSince = b.superSince;
+    S.ending = false; S.endPick = []; S.flash = "";
+    var pend = TEST.pending; TEST.pending = {}; TEST.backup = null;
+    Object.keys(pend).forEach(function (k) { pend[k].fn(pend[k].snap); });
+    setStatus(S.mode === "local" ? "local" : S.readOnly ? "readonly" : "live");
+    renderTestUI();
+    renderAll(); renderSuper();
+  }
+  $("#test-btn").addEventListener("click", function () { if (S.test) exitTest(); else enterTest(); });
+  $("#test-exit").addEventListener("click", exitTest);
+  $("#testbar").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-prev]");
+    if (!b || !S.test) return;
+    var what = b.dataset.prev;
+    if (what === "duel") {
+      var st = standings();
+      var pool = st.bottom.length >= 2 ? st.bottom.map(function (r) { return r.p; }) : S.players.slice(0, 2);
+      if (pool.length < 2) return;
+      openFight(pool.slice(0, Math.max(2, pool.length)), {
+        kicker: "Vorschau", title: "1 gegen 1", showDbl: true,
+        hint: "Testmodus: Probier den „Verloren“-Knopf ruhig aus – eingetragen wird nichts.",
+        onLoser: function (ids) { showView("punkte"); flash("Testmodus: <b>" + esc(playerName(ids[0])) + "</b> hätte verloren. Nichts wurde gespeichert."); }
+      });
+    } else if (what === "reveal") {
+      var t = seasonTop();
+      var names = t.top.length ? t.top.map(function (a) { return a.p.name; }) : (S.superNames.length ? S.superNames : S.players.slice(0, 1).map(function (p) { return p.name; }));
+      openReveal(names, "Vorschau im Testmodus");
+    } else if (what === "end") {
+      showView("rangliste"); S.rankView = "aktuell"; renderRanking();
+      if (!currentRounds().length || !seasonTop().top.length) { $("#es-warn").textContent = "Zum Testen braucht die Rangliste mindestens eine Runde mit Mimik."; return; }
+      openConfirm();
+    }
   });
 
   /* ---------- tabs ---------- */
