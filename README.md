@@ -1,10 +1,11 @@
 # ARAM Mimik
 
-Strafen-Glücksrad, Punktetabelle und Rangliste für unsere ARAM-Runden.
+Strafen-Glücksrad, Punktetabelle, Rangliste und Super-Mimik für unsere ARAM-Runden.
 
-- **Glücksrad:** Optionen mit Anzahl 0–20. Jedes Feld ist gleich groß, Anzahl 0 nimmt eine Option aus dem Rad. Der Zufall kommt aus dem Browser (`crypto.getRandomValues`). Beim Drehen Klick-Sound und anschwellendes „Ooooh“, beim Ergebnis Knall, Fanfare, Jubel, Feuerwerk und Konfetti. Ton lässt sich unter dem Rad abschalten.
-- **Punkte:** Platz nach Schaden je Spiel (1. = 5 P … 5. = 1 P), bis zu 4 Spiele pro Runde. „Runde beenden" ermittelt die Mimik und überträgt Spiele und Punkte in die Rangliste.
-- **Rangliste:** Spiele, Runden, Punkte, Punkte-%, Mimiks, Mimik-Quote, dazu der Verlauf aller Runden.
-- **Super-Mimik:** Abhakliste mit allen Optionen aus dem Glücksrad (auch Anzahl 0, alles mit „doppelt“ im Namen ausgenommen), der Reihe nach abzuhaken; „Flasche sitzen“ ist immer das Finale. Neue Optionen landen automatisch mit drin.
+- **Glücksrad:** Optionen mit Anzahl 0–20, jedes Feld gleich groß, Zufall aus dem Browser (`crypto.getRandomValues`). Das Ergebnis steht beim Drehen fest; Zitterphase, Trommelwirbel und Herzschlag sind nur Show.
+- **Punkte:** Platz nach Schaden je Spiel (1. = 5 P … 5. = 1 P). Schalter „Doppelt“: Die Mimik der Runde zählt als 2. Gleichstand beim Letzten: 2 Spieler → 1 gegen 1, ab 3 Spielern → automatisch ein Zusatzspiel (bis Spiel 8).
+- **Rangliste / Bestenliste:** aktuelle Rangliste mit Verlauf; „Rangliste beenden“ (4 Bestätigungen) bestimmt die Super-Mimik (meiste Mimiks, Gleichstand per Duell) und schiebt alles in die Bestenliste.
+- **Super-Mimik:** Enthüllung mit eigener Stadion-Hymne, danach Abhakliste aller Mimiks, „Flasche sitzen“ als Finale.
 
-Die Seite ist eine einzelne `index.html`. Alle Eingaben liegen in einer Firebase Realtime Database (europe-west1) und sind für alle mit dem Link live sichtbar und bearbeitbar.
+Alle Klänge und Musikstücke werden im Browser erzeugt und sind eigene Kompositionen.
+Die Seite ist eine einzelne `index.html`. Alle Eingaben liegen in einer Firebase Realtime Database (europe-west1) unter `spieler`, `rad`, `runden` und `super` und sind für alle mit dem Link live sichtbar und bearbeitbar.
