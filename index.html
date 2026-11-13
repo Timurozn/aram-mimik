@@ -323,7 +323,7 @@ button.av:disabled { cursor: default; }
 .roast {
   position: fixed; inset: 0; z-index: 70; pointer-events: none; display: grid; place-items: center; padding: 16px;
   background: radial-gradient(circle at 50% 45%, rgba(62, 12, 22, .9), rgba(10, 2, 6, .97) 70%);
-  animation: roast-life 4.6s ease both;
+  animation: roast-life 6s ease both;
 }
 .roast[hidden] { display: none; }
 @keyframes roast-life { 0% { opacity: 0; } 6% { opacity: 1; } 82% { opacity: 1; } 100% { opacity: 0; } }
@@ -2500,53 +2500,60 @@ td.extra { background: rgba(229, 88, 95, .07); }
         }
       };
     }
-    /* Schandplatz: soft crowd boo + mellow sad trombone, kept well below the other effects */
-    function boo(t, len, dest) {
-      var f1 = ac.createBiquadFilter(), f2 = ac.createBiquadFilter(), lp = ac.createBiquadFilter(), g = ac.createGain();
-      f1.type = "bandpass"; f1.frequency.value = 320; f1.Q.value = 2.5; f2.type = "bandpass"; f2.frequency.value = 700; f2.Q.value = 4;
-      lp.type = "lowpass"; lp.frequency.value = 1400;
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.9, t + 0.45);
-      g.gain.setValueAtTime(0.9, t + len * 0.55); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-      f1.connect(lp); f2.connect(lp); lp.connect(g); g.connect(dest);
-      for (var i = 0; i < 10; i++) {
-        var o = ac.createOscillator(), vg = ac.createGain(), base = 100 + Math.random() * 80, st = t + Math.random() * 0.3;
-        o.type = "sawtooth";
-        o.frequency.setValueAtTime(base * 1.06, st); o.frequency.exponentialRampToValueAtTime(base * 0.88, t + len);
-        vg.gain.value = 0.045;
-        o.connect(vg); vg.connect(f1); vg.connect(f2); o.start(st); o.stop(t + len + 0.05);
-      }
-    }
-    function sadTrombone(t, dest) {
-      [[55, 0, 0.42], [54, 0.5, 0.42], [53, 1.0, 0.42], [52, 1.5, 1.5]].forEach(function (nt, i) {
-        var at = t + nt[1], len = nt[2], last = i === 3;
-        var f = ac.createBiquadFilter(), g = ac.createGain();
-        f.type = "lowpass"; f.Q.value = 1.5;
-        f.frequency.setValueAtTime(260, at); f.frequency.exponentialRampToValueAtTime(950, at + 0.14); f.frequency.exponentialRampToValueAtTime(380, at + len);
-        g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.22, at + 0.07);
-        g.gain.setValueAtTime(0.2, at + len - 0.1); g.gain.exponentialRampToValueAtTime(0.0001, at + len + 0.08);
-        f.connect(g); g.connect(dest);
-        var lg = null;
-        if (last) {
-          var lfo = ac.createOscillator(); lg = ac.createGain();
-          lfo.frequency.value = 5.5; lg.gain.setValueAtTime(0, at); lg.gain.linearRampToValueAtTime(30, at + 0.5);
-          lfo.connect(lg); lfo.start(at); lfo.stop(at + len + 0.1);
-        }
-        [["triangle", 0, 1], ["sawtooth", 5, 0.35]].forEach(function (v) {
-          var o = ac.createOscillator(), og = ac.createGain();
-          o.type = v[0]; o.frequency.value = hz(nt[0]); o.detune.value = v[1]; og.gain.value = v[2];
-          if (lg) { lg.connect(o.detune); o.frequency.setValueAtTime(hz(nt[0]), at + len * 0.6); o.frequency.exponentialRampToValueAtTime(hz(nt[0]) * 0.94, at + len); }
-          o.connect(og); og.connect(f); o.start(at); o.stop(at + len + 0.1);
-        });
+    /* Schandplatz: own smooth wah-funk groove (E9 / A9, 96 bpm), kept well below the other effects */
+    function wahChord(at, len, chord, f0, f1, vol, dest) {
+      var bp = ac.createBiquadFilter(), g = ac.createGain();
+      bp.type = "bandpass"; bp.Q.value = 5;
+      bp.frequency.setValueAtTime(f0, at); bp.frequency.exponentialRampToValueAtTime(f1, at + len * 0.65);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.012);
+      g.gain.setValueAtTime(vol * 0.8, at + len * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+      bp.connect(g); g.connect(dest);
+      chord.forEach(function (m, i) {
+        var o = ac.createOscillator(); o.type = "sawtooth"; o.frequency.value = hz(m); o.detune.value = (i % 2 ? 4 : -4);
+        o.connect(bp); o.start(at); o.stop(at + len + 0.02);
       });
+    }
+    function chick(at, dest) {
+      var n = noise(), bp = ac.createBiquadFilter(), g = ac.createGain();
+      bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 2.5;
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.16, at + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.05);
+      n.connect(bp); bp.connect(g); g.connect(dest); n.start(at); n.stop(at + 0.06);
+    }
+    function softBass(at, m, len, dest) {
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.type = "triangle"; o.frequency.value = hz(m);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.35, at + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+      o.connect(g); g.connect(dest); o.start(at); o.stop(at + len + 0.02);
+    }
+    function softKick(at, dest) {
+      var o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.setValueAtTime(120, at); o.frequency.exponentialRampToValueAtTime(45, at + 0.12);
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.5, at + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
+      o.connect(g); g.connect(dest); o.start(at); o.stop(at + 0.25);
+    }
+    function funk(t, dest) {
+      var s16 = 60 / 96 / 4, E9 = [52, 56, 62, 66], A9 = [57, 61, 67, 71];
+      [0, 1].forEach(function (bar) {
+        var b = t + bar * 16 * s16, ch = bar ? A9 : E9, root = bar ? 45 : 40;
+        wahChord(b, s16 * 3, ch, 320, 2100, 0.3, dest);                 /* bow */
+        chick(b + s16 * 4, dest); chick(b + s16 * 5, dest);              /* chick-a */
+        wahChord(b + s16 * 6, s16 * 2, ch, 2000, 420, 0.26, dest);       /* wow */
+        wahChord(b + s16 * 8, s16 * 4, ch, 380, 2000, 0.3, dest);        /* wow */
+        chick(b + s16 * 12, dest); chick(b + s16 * 14, dest);
+        wahChord(b + s16 * 15, s16 * 1.2, ch, 900, 1800, 0.18, dest);
+        [0, 6, 8].forEach(function (k) { softKick(b + k * s16, dest); });
+        softBass(b, root, s16 * 3, dest); softBass(b + s16 * 6, root + 12, s16 * 1.5, dest); softBass(b + s16 * 8, root, s16 * 3, dest);
+        softBass(b + s16 * 14, root + 7, s16 * 2, dest);
+      });
+      wahChord(t + 32 * s16, s16 * 8, E9, 300, 1600, 0.28, dest);        /* final long "wowww" */
+      softBass(t + 32 * s16, 40, s16 * 8, dest); softKick(t + 32 * s16, dest);
     }
     function roast() {
       var c = ensure(); if (!c) return;
-      var t = c.currentTime + 0.02;
-      var out = c.createGain(); out.gain.value = 0.42; out.connect(fxbus);
-      boom(t, 0.3, out, out);
-      boo(t + 0.1, 2.4, out);
-      sadTrombone(t + 0.4, out);
-      setTimeout(function () { try { out.disconnect(); } catch (e) {} }, 4500);
+      var t = c.currentTime + 0.03;
+      var out = c.createGain(); out.gain.value = 0.3; out.connect(fxbus);
+      funk(t, out);
+      setTimeout(function () { try { out.disconnect(); } catch (e) {} }, 6500);
     }
     function setMuted(v) {
       muted = v;
@@ -3131,14 +3138,33 @@ td.extra { background: rgba(229, 88, 95, .07); }
     $("#shame-stats").innerHTML = chips.join("");
     return info;
   }
-  function sayDe(text) {
+  /* flirty roast voice: slow, drawn out, in pieces with pauses; prefers a male German voice if the device has one */
+  var FLIRT = [
+    ["Naaa duuu…", "{n}…", "du musst das machen. Mmmh."],
+    ["Uuuh, {n}, Schätzchen…", "ganz unten gefällt's dir wohl.", "Mmmh."],
+    ["Ooh, {n}…", "komm her, Süßer.", "Die Mimik wartet schon auf dich."],
+    ["Mmmh, {n}…", "so wenig Punkte…", "du musst das machen, Baby."],
+    ["Hey Hübscher…", "{n}…", "zeig mal, was du kannst. Bei der Mimik."]
+  ];
+  var FLIRT_AGAIN = [["Schon wieder du, {n}?", "Du kannst wohl nicht genug kriegen…", "Mmmh."], ["{n}, Schätzchen…", "schon wieder ganz unten.", "Ich steh drauf."]];
+  var FLIRT_TIE = [["Ooh, ihr zwei Hübschen…", "{n}…", "einer von euch muss es machen. Mmmh."], ["Mmmh… {n}…", "ihr seid beide so schlecht…", "und so süß."]];
+  function flirtVoice() {
+    var vs = window.speechSynthesis.getVoices().filter(function (v) { return /^de/i.test(v.lang); });
+    var male = vs.filter(function (v) { return /markus|yannick|martin|hans|stefan|viktor|ralf|reed|eddy|rocko|male|mann/i.test(v.name); });
+    return male[0] || vs[0] || null;
+  }
+  function sayFlirt(name, tie, again) {
     if (Sound.isMuted() || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return;
     try {
-      var u = new SpeechSynthesisUtterance(text);
-      u.lang = "de-DE"; u.rate = 1; u.pitch = 0.85; u.volume = 0.6;
-      var vs = window.speechSynthesis.getVoices().filter(function (v) { return /^de/i.test(v.lang); });
-      if (vs.length) u.voice = vs[0];
-      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+      var lines = pickOne(tie ? FLIRT_TIE : again ? FLIRT_AGAIN : FLIRT);
+      var v = flirtVoice();
+      window.speechSynthesis.cancel();
+      lines.forEach(function (ln, i) {
+        var u = new SpeechSynthesisUtterance(ln.replace("{n}", name));
+        u.lang = "de-DE"; u.rate = 0.72; u.pitch = 1.25; u.volume = 0.6;
+        if (v) u.voice = v;
+        window.speechSynthesis.speak(u);
+      });
     } catch (e) {}
   }
   function showRoast(info, taunt) {
@@ -3152,11 +3178,12 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var inner = ov.querySelector(".roast-inner");
     inner.style.animation = "none"; void inner.offsetWidth; inner.style.animation = "";
     clearTimeout(SHAME.roastTimer);
-    SHAME.roastTimer = setTimeout(function () { ov.hidden = true; }, 4600);
+    SHAME.roastTimer = setTimeout(function () { ov.hidden = true; }, 6000);
     var box = $("#shame");
     box.classList.remove("slam"); void box.offsetWidth; box.classList.add("slam");
     Sound.roast();
-    setTimeout(function () { sayDe("Bah! " + tx.name + (info.rows.length > 1 ? ", einer von euch muss das machen!" : ", du musst das machen!")); }, 300);
+    var again = info.rows.length === 1 && SHAME.streak > 1 && SHAME.lastIds === info.ids;
+    setTimeout(function () { sayFlirt(tx.name, info.rows.length > 1, again); }, 450);
     if (!reduceMotion) {
       var c = EPIC.centerOf($("#roast-pics"));
       EPIC.zap("#FF8A8A");
