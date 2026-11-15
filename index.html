@@ -3772,6 +3772,10 @@ td.extra { background: rgba(229, 88, 95, .07); }
     "origin": "Die Riot-Verbindung lässt diese Seite nicht zu.",
     "bad-id": "Aus dem Link lässt sich keine Spielnummer lesen."
   };
+  function riotDetail(b) {
+    if (!b || !b.status) return "";
+    return " (Riot: " + b.status + (b.riot ? " " + b.riot : "") + (b.limit ? ", Limit " + b.limit : "") + (b.key ? ", gespeicherter Schlüssel " + b.key : "") + ")";
+  }
   function setPlaces(k) {
     var id = S.roundMatches[k], m = id && S.matches[id];
     if (!m) return 0;
@@ -3812,7 +3816,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     fetch(url + "?match=" + encodeURIComponent(id))
       .then(function (r) { return r.json().catch(function () { return { error: "riot" }; }).then(function (b) { return { ok: r.ok, b: b }; }); })
       .then(function (res) {
-        if (!res.ok || !res.b || res.b.error) { st.busy = false; st.err = ERR_TXT[res.b && res.b.error] || "Riot hat nicht geantwortet. Später nochmal versuchen."; renderGameLinks(); return; }
+        if (!res.ok || !res.b || res.b.error) { st.busy = false; st.err = (ERR_TXT[res.b && res.b.error] || "Riot hat nicht geantwortet. Später nochmal versuchen.") + riotDetail(res.b); renderGameLinks(); return; }
         var m = normMatch(res.b, id);
         if (!m.p.length) { st.busy = false; st.err = "Das Spiel enthält keine Spielerdaten."; renderGameLinks(); return; }
         GL.pendingSave[m.id] = true;
@@ -4162,7 +4166,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       if (res.ok && res.b && res.b.ok) stEl.textContent = "Verbindung steht, der Riot-Schlüssel funktioniert.";
       else if (res.b && res.b.error === "no-key") stEl.textContent = "Verbindung steht, aber der Schlüssel RIOT_KEY fehlt noch bei Cloudflare.";
       else if (res.b && res.b.error === "origin") stEl.textContent = "Die Verbindung lässt diese Seite nicht zu.";
-      else stEl.textContent = "Verbindung steht, aber Riot lehnt den Schlüssel ab (abgelaufen?). Neuen Schlüssel bei Cloudflare eintragen.";
+      else stEl.textContent = "Verbindung steht, aber Riot lehnt den Schlüssel ab." + riotDetail(res.b);
     }).catch(function () { stEl.textContent = "Unter dieser Adresse antwortet nichts. Stimmt die Adresse?"; });
   });
 

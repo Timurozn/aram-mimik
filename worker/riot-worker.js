@@ -77,11 +77,22 @@ export default {
     if (!originOk(request)) return json({ error: "origin" }, 403, cors);
 
     const url = new URL(request.url);
-    if (!env.RIOT_KEY) return json({ error: "no-key" }, 500, cors);
+    const key = String(env.RIOT_KEY || "").trim().replace(/^["']|["']$/g, "");
+    if (!key) return json({ error: "no-key" }, 500, cors);
+    // safe hint about which key is stored (start and length only), to spot a wrong or old key
+    const keyHint = key.slice(0, 10) + "… (" + key.length + " Zeichen)";
+
+    async function riotError(r) {
+      let msg = "";
+      try { const b = await r.json(); msg = (b && b.status && b.status.message) || ""; } catch (e) {}
+      return { status: r.status, riot: msg, limit: r.headers.get("X-Rate-Limit-Type") || "", retry: r.headers.get("Retry-After") || "", key: keyHint };
+    }
 
     if (url.searchParams.get("ping")) {
-      const r = await fetch("https://euw1.api.riotgames.com/lol/status/v4/platform-data", { headers: { "X-Riot-Token": env.RIOT_KEY } });
-      return json({ ok: r.ok, status: r.status }, 200, cors, { "Cache-Control": "no-store" });
+      // a real check: this call only works with a valid key
+      const r = await fetch("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/CodexDraw/EUW", { headers: { "X-Riot-Token": key } });
+      if (r.ok) return json({ ok: true, status: r.status, key: keyHint }, 200, cors, { "Cache-Control": "no-store" });
+      return json(Object.assign({ ok: false }, await riotError(r)), 200, cors, { "Cache-Control": "no-store" });
     }
 
     const id = (url.searchParams.get("match") || "").toUpperCase();
@@ -95,12 +106,12 @@ export default {
     if (hit) return json(await hit.json(), 200, cors);
 
     const r = await fetch("https://" + ROUTING[m[1]] + ".api.riotgames.com/lol/match/v5/matches/" + id, {
-      headers: { "X-Riot-Token": env.RIOT_KEY }
+      headers: { "X-Riot-Token": key }
     });
-    if (r.status === 404) return json({ error: "not-found" }, 404, cors);
-    if (r.status === 401 || r.status === 403) return json({ error: "key" }, 502, cors);
-    if (r.status === 429) return json({ error: "busy" }, 429, cors);
-    if (!r.ok) return json({ error: "riot", status: r.status }, 502, cors);
+    if (r.status === 404) return json(Object.assign({ error: "not-found" }, await riotError(r)), 404, cors);
+    if (r.status === 401 || r.status === 403) return json(Object.assign({ error: "key" }, await riotError(r)), 502, cors);
+    if (r.status === 429) return json(Object.assign({ error: "busy" }, await riotError(r)), 429, cors);
+    if (!r.ok) return json(Object.assign({ error: "riot" }, await riotError(r)), 502, cors);
 
     const out = slim(await r.json());
     ctx.waitUntil(cache.put(cacheKey, new Response(JSON.stringify(out), {
