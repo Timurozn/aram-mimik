@@ -3869,7 +3869,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
 
   /* ---------- kopierte Spielseite (Blitz) einlesen ---------- */
   /* "10 / 16 / 181.75 KDA" → assists and ratio are glued together; the right split is the one where (K+A)/D equals the ratio */
-  function splitKda(k, d, rest) {
+  function splitKda(k, d, rest, strict) {
     rest = String(rest || "");
     for (var cut = 1; cut < rest.length; cut++) {
       var aTxt = rest.slice(0, cut), rTxt = rest.slice(cut);
@@ -3877,14 +3877,22 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var a = parseInt(aTxt, 10), r = parseFloat(rTxt);
       if (Math.abs(r - (k + a) / Math.max(1, d)) < 0.0051) return a;
     }
+    if (strict) return null;
     var m = /^(\d+)/.exec(rest);
     return m ? parseInt(m[1], 10) : 0;
   }
   function readKda(txt) {
     var m = /(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+(?:\.\d+)?)\s*(Perfect)?/i.exec(txt);
     if (!m) return null;
-    var k = +m[1], d = +m[2];
-    return { k: k, d: d, a: m[4] ? parseInt(m[3], 10) : splitKda(k, d, m[3]) };
+    var d = +m[2];
+    if (m[4]) return { k: +m[1], d: d, a: parseInt(m[3], 10) };
+    /* Blitz glues the rank digit in front of the kills ("E4" + "14" = "414") and the KDA value behind the assists
+       ("14" + "2.00"); the KDA value tells which split is the real one */
+    for (var i = 0; i < m[1].length; i++) {
+      var k = parseInt(m[1].slice(i), 10), a = splitKda(k, d, m[3], true);
+      if (a !== null) return { k: k, d: d, a: a };
+    }
+    return { k: +m[1], d: d, a: splitKda(+m[1], d, m[3]) };
   }
   function readDmg(txt) { var m = /([\d.,]+)\s*DMG/i.exec(txt); return m ? parseInt(m[1].replace(/[.,\s]/g, ""), 10) || 0 : null; }
   var RANK_RE = /^(MVP|SVP|ACE|\d{1,2}(st|nd|rd|th))$/i;
