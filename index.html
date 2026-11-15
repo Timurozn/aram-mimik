@@ -381,6 +381,9 @@ button.av:disabled { cursor: default; }
 .pl-bars div:nth-child(n+4) i { background: var(--blood); }
 .sp-box.pad { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--abyss); }
 .gl-shame { font-size: 13px; color: #FFB3B6; }
+.upd-bar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 9999; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center;
+  max-width: calc(100% - 32px); padding: 12px 16px; border: 1px solid var(--gold); border-radius: 12px; background: rgba(11, 24, 40, .96); color: var(--ink); font-size: 15px; box-shadow: 0 12px 40px rgba(0, 0, 0, .55); }
+.upd-bar .btn { height: 36px; padding: 0 16px; }
 .gl-shame b { color: #FFD0D2; }
 .st-tbl td { font-size: 16px; }
 .st-tbl tbody tr { cursor: pointer; }
@@ -1604,10 +1607,48 @@ td.extra { background: rgba(229, 88, 95, .07); }
     if (v && typeof v === "object") return Object.keys(v).sort(function (a, b) { return Number(a) - Number(b); }).map(function (k) { return v[k]; });
     return [];
   }
+  /* Games pasted before the fix have the rank digit in front of the kills (8 -> 48) and the
+     KDA value behind the assists (18 -> 182). Deaths were always right, so they are the check. */
+  var FIXED = {};
+  function gluedFix(k, d, a, E) {
+    var ks = String(k), as = String(a);
+    if (ks.length < 2 || !/[1-4]/.test(ks.charAt(0))) return null;
+    var k2 = parseInt(ks.slice(1), 10);
+    if (k2 > E) return null;
+    if (d === 0) return { k: k2, a: a };
+    for (var j = as.length - 1; j >= 1; j--) {
+      var a2 = parseInt(as.slice(0, j), 10), rem = as.slice(j);
+      if (a2 > E) continue;
+      var r = Math.floor(Math.round((k2 + a2) / d * 100) / 100 + 1e-9);
+      if (String(r) === rem) return { k: k2, a: a2 };
+    }
+    return null;
+  }
+  function repairMatch(m) {
+    if (m.v >= 2 || !m.p.length || m.p.some(function (x) { return x.ci; })) return false;
+    var changed = false;
+    [100, 200].forEach(function (tm) {
+      var own = m.p.filter(function (x) { return x.tm === tm; }), en = m.p.filter(function (x) { return x.tm !== tm; });
+      if (!own.length || !en.length) return;
+      var E = en.reduce(function (s2, y) { return s2 + y.d; }, 0), sumK = own.reduce(function (s2, y) { return s2 + y.k; }, 0);
+      own.forEach(function (x) {
+        if (!(x.k > E || x.a > E || sumK > E)) return;
+        var f = gluedFix(x.k, x.d, x.a, E);
+        if (f) { x.k = f.k; x.a = f.a; changed = true; }
+      });
+    });
+    m.v = 2;
+    return changed;
+  }
   function normMatch(x, id) {
     x = x || {};
+    var m = normMatch0(x, id);
+    if (repairMatch(m)) FIXED[m.id] = true;
+    return m;
+  }
+  function normMatch0(x, id) {
     return {
-      id: String(x.id || id || ""), at: Number(x.at) || 0, dur: Number(x.dur) || 0, q: Number(x.q) || 0, mode: String(x.mode || ""),
+      id: String(x.id || id || ""), v: Number(x.v) || 0, at: Number(x.at) || 0, dur: Number(x.dur) || 0, q: Number(x.q) || 0, mode: String(x.mode || ""),
       p: toArr(x.p).filter(Boolean).map(function (y) {
         return { n: String(y.n || ""), t: String(y.t || ""), c: String(y.c || ""), ci: Number(y.ci) || 0, k: Number(y.k) || 0, d: Number(y.d) || 0, a: Number(y.a) || 0,
           dmg: Number(y.dmg) || 0, tk: Number(y.tk) || 0, g: Number(y.g) || 0, cs: Number(y.cs) || 0, rk: String(y.rk || "").slice(0, 4),
@@ -1978,6 +2019,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       snap.docs.forEach(function (d) { if (d.exists) next[d.id] = normMatch(d.data(), d.id); });
       Object.keys(S.matches).forEach(function (id) { if (GL.pendingSave[id] && !next[id]) next[id] = S.matches[id]; });
       S.matches = next;
+      Object.keys(FIXED).forEach(function (id) { if (next[id] && live() && !S.readOnly) persistMatch(next[id]); delete FIXED[id]; });
       renderPoints(); renderStats();
     }), fail);
 
@@ -3787,7 +3829,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     lan: "LA1", la1: "LA1", las: "LA2", la2: "LA2", oce: "OC1", oc1: "OC1", jp: "JP1", jp1: "JP1", ru: "RU", me: "ME1", me1: "ME1" };
   var SLUG = { EUW1: "euw", EUN1: "eune", NA1: "na", KR: "kr", TR1: "tr", BR1: "br", LA1: "lan", LA2: "las", OC1: "oce", JP1: "jp", RU: "ru", ME1: "me" };
   /* known in-game names of the group, used once to link a Riot account to a player automatically */
-  var NAME_HINTS = { codexdraw: "Timur", cr7damage: "Fabian", jotti: "Jetmir", joty: "Jetmir", moshnaldo: "Marci", moschnaldo: "Marci", pilzkopf: "Besnik" };
+  var NAME_HINTS = { codexdraw: "Timur", cr7damage: "Fabian", jotti: "Jetmir", joty: "Jetmir", moshnaldo: "Marci", moschnaldo: "Marci", pilzkopf: "Besnik", pilzkopf1: "Besnik" };
   var CHAMP_NAMES = { MonkeyKing: "Wukong", Belveth: "Bel'Veth", KSante: "K'Sante", Kaisa: "Kai'Sa", Khazix: "Kha'Zix", Chogath: "Cho'Gath", Velkoz: "Vel'Koz",
     KogMaw: "Kog'Maw", RekSai: "Rek'Sai", Leblanc: "LeBlanc", DrMundo: "Dr. Mundo", JarvanIV: "Jarvan IV", Nunu: "Nunu & Willump", Renata: "Renata Glasc",
     FiddleSticks: "Fiddlesticks", AurelionSol: "Aurelion Sol", TahmKench: "Tahm Kench", TwistedFate: "Twisted Fate", XinZhao: "Xin Zhao", LeeSin: "Lee Sin",
@@ -3900,7 +3942,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       .then(function (r) { return r.json().catch(function () { return { error: "riot" }; }).then(function (b) { return { ok: r.ok, b: b }; }); })
       .then(function (res) {
         if (!res.ok || !res.b || res.b.error) { st.busy = false; st.err = (ERR_TXT[res.b && res.b.error] || "Riot hat nicht geantwortet. Später nochmal versuchen.") + riotDetail(res.b); renderGameLinks(); return; }
-        var m = normMatch(res.b, id);
+        var m = normMatch(Object.assign({ v: 2 }, res.b), id);
         if (!m.p.length) { st.busy = false; st.err = "Das Spiel enthält keine Spielerdaten."; renderGameLinks(); return; }
         GL.pendingSave[m.id] = true;
         persistMatch(m);
@@ -3936,13 +3978,23 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var m = /^(\d+)/.exec(rest);
     return m ? parseInt(m[1], 10) : 0;
   }
+  /* Blitz glues everything of one player together: "CodexDraw" "6th" "E4" "8 / 13 / 18" "2.00 KDA"
+     becomes "CodexDraw6thE48 / 13 / 182.00 KDA". Place and rank are read first, then the KDA value decides
+     where the assists end. */
+  var KDA_PR = /(?:MVP|SVP|ACE|\d{1,2}(?:st|nd|rd|th))\s*(?:-|[A-Z]{1,2}[1-4]?)?\s*(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+(?:\.\d+)?)\s*(Perfect)?/;
+  var KDA_ANY = /(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+(?:\.\d+)?)\s*(Perfect)?/i;
   function readKda(txt) {
-    var m = /(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+(?:\.\d+)?)\s*(Perfect)?/i.exec(txt);
+    var p = KDA_PR.exec(txt), m = KDA_ANY.exec(txt);
     if (!m) return null;
     var d = +m[2];
+    if (p) {
+      var kp = +p[1];
+      if (p[4]) return { k: kp, d: +p[2], a: parseInt(p[3], 10) };
+      var ap = splitKda(kp, +p[2], p[3], true);
+      if (ap !== null) return { k: kp, d: +p[2], a: ap };
+    }
     if (m[4]) return { k: +m[1], d: d, a: parseInt(m[3], 10) };
-    /* Blitz glues the rank digit in front of the kills ("E4" + "14" = "414") and the KDA value behind the assists
-       ("14" + "2.00"); the KDA value tells which split is the real one */
+    /* no place/rank found: the KDA value tells which split of kills and assists is the real one */
     for (var i = 0; i < m[1].length; i++) {
       var k = parseInt(m[1].slice(i), 10), a = splitKda(k, d, m[3], true);
       if (a !== null) return { k: k, d: d, a: a };
@@ -4006,7 +4058,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     if (ago) at -= +ago[1] * ({ minute: 6e4, hour: 36e5, day: 864e5 }[ago[2].toLowerCase()]);
     var id = matchNo ? platform + "_" + matchNo : "BLITZ_" + players.map(function (x) { return x.n + x.dmg; }).join("").replace(/[^A-Za-z0-9]/g, "").slice(0, 40);
     return {
-      id: id, at: at, dur: dm ? +dm[1] * 60 + +dm[2] : 0, q: 0, mode: /mayhem|chaos/i.test(all) ? "ARAM Mayhem" : "",
+      id: id, v: 2, at: at, dur: dm ? +dm[1] * 60 + +dm[2] : 0, q: 0, mode: /mayhem|chaos/i.test(all) ? "ARAM Mayhem" : "",
       p: players.map(function (x, i) {
         var tm = i < half ? 100 : 200;
         return { n: x.n, t: x.t, c: x.c, ci: 0, k: x.k || 0, d: x.d || 0, a: x.a || 0, dmg: x.dmg || 0, tk: 0, g: 0, cs: x.cs || 0, rk: x.rk || "",
@@ -5940,6 +5992,32 @@ td.extra { background: rgba(229, 88, 95, .07); }
   if (window.ResizeObserver) new ResizeObserver(function () { if (!S.spinning) draw(); }).observe($("#wheel-box"));
   else window.addEventListener("resize", draw);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+
+  /* a tab that stays open for hours keeps old code: look for a newer version and offer (or do) a reload */
+  var BUILD = "2026-11-16a";
+  (function () {
+    if (!/github\.io$/.test(location.hostname) || !window.fetch) return;
+    var bar = null, busy = false;
+    function check() {
+      if (busy) return; busy = true;
+      fetch(location.pathname + "?build=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (t) {
+        busy = false;
+        var m = /var BUILD = "([^"]+)"/.exec(t || "");
+        if (!m || m[1] === BUILD) return;
+        if (document.hidden && !S.test && !S.spinning) { location.reload(); return; }
+        if (bar) return;
+        bar = document.createElement("div");
+        bar.className = "upd-bar";
+        bar.innerHTML = '<span>Es gibt eine neue Version der Seite.</span><button type="button" class="btn">Neu laden</button>';
+        bar.querySelector("button").addEventListener("click", function () { location.reload(); });
+        document.body.appendChild(bar);
+      }).catch(function () { busy = false; });
+    }
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) check(); });
+    window.addEventListener("focus", check);
+    setInterval(check, 5 * 60 * 1000);
+    setTimeout(check, 20000);
+  })();
 
   showView(location.hash.replace("#", ""));
   boot();
