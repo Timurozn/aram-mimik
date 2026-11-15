@@ -1233,7 +1233,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       </div>
 
       <div class="panel gl" id="gl">
-        <div class="gl-head"><h2>Spiele laden</h2><span class="eyebrow">Link von playaram.gg einfügen · Plätze kommen automatisch nach Schaden</span></div>
+        <div class="gl-head"><h2>Spiele laden</h2><span class="eyebrow">In Blitz die Spielseite öffnen · Strg+A · Strg+C · hier Strg+V · Plätze kommen nach Schaden</span></div>
         <div class="gl-grid" id="gl-grid"></div>
       </div>
 
@@ -3701,19 +3701,26 @@ td.extra { background: rgba(229, 88, 95, .07); }
     lan: "LA1", la1: "LA1", las: "LA2", la2: "LA2", oce: "OC1", oc1: "OC1", jp: "JP1", jp1: "JP1", ru: "RU", me: "ME1", me1: "ME1" };
   var SLUG = { EUW1: "euw", EUN1: "eune", NA1: "na", KR: "kr", TR1: "tr", BR1: "br", LA1: "lan", LA2: "las", OC1: "oce", JP1: "jp", RU: "ru", ME1: "me" };
   /* known in-game names of the group, used once to link a Riot account to a player automatically */
-  var NAME_HINTS = { codexdraw: "Timur", cr7damage: "Fabian", jotti: "Jetmir", moshnaldo: "Marci", moschnaldo: "Marci", pilzkopf: "Besnik" };
+  var NAME_HINTS = { codexdraw: "Timur", cr7damage: "Fabian", jotti: "Jetmir", joty: "Jetmir", moshnaldo: "Marci", moschnaldo: "Marci", pilzkopf: "Besnik" };
   var CHAMP_NAMES = { MonkeyKing: "Wukong", Belveth: "Bel'Veth", KSante: "K'Sante", Kaisa: "Kai'Sa", Khazix: "Kha'Zix", Chogath: "Cho'Gath", Velkoz: "Vel'Koz",
     KogMaw: "Kog'Maw", RekSai: "Rek'Sai", Leblanc: "LeBlanc", DrMundo: "Dr. Mundo", JarvanIV: "Jarvan IV", Nunu: "Nunu & Willump", Renata: "Renata Glasc",
     FiddleSticks: "Fiddlesticks", AurelionSol: "Aurelion Sol", TahmKench: "Tahm Kench", TwistedFate: "Twisted Fate", XinZhao: "Xin Zhao", LeeSin: "Lee Sin",
     MasterYi: "Master Yi", MissFortune: "Miss Fortune" };
   function champName(c) { return CHAMP_NAMES[c] || String(c || "?").replace(/([a-z])([A-Z])/g, "$1 $2"); }
-  function champIcon(ci) { return CD + "plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/" + (ci || -1) + ".png"; }
+  function champIcon(ci, c) {
+    if (ci) return CD + "plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/" + ci + ".png";
+    return "https://cdn.communitydragon.org/latest/champion/" + encodeURIComponent(c || "-1") + "/square";
+  }
   function riotKey(n, t) { return (String(n || "") + "#" + String(t || "")).toLowerCase().replace(/\s+/g, ""); }
   function playerByRiot(x) {
-    var k = riotKey(x.n, x.t);
+    var k = riotKey(x.n, x.t), gn = String(x.n || "").toLowerCase().replace(/\s+/g, "");
     for (var i = 0; i < S.players.length; i++) {
       var r = S.players[i].riot || [];
-      for (var j = 0; j < r.length; j++) if (r[j].toLowerCase().replace(/\s+/g, "") === k) return S.players[i];
+      for (var j = 0; j < r.length; j++) {
+        var rk = r[j].toLowerCase().replace(/\s+/g, ""), rg = rk.split("#")[0];
+        /* exact Riot ID, or only the name when one side has no tag (plain-text paste) */
+        if (rk === k || ((!x.t || rk.indexOf("#") < 0 || /#$/.test(rk)) && rg === gn)) return S.players[i];
+      }
     }
     return null;
   }
@@ -3757,6 +3764,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function playaramLink(m, x) {
     var parts = m.id.split("_"), slug = SLUG[parts[0]] || "euw";
+    if (!parts[1] || !/^\d+$/.test(parts[1])) return "https://blitz.gg/lol/profile/" + (parts[0] === "BLITZ" ? "EUW1" : parts[0]) + "/" + encodeURIComponent(x.n + "-" + x.t);
     return "https://playaram.gg/en/profile/" + slug + "/" + encodeURIComponent(x.n + "#" + (x.t || slug)) + "/match/" + parts[1];
   }
   function proxyUrl() {
@@ -3797,18 +3805,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     if (!id) { st.err = "Aus dem Link lässt sich keine Spielnummer lesen. Bitte den Link der Spielseite einfügen (…/match/1234567890)."; renderGameLinks(); return; }
     var dupe = S.roundMatches.indexOf(id);
     if (dupe >= 0 && dupe !== k) { st.err = "Dieses Spiel ist schon bei Spiel " + (dupe + 1) + " eingetragen."; renderGameLinks(); return; }
-    function done(m) {
-      st.busy = false;
-      S.matches[m.id] = m;
-      applyHints(m);
-      while (S.roundMatches.length <= k) S.roundMatches.push("");
-      S.roundMatches[k] = m.id;
-      persistRunde();
-      var n = setPlaces(k);
-      Sound.stamp();
-      if (!n) st.err = "Geladen, aber noch kein Spieler erkannt. Unten auswählen, wer wer ist.";
-      renderPoints(); renderStats();
-    }
+    function done(m) { st.busy = false; useMatch(k, m); }
     if (S.matches[id]) { done(S.matches[id]); return; }
     var url = proxyUrl();
     if (!url) { st.err = "Die Riot-Verbindung ist noch nicht eingerichtet (Statistik → Einstellungen)."; renderGameLinks(); return; }
@@ -3826,6 +3823,113 @@ td.extra { background: rgba(229, 88, 95, .07); }
       })
       .catch(function () { st.busy = false; st.err = "Die Riot-Verbindung ist nicht erreichbar."; renderGameLinks(); });
   }
+  function useMatch(k, m) {
+    var st = GL.state[k] || (GL.state[k] = {});
+    S.matches[m.id] = m;
+    applyHints(m);
+    while (S.roundMatches.length <= k) S.roundMatches.push("");
+    S.roundMatches[k] = m.id;
+    persistRunde();
+    var n = setPlaces(k);
+    Sound.stamp();
+    st.err = n ? "" : "Geladen, aber noch kein Spieler erkannt. Unten auswählen, wer wer ist.";
+    renderPoints(); renderStats();
+  }
+
+  /* ---------- kopierte Spielseite (Blitz) einlesen ---------- */
+  /* "10 / 16 / 181.75 KDA" → assists and ratio are glued together; the right split is the one where (K+A)/D equals the ratio */
+  function splitKda(k, d, rest) {
+    rest = String(rest || "");
+    for (var cut = 1; cut < rest.length; cut++) {
+      var aTxt = rest.slice(0, cut), rTxt = rest.slice(cut);
+      if (!/^\d+$/.test(aTxt) || !/^\d*\.?\d+$/.test(rTxt)) continue;
+      var a = parseInt(aTxt, 10), r = parseFloat(rTxt);
+      if (Math.abs(r - (k + a) / Math.max(1, d)) < 0.0051) return a;
+    }
+    var m = /^(\d+)/.exec(rest);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+  function readKda(txt) {
+    var m = /(\d+)\s*\/\s*(\d+)\s*\/\s*(\d+(?:\.\d+)?)\s*(Perfect)?/i.exec(txt);
+    if (!m) return null;
+    var k = +m[1], d = +m[2];
+    return { k: k, d: d, a: m[4] ? parseInt(m[3], 10) : splitKda(k, d, m[3]) };
+  }
+  function readDmg(txt) { var m = /([\d.,]+)\s*DMG/i.exec(txt); return m ? parseInt(m[1].replace(/[.,\s]/g, ""), 10) || 0 : null; }
+  function parsePastedGame(html, text) {
+    var players = [], matchNo = "", platform = "EUW1", focus = "", all = (text || "") + " ";
+    if (html && /<a[\s>]/i.test(html)) {
+      var doc = new DOMParser().parseFromString(html, "text/html");
+      all = doc.body ? doc.body.textContent + " " : all;
+      var cur = null;
+      Array.prototype.forEach.call(doc.querySelectorAll("a[href]"), function (a) {
+        var href = a.getAttribute("href") || "", dec = href, txt = (a.textContent || "").trim();
+        try { dec = decodeURIComponent(href); } catch (e) {}
+        var mm = /\/match\/([A-Za-z0-9]+)\/([^\/?#]+)\/(\d{6,13})/.exec(dec);
+        if (mm) { matchNo = mm[3]; platform = mm[1].toUpperCase(); focus = focus || mm[2]; }
+        var ch = /\/champions\/([A-Za-z0-9']+)(?:[\/?#]|$)/.exec(dec);
+        if (ch) { cur = { c: ch[1], n: "", t: "", k: null, d: null, a: null, dmg: null }; players.push(cur); return; }
+        var pr = /\/profile\/([A-Za-z0-9]+)\/([^\/?#]+)$/.exec(dec.split("?")[0]);
+        if (!pr) return;
+        var full = pr[2], cut = full.lastIndexOf("-"), gn = cut > 0 ? full.slice(0, cut) : full, tg = cut > 0 ? full.slice(cut + 1) : "";
+        if (cur && !cur.n) { cur.n = gn; cur.t = tg; platform = pr[1].toUpperCase(); }
+        else if (!cur) { if (!focus) focus = full; return; }
+        if (cur && cur.n === gn) {
+          var kda = readKda(txt); if (kda && cur.k === null) { cur.k = kda.k; cur.d = kda.d; cur.a = kda.a; }
+          var dm = readDmg(txt); if (dm !== null && cur.dmg === null) cur.dmg = dm;
+        }
+      });
+      players = players.filter(function (x) { return x.n && x.dmg !== null; });
+    }
+    if (!players.length && text) {
+      /* plain text: name, place, rank, "K / D / A…KDA", "CS…KP", "… DMG" */
+      var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+      lines.forEach(function (l, i) {
+        var kda = /KDA/i.test(l) ? readKda(l) : null;
+        if (!kda) return;
+        var dmgLine = lines.slice(i + 1, i + 4).filter(function (x) { return /DMG/i.test(x); })[0];
+        if (!dmgLine) return;
+        var nm = lines[i - 3] || "";
+        if (/^\d+$/.test(nm)) nm = lines[i - 2] || nm;
+        players.push({ c: "", n: nm, t: "", k: kda.k, d: kda.d, a: kda.a, dmg: readDmg(dmgLine) || 0 });
+      });
+    }
+    if (players.length < 2) return null;
+    var half = Math.ceil(players.length / 2);
+    var vi = all.search(/\bVictory\b|\bSieg\b/i), de = all.search(/\bDefeat\b|\bNiederlage\b/i);
+    var focusWon = vi < 0 && de < 0 ? null : (de < 0 || (vi >= 0 && vi < de));
+    var focusN = focus ? focus.slice(0, focus.lastIndexOf("-") > 0 ? focus.lastIndexOf("-") : focus.length).toLowerCase() : "";
+    var fi = -1;
+    players.forEach(function (x, i) { if (fi < 0 && focusN && x.n.toLowerCase() === focusN) fi = i; });
+    var focusTeam = fi < 0 ? 100 : (fi < half ? 100 : 200);
+    var dm = /(\d+):(\d{2})\s*min/i.exec(all), ago = /(\d+)\s*(minute|hour|day)s?\s*ago/i.exec(all);
+    var at = Date.now();
+    if (ago) at -= +ago[1] * ({ minute: 6e4, hour: 36e5, day: 864e5 }[ago[2].toLowerCase()]);
+    var id = matchNo ? platform + "_" + matchNo : "BLITZ_" + players.map(function (x) { return x.n + x.dmg; }).join("").replace(/[^A-Za-z0-9]/g, "").slice(0, 40);
+    return {
+      id: id, at: at, dur: dm ? +dm[1] * 60 + +dm[2] : 0, q: 0, mode: /mayhem|chaos/i.test(all) ? "ARAM Mayhem" : "",
+      p: players.map(function (x, i) {
+        var tm = i < half ? 100 : 200;
+        return { n: x.n, t: x.t, c: x.c, ci: 0, k: x.k || 0, d: x.d || 0, a: x.a || 0, dmg: x.dmg || 0, tk: 0, g: 0,
+          w: focusWon === null ? false : (tm === focusTeam ? focusWon : !focusWon), tm: tm, aug: [] };
+      })
+    };
+  }
+  function pasteGame(k, html, text) {
+    var st = GL.state[k] = { busy: false, err: "" };
+    if (S.readOnly || S.mode === "init") return true;
+    var m = parsePastedGame(html, text);
+    if (!m) return false;
+    var dupe = S.roundMatches.indexOf(m.id);
+    if (dupe >= 0 && dupe !== k) { st.err = "Dieses Spiel ist schon bei Spiel " + (dupe + 1) + " eingetragen."; renderGameLinks(); return true; }
+    m = normMatch(m, m.id);
+    GL.pendingSave[m.id] = true;
+    persistMatch(m);
+    setTimeout(function () { delete GL.pendingSave[m.id]; }, 8000);
+    useMatch(k, m);
+    return true;
+  }
+
   function unlinkGame(k) {
     var id = S.roundMatches[k], m = id && S.matches[id];
     /* take back the places this game put into the table */
@@ -3872,7 +3976,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     el.dataset.k = String(k);
     if (!m) {
       el.innerHTML = '<div class="gl-k">Spiel ' + (k + 1) + '</div>' +
-        '<form class="gl-form" autocomplete="off"><input class="gl-in" placeholder="Link einfügen" inputmode="url"><button class="btn" type="submit">Laden</button></form>' +
+        '<form class="gl-form" autocomplete="off"><input class="gl-in" placeholder="Blitz-Spielseite einfügen (Strg+V)"><button class="btn" type="submit">Laden</button></form>' +
         '<div class="gl-msg"></div>';
       var inp = el.querySelector(".gl-in"), btn = el.querySelector("button");
       inp.dataset.k = String(k); inp.value = typed;
@@ -3895,7 +3999,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var pl = playerByRiot(x), li = document.createElement("li");
       li.innerHTML = '<span class="pl"></span><img alt="" loading="lazy"><span class="nm"></span><span class="dm"></span>';
       li.querySelector(".pl").textContent = tm === null ? "" : (i + 1) + ".";
-      li.querySelector("img").src = champIcon(x.ci);
+      li.querySelector("img").src = champIcon(x.ci, x.c);
       li.querySelector("img").title = champName(x.c);
       var nm = li.querySelector(".nm");
       if (pl) { nm.textContent = pl.name; nm.classList.add("ours"); nm.title = x.n + "#" + x.t + " · " + champName(x.c); }
@@ -3922,6 +4026,17 @@ td.extra { background: rgba(229, 88, 95, .07); }
   });
   $("#gl-grid").addEventListener("paste", function (e) {
     var inp = e.target.closest(".gl-in"); if (!inp) return;
+    var cd = e.clipboardData || window.clipboardData, html = "", text = "";
+    try { html = cd.getData("text/html") || ""; text = cd.getData("text/plain") || cd.getData("Text") || ""; } catch (er) {}
+    /* a copied game page (several lines with KDA / DMG) instead of a single link */
+    if (/DMG/i.test(text + html) && /KDA/i.test(text + html)) {
+      e.preventDefault();
+      if (!pasteGame(Number(inp.dataset.k), html, text)) {
+        GL.state[Number(inp.dataset.k)] = { err: "In dem eingefügten Text habe ich keine Spieler gefunden. In Blitz die Spielseite öffnen, Strg+A, Strg+C, dann hier Strg+V." };
+        renderGameLinks();
+      }
+      return;
+    }
     setTimeout(function () { if (inp.value.trim()) loadGame(Number(inp.dataset.k), inp.value); }, 30);
   });
   $("#gl-grid").addEventListener("change", function (e) {
@@ -3990,7 +4105,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     });
   }
   function chHTML(c, sub) {
-    return '<span class="st-ch"><img class="ch-ic" alt="" loading="lazy" src="' + esc(champIcon(c.ci)) + '"><span>' + esc(champName(c.c)) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span></span>";
+    return '<span class="st-ch"><img class="ch-ic" alt="" loading="lazy" src="' + esc(champIcon(c.ci, c.c)) + '"><span>' + esc(champName(c.c)) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span></span>";
   }
   function pct(a, b) { return b ? Math.round(a / b * 100) + " %" : "–"; }
   function fx1(v) { return (Math.round(v * 10) / 10).toLocaleString("de-DE"); }
@@ -4009,7 +4124,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     }
     var teamW = 0;
     Object.keys(S.matches).forEach(function (id) { var m = S.matches[id], tm = ourTeam(m); if (tm !== null && m.p.some(function (x) { return x.tm === tm && x.w; })) teamW++; });
-    card("Gespeicherte Spiele", String(total), total ? teamW + (teamW === 1 ? " Sieg · " : " Siege · ") + (total - teamW) + (total - teamW === 1 ? " Niederlage" : " Niederlagen") : "Bei den Punkten pro Spiel den Link einfügen");
+    card("Gespeicherte Spiele", String(total), total ? teamW + (teamW === 1 ? " Sieg · " : " Siege · ") + (total - teamW) + (total - teamW === 1 ? " Niederlage" : " Niederlagen") : "Bei den Punkten pro Spiel die Blitz-Seite einfügen");
     var top = rows.filter(function (r) { return r.n >= 3; })[0] || rows[0];
     card("Schadenskönig", top ? top.p.name : "—", top ? fmtDmg(Math.round(top.dmg)) + " Schaden im Schnitt" : "Erscheint nach dem ersten Spiel", "best");
     var cc = {};
@@ -4021,7 +4136,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     $("#st-wrap").hidden = !rows.length;
     if (!rows.length) {
       $("#st-prof").hidden = false;
-      $("#st-prof").innerHTML = '<div class="st-empty">Noch keine Spieldaten. Auf der Seite <b>Punkte</b> bei Spiel 1 bis 4 den Link von playaram.gg einfügen, dann erscheinen hier Champions, Schaden, Kills und Augmentierungen für jeden.</div>';
+      $("#st-prof").innerHTML = '<div class="st-empty">Noch keine Spieldaten. Auf der Seite <b>Punkte</b> bei Spiel 1 bis 4 die kopierte Spielseite aus Blitz einfügen, dann erscheinen hier Champions, Schaden und Kills für jeden.</div>';
     } else {
       if (!rows.some(function (r) { return r.p.id === S.statSel; })) S.statSel = rows[0].p.id;
       rows.forEach(function (r) {
@@ -4077,7 +4192,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     });
     var ul = $("#sp-aug");
     var winner = r.augs.filter(function (a) { return a.n >= 2; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.n - a.n; })[0];
-    if (!r.augs.length) ul.innerHTML = '<li><span></span><span class="aug-nm">Noch keine Augmentierungen in den Spieldaten</span><span></span></li>';
+    if (!r.augs.length) ul.innerHTML = '<li><span></span><span class="aug-nm">Keine Augmentierungen gespeichert<small>Blitz gibt sie beim Kopieren nicht mit heraus</small></span><span></span></li>';
     r.augs.slice(0, 10).forEach(function (a) {
       var li = document.createElement("li");
       if (winner && a.id === winner.id) li.className = "star";
@@ -4092,7 +4207,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     r.g.slice(0, 12).forEach(function (it) {
       var x = it.x, li = document.createElement("li");
       li.innerHTML = '<img class="ch-ic" alt="" loading="lazy"><div><div class="g1"></div><div class="g2"></div></div><div class="g3"></div>';
-      li.querySelector("img").src = champIcon(x.ci);
+      li.querySelector("img").src = champIcon(x.ci, x.c);
       li.querySelector(".g1").innerHTML = esc(champName(x.c)) + ' · <b class="' + (x.w ? "w" : "l") + '">' + (x.w ? "Sieg" : "Niederlage") + "</b>";
       var g2 = li.querySelector(".g2");
       g2.textContent = fmtDate(new Date(it.m.at).toISOString()) + " · " + x.k + " / " + x.d + " / " + x.a + (it.place ? " · " + it.place + ". im Team" : "") + " ";
