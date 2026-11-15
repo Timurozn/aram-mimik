@@ -95,6 +95,35 @@ export default {
       return json(Object.assign({ ok: false }, await riotError(r)), 200, cors, { "Cache-Control": "no-store" });
     }
 
+    if (url.searchParams.get("diag")) {
+      // step-by-step check of the match data access, to find out where Riot says no
+      const H = { headers: { "X-Riot-Token": key } }, out = { key: keyHint };
+      const acc = await fetch("https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/CodexDraw/EUW", H);
+      out.konto = acc.status;
+      if (acc.ok) {
+        const puuid = (await acc.json()).puuid;
+        const ids = await fetch("https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?count=5", H);
+        out.spielliste = ids.status;
+        if (ids.ok) {
+          const list = await ids.json();
+          out.letzteSpiele = list;
+          if (list[0]) {
+            const one = await fetch("https://europe.api.riotgames.com/lol/match/v5/matches/" + list[0], H);
+            out.letztesSpiel = one.status;
+            if (one.ok) { const d = await one.json(); out.modus = d.info && d.info.gameMode; out.queue = d.info && d.info.queueId; }
+            else out.letztesSpielRiot = (await riotError(one)).riot;
+          }
+        } else out.spiellisteRiot = (await riotError(ids)).riot;
+      }
+      const link = url.searchParams.get("diag");
+      if (/^[A-Z]{2,4}\d?_\d{6,13}$/.test(link)) {
+        const r2 = await fetch("https://europe.api.riotgames.com/lol/match/v5/matches/" + link, H);
+        out.linkSpiel = r2.status;
+        if (!r2.ok) out.linkSpielRiot = (await riotError(r2)).riot;
+      }
+      return json(out, 200, cors, { "Cache-Control": "no-store" });
+    }
+
     const id = (url.searchParams.get("match") || "").toUpperCase();
     const m = /^([A-Z]{2,4}\d?)_(\d{6,13})$/.exec(id);
     if (!m || !ROUTING[m[1]]) return json({ error: "bad-id" }, 400, cors);
