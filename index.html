@@ -3823,7 +3823,12 @@ td.extra { background: rgba(229, 88, 95, .07); }
       .catch(function () { st.busy = false; st.err = "Die Riot-Verbindung ist nicht erreichbar."; renderGameLinks(); });
   }
   function unlinkGame(k) {
-    var id = S.roundMatches[k];
+    var id = S.roundMatches[k], m = id && S.matches[id];
+    /* take back the places this game put into the table */
+    if (m) m.p.forEach(function (x) {
+      var pl = playerByRiot(x);
+      if (pl && pl.p[k] !== null) { pl.p[k] = null; persistPlayer(pl); }
+    });
     S.roundMatches[k] = "";
     GL.state[k] = {};
     persistRunde();
@@ -3879,7 +3884,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var team = tm === null ? m.p.slice().sort(function (a, b) { return a.tm - b.tm || b.dmg - a.dmg; }) : teamByDamage(m, tm);
     if (tm !== null && team[0]) win = team[0].w;
     el.innerHTML = '<div class="gl-k">Spiel ' + (k + 1) + (win === null ? "" : ' · <b class="' + (win ? "w" : "l") + '">' + (win ? "Sieg" : "Niederlage") + "</b>") + " · " + fmtDur(m.dur) + "</div>" +
-      '<ol class="gl-team"></ol><div class="gl-msg"></div><div class="gl-foot"><a target="_blank" rel="noopener">Spiel ansehen</a><button type="button" class="gl-x">Link entfernen</button></div>';
+      '<ol class="gl-team"></ol><div class="gl-msg"></div><div class="gl-foot"><a target="_blank" rel="noopener">Spiel ansehen</a><button type="button" class="gl-x">Spiel löschen</button></div>';
     var ol = el.querySelector(".gl-team");
     var free = S.players.filter(function (q) { return !m.p.some(function (x) { return playerByRiot(x) === q; }); });
     team.forEach(function (x, i) {
@@ -3927,7 +3932,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   $("#gl-grid").addEventListener("click", function (e) {
     var b = e.target.closest(".gl-x"); if (!b) return;
     var k = Number(b.closest(".gl-slot").dataset.k);
-    arm(b, "Wirklich entfernen?", function () { unlinkGame(k); });
+    arm(b, "Wirklich löschen?", function () { unlinkGame(k); });
   });
 
   /* augment names and icons from CommunityDragon (German), cached on the device for a week */
