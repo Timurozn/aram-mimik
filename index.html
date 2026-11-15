@@ -99,7 +99,7 @@ input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 .tab.sm svg { width: 22px; height: 22px; flex: none; }
 .tab.sm:hover { color: #FFD3D5; }
 .tab.sm[aria-selected="true"] { background: linear-gradient(180deg, #F0767C, #D9464E); color: #fff; box-shadow: 0 0 20px rgba(229, 88, 95, .5), inset 0 1px 0 rgba(255, 255, 255, .3); }
-@media (max-width: 480px) { .tab { font-size: 13px; padding: 9px 11px; letter-spacing: .05em; } .tab.sm { padding-left: 8px; gap: 5px; } .tab.sm svg { width: 18px; height: 18px; } .sm-b { display: none; } }
+@media (max-width: 480px) { .tab { font-size: 12.5px; padding: 9px 8px; letter-spacing: .02em; } .tab.sm { padding-left: 8px; gap: 5px; } .tab.sm svg { width: 18px; height: 18px; } .sm-b { display: none; } }
 .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--mute); }
 .status .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mute); flex: none; }
 .status[data-s="live"] .dot { background: var(--win); }
@@ -281,6 +281,98 @@ button.av:disabled { cursor: default; }
 .card.loser .v { color: var(--blood); }
 .card.best { border-color: var(--gold); }
 .tbl-wrap { overflow-x: auto; }
+
+/* Spiele laden (Punkte) */
+.gl { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+.gl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; }
+.gl-head h2 { margin: 0; font-family: var(--f-display); font-size: 19px; letter-spacing: .06em; color: var(--gold-hi); }
+.gl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+.gl-slot { border: 1px solid var(--line); border-radius: 10px; background: var(--abyss); padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.gl-slot.done { border-color: rgba(200, 170, 110, .55); }
+@media (max-width: 640px) { .gl-slot.later { display: none; } }
+.gl-k { font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.gl-k b.w { color: #9BE7BE; } .gl-k b.l { color: #FFB3B6; }
+.gl-form { display: flex; gap: 6px; }
+.gl-in { flex: 1; min-width: 0; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--deep); color: var(--ink); padding: 0 10px; font-size: 15px; }
+.gl-in::placeholder { color: var(--mute); }
+.gl-form .btn { height: 38px; padding: 0 14px; font-size: 13px; }
+.gl-msg { font-size: 14px; color: var(--mute); min-height: 0; }
+.gl-msg.err { color: #FFB3B6; }
+.gl-team { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.gl-team li { display: grid; grid-template-columns: 20px 28px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 15px; }
+.gl-team .pl { color: var(--gold); font-weight: 700; font-variant-numeric: tabular-nums; }
+.gl-team img, .ch-ic { width: 28px; height: 28px; border-radius: 6px; display: block; background: var(--raise); }
+.gl-team .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gl-team .nm.ours { font-weight: 700; color: var(--ink); }
+.gl-team .nm.foreign { color: var(--mute); }
+.gl-team select { max-width: 100%; height: 28px; border: 1px dashed var(--gold); border-radius: 6px; background: var(--deep); color: var(--gold-hi); font-size: 13px; padding: 0 4px; }
+.gl-team .dm { font-variant-numeric: tabular-nums; color: var(--gold-hi); font-weight: 600; }
+.gl-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.gl-foot a { color: var(--ice); }
+.gl-x { appearance: none; border: 0; background: none; color: var(--mute); cursor: pointer; font-size: 13px; padding: 2px 0; text-decoration: underline; }
+.gl-x:hover:not(:disabled) { color: #FFB3B6; }
+
+/* Statistik */
+.stats { padding-top: 28px; display: flex; flex-direction: column; gap: 22px; }
+.st-tbl { min-width: 860px; }
+.st-tbl td { font-size: 16px; }
+.st-tbl tbody tr { cursor: pointer; }
+.st-tbl tbody tr:hover td { background: rgba(200, 170, 110, .06); }
+.st-tbl tbody tr.sel td { background: rgba(200, 170, 110, .12); }
+.st-tbl tbody tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
+.st-ch { display: inline-flex; align-items: center; gap: 8px; text-align: left; }
+.st-ch small { display: block; color: var(--mute); font-size: 12px; }
+.st-empty { padding: 22px 20px; color: var(--mute); }
+.st-prof { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
+.sp-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.sp-head .av { width: 64px; height: 64px; font-size: 24px; }
+.sp-name { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--gold-hi); }
+.sp-rid { color: var(--mute); font-size: 14px; }
+.sp-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 640px) { .sp-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sp-kpi { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--abyss); }
+.sp-kpi .v { font-family: var(--f-display); font-weight: 700; font-size: 24px; color: var(--gold-hi); }
+.sp-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 900px) { .sp-grid { grid-template-columns: minmax(0, 1fr); } }
+.sp-box h3 { margin: 0 0 8px; font-family: var(--f-display); font-size: 16px; letter-spacing: .08em; color: var(--gold-hi); }
+.sp-box .tbl-wrap { border: 1px solid var(--line); border-radius: 10px; }
+.sp-box table { min-width: 0; }
+.sp-box td, .sp-box th { padding: 7px 8px; font-size: 14px; }
+.sp-box td:first-child, .sp-box th:first-child { text-align: left; }
+.aug-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.aug-list li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--abyss); }
+.aug-list li.star { border-color: var(--gold); background: rgba(200, 170, 110, .1); }
+.aug-ic { width: 30px; height: 30px; border-radius: 6px; display: block; background: var(--raise); object-fit: cover; }
+.aug-nm { min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+.aug-nm small { display: block; font-weight: 400; color: var(--mute); font-size: 12px; }
+.aug-v { text-align: right; font-size: 13px; color: var(--mute); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.aug-v b { color: var(--gold-hi); font-size: 15px; }
+.sp-games { list-style: none; margin: 0; padding: 0; }
+.sp-games li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.sp-games li:last-child { border-bottom: 0; }
+.sp-games .ch-ic { width: 34px; height: 34px; }
+.sp-games .g1 { font-weight: 700; }
+.sp-games .g1 b.w { color: #9BE7BE; } .sp-games .g1 b.l { color: #FFB3B6; }
+.sp-games .g2 { font-size: 13px; color: var(--mute); display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.sp-games .g2 img { width: 20px; height: 20px; border-radius: 4px; }
+.sp-games .g3 { text-align: right; font-variant-numeric: tabular-nums; }
+.sp-games .g3 b { color: var(--gold-hi); }
+.sp-games .g3 a { display: block; font-size: 12px; color: var(--ice); }
+.st-set { padding: 18px 20px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+@media (max-width: 860px) { .st-set { grid-template-columns: minmax(0, 1fr); } }
+.st-set form { display: flex; gap: 8px; margin-top: 8px; }
+.st-set input { flex: 1; min-width: 0; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--abyss); color: var(--ink); padding: 0 10px; font-size: 15px; }
+.st-set .btn { height: 38px; font-size: 13px; padding: 0 12px; }
+.rid-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.rid-row:last-child { border-bottom: 0; }
+.rid-row .who { font-weight: 700; }
+.rid-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.rid-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 13px; background: var(--abyss); }
+.rid-chip button { appearance: none; border: 0; background: none; color: var(--mute); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 4px; }
+.rid-chip button:hover { color: #FFB3B6; }
+.rid-add { width: 140px; height: 28px !important; font-size: 13px !important; }
+.tl-short { display: none; }
+@media (max-width: 480px) { .tl-long { display: none; } .tl-short { display: inline; } }
 
 /* Schandplatz */
 .shame {
@@ -1057,9 +1149,10 @@ td.extra { background: rgba(229, 88, 95, .07); }
     </div>
     <div class="rail">
       <nav class="tabs" role="tablist" aria-label="Bereiche">
-        <button class="tab" role="tab" id="tab-rad" aria-controls="view-rad" aria-selected="true" data-view="rad">Glücksrad</button>
+        <button class="tab" role="tab" id="tab-rad" aria-controls="view-rad" aria-selected="true" data-view="rad"><span class="tl-long">Glücksrad</span><span class="tl-short">Rad</span></button>
         <button class="tab" role="tab" id="tab-punkte" aria-controls="view-punkte" aria-selected="false" data-view="punkte">Punkte</button>
-        <button class="tab" role="tab" id="tab-rangliste" aria-controls="view-rangliste" aria-selected="false" data-view="rangliste">Rangliste</button>
+        <button class="tab" role="tab" id="tab-rangliste" aria-controls="view-rangliste" aria-selected="false" data-view="rangliste"><span class="tl-long">Rangliste</span><span class="tl-short">Rang</span></button>
+        <button class="tab" role="tab" id="tab-statistik" aria-controls="view-statistik" aria-selected="false" data-view="statistik"><span class="tl-long">Statistik</span><span class="tl-short">Stats</span></button>
         <button class="tab sm" role="tab" id="tab-super" aria-controls="view-super" aria-selected="false" data-view="super"><span class="emb-mini" aria-hidden="true"></span><span>Super<span class="sm-b">-Mimik</span></span></button>
       </nav>
       <button class="test-btn" id="test-btn" type="button" aria-pressed="false">
@@ -1137,6 +1230,11 @@ td.extra { background: rgba(229, 88, 95, .07); }
           <div class="shame-taunt" id="shame-taunt"></div>
           <div class="shame-stats" id="shame-stats"></div>
         </div>
+      </div>
+
+      <div class="panel gl" id="gl">
+        <div class="gl-head"><h2>Spiele laden</h2><span class="eyebrow">Link von playaram.gg einfügen · Plätze kommen automatisch nach Schaden</span></div>
+        <div class="gl-grid" id="gl-grid"></div>
       </div>
 
       <div class="tbl-wrap panel">
@@ -1235,6 +1333,35 @@ td.extra { background: rgba(229, 88, 95, .07); }
         <button class="btn danger" id="end-season-btn" type="button">Rangliste beenden</button>
       </div>
       <p class="note" id="mode-note"></p>
+    </div>
+  </section>
+
+  <section class="view" id="view-statistik" role="tabpanel" aria-labelledby="tab-statistik" hidden>
+    <div class="stats">
+      <div class="cards three" id="st-cards"></div>
+      <div class="tbl-wrap panel" id="st-wrap">
+        <table class="st-tbl">
+          <thead><tr>
+            <th class="name-cell" scope="col">Spieler</th><th scope="col">Spiele</th><th scope="col">Siege</th><th scope="col">Ø Schaden</th>
+            <th scope="col">Ø K / T / A</th><th scope="col">KDA</th><th scope="col">Lieblings-Champion</th><th scope="col">Stärkster Champion</th>
+          </tr></thead>
+          <tbody id="st-body"></tbody>
+        </table>
+      </div>
+      <div class="panel st-prof" id="st-prof" hidden></div>
+      <div class="sec-head"><h2>Einstellungen</h2></div>
+      <div class="panel st-set">
+        <div>
+          <div class="eyebrow">Riot-Verbindung</div>
+          <form id="rp-form" autocomplete="off"><input id="rp-url" placeholder="https://…workers.dev" inputmode="url"><button class="btn ghost" type="submit">Speichern &amp; testen</button></form>
+          <p class="note" id="rp-status" style="margin-top:8px"></p>
+        </div>
+        <div>
+          <div class="eyebrow">Riot-Namen der Spieler</div>
+          <div id="rid-list"></div>
+        </div>
+      </div>
+      <p class="note">Daten: Riot Games (Spieldaten) und CommunityDragon (Namen und Symbole der Augmentierungen und Champions). Jedes Spiel wird einmal geladen und dann für alle gespeichert.</p>
     </div>
   </section>
 
@@ -1341,6 +1468,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
   "use strict";
   /* Online-Datenbank für die GitHub-Seite. Leer lassen = jedes Gerät speichert für sich. */
   var FIREBASE_CONFIG = { databaseURL: "https://aram-mimik-default-rtdb.europe-west1.firebasedatabase.app" };
+  /* address of the small Riot proxy (Cloudflare Worker); can also be set on the page under Statistik → Einstellungen */
+  var RIOT_PROXY = null;
   var FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
 
   var DEFAULT_PLAYERS = ["Fabian", "Marci", "Tugrap", "Jetmir", "Besnik", "Mergim", "Timur"];
@@ -1364,7 +1493,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
     mode: "init", readOnly: false, players: [], wheel: [], rounds: [],
     rot: 0, spinning: false, spinSegs: null, spinHistory: [],
     ending: false, endPick: [], sortKey: "pct", sortDir: -1, flash: "", superDone: [],
-    games: BASE_GAMES, doppelt: false, seasons: [], superWho: [], superNames: [], superSince: "", rankView: "aktuell"
+    games: BASE_GAMES, doppelt: false, seasons: [], superWho: [], superNames: [], superSince: "", rankView: "aktuell",
+    matches: {}, roundMatches: [], riotProxy: "", statSel: ""
   };
   var DB = null;
   var dirty = new Set();
@@ -1381,7 +1511,23 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var pl = emptyP();
     if (p.p && typeof p.p === "object") for (var k = 0; k < MAX_GAMES; k++) pl[k] = normPlace(p.p[k]);
     else if (Array.isArray(p.r)) for (var j = 0; j < BASE_GAMES; j++) { var x = Number(p.r[j]); pl[j] = x >= 1 && x <= 5 ? 6 - Math.floor(x) : null; }
-    return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, p: pl, avatar: safeAvatar(p.avatar), dbl: !!p.dbl };
+    return { id: String(p.id || ("p" + uid())), name: String(p.name || "Spieler").slice(0, 24), order: typeof p.order === "number" ? p.order : i, p: pl, avatar: safeAvatar(p.avatar), dbl: !!p.dbl,
+      riot: toArr(p.riot).map(function (x) { return String(x).slice(0, 40); }).filter(Boolean).slice(0, 4) };
+  }
+  function toArr(v) {
+    if (Array.isArray(v)) return v;
+    if (v && typeof v === "object") return Object.keys(v).sort(function (a, b) { return Number(a) - Number(b); }).map(function (k) { return v[k]; });
+    return [];
+  }
+  function normMatch(x, id) {
+    x = x || {};
+    return {
+      id: String(x.id || id || ""), at: Number(x.at) || 0, dur: Number(x.dur) || 0, q: Number(x.q) || 0, mode: String(x.mode || ""),
+      p: toArr(x.p).filter(Boolean).map(function (y) {
+        return { n: String(y.n || ""), t: String(y.t || ""), c: String(y.c || ""), ci: Number(y.ci) || 0, k: Number(y.k) || 0, d: Number(y.d) || 0, a: Number(y.a) || 0,
+          dmg: Number(y.dmg) || 0, tk: Number(y.tk) || 0, g: Number(y.g) || 0, w: !!y.w, tm: Number(y.tm) || 0, aug: toArr(y.aug).map(Number).filter(Boolean) };
+      })
+    };
   }
   function normOpt(o) { var c = Number(o.count); return { id: String(o.id || uid()), label: String(o.label == null ? "" : o.label).slice(0, 40), count: isFinite(c) ? Math.min(MAX_COUNT, Math.max(0, Math.floor(c))) : 1 }; }
   function normRound(r) {
@@ -1389,12 +1535,13 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var mimik = Array.isArray(r.mimik) ? r.mimik.map(String) : [];
     return { id: String(r.id || uid()), at: String(r.at || ""), entries: entries, mimik: mimik,
       doppelt: !!r.doppelt, dbl: strList(r.dbl), duel: !!r.duel, games: num(r.games) || 0, saison: r.saison ? String(r.saison) : "",
-      blitz: !!r.blitz, regel: r.regel ? String(r.regel) : "" };
+      blitz: !!r.blitz, regel: r.regel ? String(r.regel) : "", spiele: toArr(r.spiele).map(String).filter(Boolean) };
   }
   function roundBody(r) {
     var b = { at: r.at, entries: r.entries, mimik: r.mimik, doppelt: !!r.doppelt, dbl: (r.dbl || []).slice(), duel: !!r.duel, games: r.games || 0, saison: r.saison || "" };
     if (r.blitz) b.blitz = true;
     if (r.regel) b.regel = r.regel;
+    if (r.spiele && r.spiele.length) b.spiele = r.spiele.slice();
     return b;
   }
   function isDbl(r, id) { return r.dbl && r.dbl.length ? r.dbl.indexOf(id) >= 0 : !!r.doppelt; }
@@ -1470,7 +1617,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function lsBody() {
     return { players: S.players, wheel: S.wheel, rounds: S.rounds, superDone: S.superDone, games: S.games, doppelt: S.doppelt,
-      seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince };
+      seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince,
+      matches: S.matches, roundMatches: S.roundMatches, riotProxy: S.riotProxy };
   }
   function live() { return S.mode === "db" && !S.test; }
   function lsSaveNow() {
@@ -1488,7 +1636,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       catch (e) { flash("Speichern im Browser fehlgeschlagen – evtl. ist der Speicher voll (Profilbilder verkleinern oder löschen)."); }
     }, 250);
   }
-  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.map(function (x) { return x || 0; }), avatar: p.avatar || "", dbl: !!p.dbl }; }
+  function playerBody(p) { return { name: p.name, order: p.order, p: p.p.map(function (x) { return x || 0; }), avatar: p.avatar || "", dbl: !!p.dbl, riot: (p.riot || []).slice() }; }
   function superBody() { return { done: S.superDone.slice(), who: S.superWho.slice(), names: S.superNames.slice(), since: S.superSince || "" }; }
   function wheelBody() { return { items: S.wheel.map(function (o) { return { id: o.id, label: o.label, count: o.count }; }) }; }
 
@@ -1553,7 +1701,19 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function persistRunde() {
     if (S.mode === "local") lsSaveSoon();
-    else if (live()) queueWrite("rad/runde", function () { return { games: S.games }; }, 0);
+    else if (live()) queueWrite("rad/runde", function () { return { games: S.games, spiele: S.roundMatches.map(function (x) { return x || ""; }) }; }, 0);
+  }
+  function persistMatch(m) {
+    if (S.mode === "local") lsSaveSoon();
+    else if (live()) DB.doc("super/spiele/" + m.id).set(m).catch(onWriteError);
+  }
+  function dropMatch(id) {
+    if (S.mode === "local") lsSaveSoon();
+    else if (live()) DB.doc("super/spiele/" + id).delete().catch(onWriteError);
+  }
+  function persistRiot() {
+    if (S.mode === "local") lsSaveSoon();
+    else if (live()) queueWrite("rad/riot", function () { return { url: S.riotProxy || "" }; }, 0);
   }
   function persistSeasons() {
     if (S.mode === "local") lsSaveSoon();
@@ -1574,18 +1734,22 @@ td.extra { background: rgba(229, 88, 95, .07); }
       rounds: Array.isArray(d.rounds) ? d.rounds.map(normRound) : [],
       superDone: strList(d.superDone), games: clampGames(d.games), doppelt: !!d.doppelt,
       seasons: Array.isArray(d.seasons) ? d.seasons.map(normSeason) : [],
-      superWho: strList(d.superWho), superNames: strList(d.superNames), superSince: String(d.superSince || "")
+      superWho: strList(d.superWho), superNames: strList(d.superNames), superSince: String(d.superSince || ""),
+      matches: (function () { var o = {}; if (d.matches && typeof d.matches === "object") Object.keys(d.matches).forEach(function (k) { o[k] = normMatch(d.matches[k], k); }); return o; })(),
+      roundMatches: toArr(d.roundMatches).map(function (x) { return x ? String(x) : ""; }), riotProxy: String(d.riotProxy || "")
     };
     return {
       players: DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, p: emptyP(), avatar: "" }; }),
       wheel: DEFAULT_WHEEL.map(function (l, i) { return { id: "o" + (i + 1), label: l, count: 1 }; }),
-      rounds: [], superDone: [], games: BASE_GAMES, doppelt: false, seasons: [], superWho: [], superNames: [], superSince: ""
+      rounds: [], superDone: [], games: BASE_GAMES, doppelt: false, seasons: [], superWho: [], superNames: [], superSince: "",
+      matches: {}, roundMatches: [], riotProxy: ""
     };
   }
   function applyData(d) {
     S.players = d.players; S.wheel = d.wheel; S.rounds = d.rounds; S.superDone = d.superDone;
     S.games = d.games; S.doppelt = d.doppelt; S.seasons = d.seasons;
     S.superWho = d.superWho; S.superNames = d.superNames; S.superSince = d.superSince;
+    S.matches = d.matches || {}; S.roundMatches = d.roundMatches || []; S.riotProxy = d.riotProxy || "";
   }
   function startLocal() {
     S.mode = "local";
@@ -1680,7 +1844,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var mine = new Map(S.players.map(function (p) { return [p.id, p]; }));
       var incoming = snap.docs.filter(function (d) { return d.exists; }).map(function (d, i) {
         var x = d.data() || {};
-        return normPlayer({ id: d.id, name: x.name, order: x.order, p: x.p, r: x.r, avatar: x.avatar, dbl: x.dbl }, i);
+        return normPlayer({ id: d.id, name: x.name, order: x.order, p: x.p, r: x.r, avatar: x.avatar, dbl: x.dbl, riot: x.riot }, i);
       });
       var next = incoming.map(function (p) { return dirty.has("spieler/" + p.id) && mine.has(p.id) ? mine.get(p.id) : p; });
       mine.forEach(function (p) {
@@ -1718,8 +1882,22 @@ td.extra { background: rgba(229, 88, 95, .07); }
         var data = snap.exists ? (snap.data() || {}) : {};
         S.games = clampGames(data.games);
         S.doppelt = !!data.doppelt;
+        S.roundMatches = toArr(data.spiele).map(function (x) { return x ? String(x) : ""; });
       }
       renderPoints();
+    }), fail);
+
+    DB.collection("super/spiele").onSnapshot(guard("spiele", function (snap) {
+      var next = {};
+      snap.docs.forEach(function (d) { if (d.exists) next[d.id] = normMatch(d.data(), d.id); });
+      Object.keys(S.matches).forEach(function (id) { if (GL.pendingSave[id] && !next[id]) next[id] = S.matches[id]; });
+      S.matches = next;
+      renderPoints(); renderStats();
+    }), fail);
+
+    DB.doc("rad/riot").onSnapshot(guard("riot", function (snap) {
+      if (!dirty.has("rad/riot")) { var data = snap.exists ? (snap.data() || {}) : {}; S.riotProxy = String(data.url || ""); }
+      renderStats();
     }), fail);
 
     DB.doc("rad/optionen").onSnapshot(guard("optionen", function (snap) {
@@ -3513,7 +3691,475 @@ td.extra { background: rgba(229, 88, 95, .07); }
     $("#flash").innerHTML = S.flash;
     renderEndBox(st);
     updateShame(st);
+    renderGameLinks();
   }
+
+  /* ---------- Spiele laden: Link → Riot-Spieldaten → Plätze nach Schaden ---------- */
+  var CD = "https://raw.communitydragon.org/latest/";
+  var GL = { state: {}, pendingSave: {} };
+  var PLATFORM = { euw: "EUW1", euw1: "EUW1", eune: "EUN1", eun1: "EUN1", na: "NA1", na1: "NA1", kr: "KR", tr: "TR1", tr1: "TR1", br: "BR1", br1: "BR1",
+    lan: "LA1", la1: "LA1", las: "LA2", la2: "LA2", oce: "OC1", oc1: "OC1", jp: "JP1", jp1: "JP1", ru: "RU", me: "ME1", me1: "ME1" };
+  var SLUG = { EUW1: "euw", EUN1: "eune", NA1: "na", KR: "kr", TR1: "tr", BR1: "br", LA1: "lan", LA2: "las", OC1: "oce", JP1: "jp", RU: "ru", ME1: "me" };
+  /* known in-game names of the group, used once to link a Riot account to a player automatically */
+  var NAME_HINTS = { codexdraw: "Timur", cr7damage: "Fabian", jotti: "Jetmir", moshnaldo: "Marci", moschnaldo: "Marci", pilzkopf: "Besnik" };
+  var CHAMP_NAMES = { MonkeyKing: "Wukong", Belveth: "Bel'Veth", KSante: "K'Sante", Kaisa: "Kai'Sa", Khazix: "Kha'Zix", Chogath: "Cho'Gath", Velkoz: "Vel'Koz",
+    KogMaw: "Kog'Maw", RekSai: "Rek'Sai", Leblanc: "LeBlanc", DrMundo: "Dr. Mundo", JarvanIV: "Jarvan IV", Nunu: "Nunu & Willump", Renata: "Renata Glasc",
+    FiddleSticks: "Fiddlesticks", AurelionSol: "Aurelion Sol", TahmKench: "Tahm Kench", TwistedFate: "Twisted Fate", XinZhao: "Xin Zhao", LeeSin: "Lee Sin",
+    MasterYi: "Master Yi", MissFortune: "Miss Fortune" };
+  function champName(c) { return CHAMP_NAMES[c] || String(c || "?").replace(/([a-z])([A-Z])/g, "$1 $2"); }
+  function champIcon(ci) { return CD + "plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/" + (ci || -1) + ".png"; }
+  function riotKey(n, t) { return (String(n || "") + "#" + String(t || "")).toLowerCase().replace(/\s+/g, ""); }
+  function playerByRiot(x) {
+    var k = riotKey(x.n, x.t);
+    for (var i = 0; i < S.players.length; i++) {
+      var r = S.players[i].riot || [];
+      for (var j = 0; j < r.length; j++) if (r[j].toLowerCase().replace(/\s+/g, "") === k) return S.players[i];
+    }
+    return null;
+  }
+  function addRiot(pl, n, t) {
+    var disp = n + (t ? "#" + t : "");
+    S.players.forEach(function (q) {
+      var before = (q.riot || []).length;
+      q.riot = (q.riot || []).filter(function (r) { return r.toLowerCase().replace(/\s+/g, "") !== riotKey(n, t); });
+      if (q.riot.length !== before && q !== pl) persistPlayer(q, 0);
+    });
+    pl.riot = (pl.riot || []).concat([disp]).slice(-4);
+    persistPlayer(pl, 0);
+  }
+  function applyHints(m) {
+    m.p.forEach(function (x) {
+      if (playerByRiot(x)) return;
+      var want = NAME_HINTS[String(x.n).toLowerCase().replace(/\s+/g, "")];
+      if (!want) return;
+      var pl = S.players.filter(function (q) { return q.name.toLowerCase() === want.toLowerCase(); })[0];
+      if (pl && !(pl.riot || []).length) addRiot(pl, x.n, x.t);
+    });
+  }
+  function ourTeam(m) {
+    var cnt = {}, best = null;
+    m.p.forEach(function (x) { if (playerByRiot(x)) cnt[x.tm] = (cnt[x.tm] || 0) + 1; });
+    Object.keys(cnt).forEach(function (t) { if (best === null || cnt[t] > cnt[best]) best = t; });
+    return best === null ? null : Number(best);
+  }
+  function teamByDamage(m, tm) { return m.p.filter(function (x) { return x.tm === tm; }).sort(function (a, b) { return b.dmg - a.dmg; }); }
+  function parseMatchLink(raw) {
+    var s = String(raw || "").trim();
+    if (!s) return null;
+    var dec = s; try { dec = decodeURIComponent(s); } catch (e) {}
+    var m = /\b([A-Za-z]{2,4}\d?)_(\d{6,13})\b/.exec(dec);
+    if (m && PLATFORM[m[1].toLowerCase()]) return PLATFORM[m[1].toLowerCase()] + "_" + m[2];
+    if (/^\d{6,13}$/.test(s)) return "EUW1_" + s;
+    var reg = /\/(?:profile|match|summoner|summoners)\/([a-z]{2,4}\d?)\//i.exec(dec);
+    var num = /(?:match|matches|game)[\/=](\d{6,13})(?!\d)/i.exec(dec) || /\/(\d{9,13})(?=[\/?#]|$)/.exec(dec);
+    if (!num) return null;
+    return ((reg && PLATFORM[reg[1].toLowerCase()]) || "EUW1") + "_" + num[1];
+  }
+  function playaramLink(m, x) {
+    var parts = m.id.split("_"), slug = SLUG[parts[0]] || "euw";
+    return "https://playaram.gg/en/profile/" + slug + "/" + encodeURIComponent(x.n + "#" + (x.t || slug)) + "/match/" + parts[1];
+  }
+  function proxyUrl() {
+    var u = String(S.riotProxy || RIOT_PROXY || "").trim().replace(/\/+$/, "");
+    if (u && !/^https?:\/\//i.test(u)) u = "https://" + u;
+    return u;
+  }
+  var ERR_TXT = {
+    "key": "Der Riot-Schlüssel ist abgelaufen oder ungültig. Neuen Schlüssel bei Cloudflare eintragen.",
+    "no-key": "In der Riot-Verbindung fehlt noch der Schlüssel (RIOT_KEY).",
+    "not-found": "Dieses Spiel kennt Riot nicht. Stimmt der Link?",
+    "busy": "Riot ist gerade ausgelastet. In einer Minute nochmal versuchen.",
+    "origin": "Die Riot-Verbindung lässt diese Seite nicht zu.",
+    "bad-id": "Aus dem Link lässt sich keine Spielnummer lesen."
+  };
+  function setPlaces(k) {
+    var id = S.roundMatches[k], m = id && S.matches[id];
+    if (!m) return 0;
+    var tm = ourTeam(m);
+    if (tm === null) return 0;
+    var n = 0;
+    teamByDamage(m, tm).forEach(function (x, i) {
+      var pl = playerByRiot(x);
+      if (!pl) return;
+      n++;
+      if (pl.p[k] !== i + 1) { pl.p[k] = i + 1; persistPlayer(pl); }
+    });
+    return n;
+  }
+  function loadGame(k, raw) {
+    var st = GL.state[k] = { busy: false, err: "" };
+    if (S.readOnly || S.mode === "init") return;
+    var id = parseMatchLink(raw);
+    if (!id) { st.err = "Aus dem Link lässt sich keine Spielnummer lesen. Bitte den Link der Spielseite einfügen (…/match/1234567890)."; renderGameLinks(); return; }
+    var dupe = S.roundMatches.indexOf(id);
+    if (dupe >= 0 && dupe !== k) { st.err = "Dieses Spiel ist schon bei Spiel " + (dupe + 1) + " eingetragen."; renderGameLinks(); return; }
+    function done(m) {
+      st.busy = false;
+      S.matches[m.id] = m;
+      applyHints(m);
+      while (S.roundMatches.length <= k) S.roundMatches.push("");
+      S.roundMatches[k] = m.id;
+      persistRunde();
+      var n = setPlaces(k);
+      Sound.stamp();
+      if (!n) st.err = "Geladen, aber noch kein Spieler erkannt. Unten auswählen, wer wer ist.";
+      renderPoints(); renderStats();
+    }
+    if (S.matches[id]) { done(S.matches[id]); return; }
+    var url = proxyUrl();
+    if (!url) { st.err = "Die Riot-Verbindung ist noch nicht eingerichtet (Statistik → Einstellungen)."; renderGameLinks(); return; }
+    st.busy = true; renderGameLinks();
+    fetch(url + "?match=" + encodeURIComponent(id))
+      .then(function (r) { return r.json().catch(function () { return { error: "riot" }; }).then(function (b) { return { ok: r.ok, b: b }; }); })
+      .then(function (res) {
+        if (!res.ok || !res.b || res.b.error) { st.busy = false; st.err = ERR_TXT[res.b && res.b.error] || "Riot hat nicht geantwortet. Später nochmal versuchen."; renderGameLinks(); return; }
+        var m = normMatch(res.b, id);
+        if (!m.p.length) { st.busy = false; st.err = "Das Spiel enthält keine Spielerdaten."; renderGameLinks(); return; }
+        GL.pendingSave[m.id] = true;
+        persistMatch(m);
+        setTimeout(function () { delete GL.pendingSave[m.id]; }, 8000);
+        done(m);
+      })
+      .catch(function () { st.busy = false; st.err = "Die Riot-Verbindung ist nicht erreichbar."; renderGameLinks(); });
+  }
+  function unlinkGame(k) {
+    var id = S.roundMatches[k];
+    S.roundMatches[k] = "";
+    GL.state[k] = {};
+    persistRunde();
+    var used = S.roundMatches.indexOf(id) >= 0 || S.rounds.some(function (r) { return (r.spiele || []).indexOf(id) >= 0; });
+    if (id && !used) { delete S.matches[id]; dropMatch(id); }
+    renderPoints(); renderStats();
+  }
+  function fmtDmg(v) { return Number(v || 0).toLocaleString("de-DE"); }
+  function fmtDur(sec) { sec = Math.round(sec || 0); return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0"); }
+  function renderGameLinks() {
+    var grid = $("#gl-grid");
+    if (!grid) return;
+    var locked = S.readOnly || S.mode === "init";
+    var keyAll = [];
+    for (var k = 0; k < S.games; k++) {
+      var id = S.roundMatches[k] || "", m = id && S.matches[id], st = GL.state[k] || {};
+      var mapKey = m ? m.p.map(function (x) { var pl = playerByRiot(x); return pl ? pl.id : "-"; }).join(",") : "";
+      keyAll.push([k, id, !!m, st.busy ? 1 : 0, st.err || "", mapKey, locked ? 1 : 0, S.players.length].join("|"));
+    }
+    var sig = keyAll.join("~");
+    if (grid.dataset.sig === sig) return;
+    var typing = {};
+    grid.querySelectorAll(".gl-in").forEach(function (inp) { typing[inp.dataset.k] = inp.value; });
+    grid.dataset.sig = sig;
+    grid.textContent = "";
+    var firstEmpty = true;
+    for (var g = 0; g < S.games; g++) {
+      var sl = gameSlot(g, locked, typing[g] || "");
+      if (!sl.classList.contains("done")) { if (!firstEmpty && !typing[g]) sl.classList.add("later"); firstEmpty = false; }
+      grid.appendChild(sl);
+    }
+  }
+  function gameSlot(k, locked, typed) {
+    var id = S.roundMatches[k] || "", m = id && S.matches[id], st = GL.state[k] || {};
+    var el = document.createElement("div");
+    el.className = "gl-slot" + (m ? " done" : "");
+    el.dataset.k = String(k);
+    if (!m) {
+      el.innerHTML = '<div class="gl-k">Spiel ' + (k + 1) + '</div>' +
+        '<form class="gl-form" autocomplete="off"><input class="gl-in" placeholder="Link einfügen" inputmode="url"><button class="btn" type="submit">Laden</button></form>' +
+        '<div class="gl-msg"></div>';
+      var inp = el.querySelector(".gl-in"), btn = el.querySelector("button");
+      inp.dataset.k = String(k); inp.value = typed;
+      inp.setAttribute("aria-label", "Link zu Spiel " + (k + 1));
+      inp.disabled = btn.disabled = locked || !!st.busy;
+      if (st.busy) btn.textContent = "Lädt…";
+      var msg = el.querySelector(".gl-msg");
+      if (st.err) { msg.textContent = st.err; msg.classList.add("err"); }
+      else if (id && !m) msg.textContent = "Wird geladen…";
+      return el;
+    }
+    var tm = ourTeam(m), win = null;
+    var team = tm === null ? m.p.slice().sort(function (a, b) { return a.tm - b.tm || b.dmg - a.dmg; }) : teamByDamage(m, tm);
+    if (tm !== null && team[0]) win = team[0].w;
+    el.innerHTML = '<div class="gl-k">Spiel ' + (k + 1) + (win === null ? "" : ' · <b class="' + (win ? "w" : "l") + '">' + (win ? "Sieg" : "Niederlage") + "</b>") + " · " + fmtDur(m.dur) + "</div>" +
+      '<ol class="gl-team"></ol><div class="gl-msg"></div><div class="gl-foot"><a target="_blank" rel="noopener">Spiel ansehen</a><button type="button" class="gl-x">Link entfernen</button></div>';
+    var ol = el.querySelector(".gl-team");
+    var free = S.players.filter(function (q) { return !m.p.some(function (x) { return playerByRiot(x) === q; }); });
+    team.forEach(function (x, i) {
+      var pl = playerByRiot(x), li = document.createElement("li");
+      li.innerHTML = '<span class="pl"></span><img alt="" loading="lazy"><span class="nm"></span><span class="dm"></span>';
+      li.querySelector(".pl").textContent = tm === null ? "" : (i + 1) + ".";
+      li.querySelector("img").src = champIcon(x.ci);
+      li.querySelector("img").title = champName(x.c);
+      var nm = li.querySelector(".nm");
+      if (pl) { nm.textContent = pl.name; nm.classList.add("ours"); nm.title = x.n + "#" + x.t + " · " + champName(x.c); }
+      else if (!locked) {
+        var sel = document.createElement("select");
+        sel.innerHTML = '<option value="">' + esc(x.n) + " – wer ist das?</option>" + free.map(function (q) { return '<option value="' + esc(q.id) + '">' + esc(q.name) + "</option>"; }).join("");
+        sel.dataset.n = x.n; sel.dataset.t = x.t;
+        sel.setAttribute("aria-label", "Wer ist " + x.n + "?");
+        nm.appendChild(sel);
+      } else { nm.textContent = x.n; nm.classList.add("foreign"); }
+      li.querySelector(".dm").textContent = fmtDmg(x.dmg);
+      ol.appendChild(li);
+    });
+    var lead = team.filter(function (x) { return playerByRiot(x); })[0] || team[0];
+    el.querySelector("a").href = playaramLink(m, lead);
+    el.querySelector(".gl-x").disabled = locked;
+    if (st.err) { var msg2 = el.querySelector(".gl-msg"); msg2.textContent = st.err; msg2.classList.add("err"); }
+    return el;
+  }
+  $("#gl-grid").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var slot = e.target.closest(".gl-slot"); if (!slot) return;
+    loadGame(Number(slot.dataset.k), slot.querySelector(".gl-in").value);
+  });
+  $("#gl-grid").addEventListener("paste", function (e) {
+    var inp = e.target.closest(".gl-in"); if (!inp) return;
+    setTimeout(function () { if (inp.value.trim()) loadGame(Number(inp.dataset.k), inp.value); }, 30);
+  });
+  $("#gl-grid").addEventListener("change", function (e) {
+    var sel = e.target.closest("select"); if (!sel || !sel.value) return;
+    var pl = S.players.filter(function (q) { return q.id === sel.value; })[0]; if (!pl) return;
+    addRiot(pl, sel.dataset.n, sel.dataset.t);
+    var k = Number(sel.closest(".gl-slot").dataset.k);
+    GL.state[k] = {};
+    setPlaces(k);
+    renderPoints(); renderStats();
+  });
+  $("#gl-grid").addEventListener("click", function (e) {
+    var b = e.target.closest(".gl-x"); if (!b) return;
+    var k = Number(b.closest(".gl-slot").dataset.k);
+    arm(b, "Wirklich entfernen?", function () { unlinkGame(k); });
+  });
+
+  /* augment names and icons from CommunityDragon (German), cached on the device for a week */
+  var AUG = { map: null, busy: false };
+  function loadAugs() {
+    if (AUG.map || AUG.busy || !Object.keys(S.matches).length) return;
+    try {
+      var c = JSON.parse(localStorage.getItem("aram-augs-de") || "null");
+      if (c && c.m && c.t > Date.now() - 7 * 864e5) { AUG.map = c.m; return; }
+    } catch (e) {}
+    AUG.busy = true;
+    fetch(CD + "cdragon/arena/de_de.json").then(function (r) { return r.json(); }).then(function (d) {
+      var m = {};
+      (d.augments || []).forEach(function (a) { m[a.id] = [String(a.name || ""), String(a.iconSmall || a.iconLarge || "").toLowerCase()]; });
+      AUG.map = m; AUG.busy = false;
+      try { localStorage.setItem("aram-augs-de", JSON.stringify({ t: Date.now(), m: m })); } catch (e) {}
+      renderStats();
+    }).catch(function () { AUG.busy = false; });
+  }
+  function augName(id) { return AUG.map && AUG.map[id] && AUG.map[id][0] ? AUG.map[id][0] : "Augmentierung " + id; }
+  function augIcon(id) { return AUG.map && AUG.map[id] && AUG.map[id][1] ? CD + "game/" + AUG.map[id][1] : ""; }
+
+  /* ---------- Statistik ---------- */
+  function statData() {
+    var per = new Map(S.players.map(function (p) { return [p.id, { p: p, g: [] }]; }));
+    Object.keys(S.matches).forEach(function (id) {
+      var m = S.matches[id], tm = ourTeam(m);
+      var team = tm === null ? [] : teamByDamage(m, tm);
+      m.p.forEach(function (x) {
+        var pl = playerByRiot(x), e = pl && per.get(pl.id);
+        if (e) e.g.push({ m: m, x: x, place: team.indexOf(x) + 1 || null });
+      });
+    });
+    return Array.from(per.values()).map(function (e) {
+      e.g.sort(function (a, b) { return b.m.at - a.m.at; });
+      var n = e.g.length, sum = { k: 0, d: 0, a: 0, dmg: 0, w: 0 }, ch = {}, au = {};
+      e.g.forEach(function (it) {
+        var x = it.x;
+        sum.k += x.k; sum.d += x.d; sum.a += x.a; sum.dmg += x.dmg; if (x.w) sum.w++;
+        var c = ch[x.c] || (ch[x.c] = { c: x.c, ci: x.ci, n: 0, w: 0, dmg: 0, k: 0, d: 0, a: 0, best: 0 });
+        c.n++; if (x.w) c.w++; c.dmg += x.dmg; c.k += x.k; c.d += x.d; c.a += x.a; c.best = Math.max(c.best, x.dmg);
+        x.aug.forEach(function (aid) { var a = au[aid] || (au[aid] = { id: aid, n: 0, w: 0 }); a.n++; if (x.w) a.w++; });
+      });
+      var champs = Object.keys(ch).map(function (k) { return ch[k]; }).sort(function (a, b) { return b.n - a.n || b.dmg / b.n - a.dmg / a.n; });
+      var strong = champs.filter(function (c) { return c.n >= 2; });
+      if (!strong.length) strong = champs.slice();
+      strong.sort(function (a, b) { return b.dmg / b.n - a.dmg / a.n; });
+      var augs = Object.keys(au).map(function (k) { return au[k]; }).sort(function (a, b) { return b.n - a.n || b.w - a.w; });
+      return { p: e.p, g: e.g, n: n, w: sum.w, dmg: n ? sum.dmg / n : 0, k: n ? sum.k / n : 0, d: n ? sum.d / n : 0, a: n ? sum.a / n : 0,
+        kda: (sum.k + sum.a) / Math.max(1, sum.d), champs: champs, fav: champs[0] || null, strong: strong[0] || null, augs: augs };
+    });
+  }
+  function chHTML(c, sub) {
+    return '<span class="st-ch"><img class="ch-ic" alt="" loading="lazy" src="' + esc(champIcon(c.ci)) + '"><span>' + esc(champName(c.c)) + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span></span>";
+  }
+  function pct(a, b) { return b ? Math.round(a / b * 100) + " %" : "–"; }
+  function fx1(v) { return (Math.round(v * 10) / 10).toLocaleString("de-DE"); }
+  function renderStats() {
+    var body = $("#st-body");
+    if (!body) return;
+    var rows = statData().filter(function (r) { return r.n > 0; }).sort(function (a, b) { return b.dmg - a.dmg; });
+    var total = Object.keys(S.matches).length;
+    /* cards */
+    var cards = $("#st-cards");
+    cards.innerHTML = "";
+    function card(k, v, sub, cls) {
+      var d = document.createElement("div"); d.className = "card panel" + (cls ? " " + cls : "");
+      d.innerHTML = '<div class="eyebrow"></div><div class="v"></div><div class="sub"></div>';
+      d.children[0].textContent = k; d.children[1].textContent = v; d.children[2].textContent = sub; cards.appendChild(d);
+    }
+    var teamW = 0;
+    Object.keys(S.matches).forEach(function (id) { var m = S.matches[id], tm = ourTeam(m); if (tm !== null && m.p.some(function (x) { return x.tm === tm && x.w; })) teamW++; });
+    card("Gespeicherte Spiele", String(total), total ? teamW + (teamW === 1 ? " Sieg · " : " Siege · ") + (total - teamW) + (total - teamW === 1 ? " Niederlage" : " Niederlagen") : "Bei den Punkten pro Spiel den Link einfügen");
+    var top = rows.filter(function (r) { return r.n >= 3; })[0] || rows[0];
+    card("Schadenskönig", top ? top.p.name : "—", top ? fmtDmg(Math.round(top.dmg)) + " Schaden im Schnitt" : "Erscheint nach dem ersten Spiel", "best");
+    var cc = {};
+    rows.forEach(function (r) { r.champs.forEach(function (c) { var o = cc[c.c] || (cc[c.c] = { c: c.c, ci: c.ci, n: 0 }); o.n += c.n; }); });
+    var favG = Object.keys(cc).map(function (k) { return cc[k]; }).sort(function (a, b) { return b.n - a.n; })[0];
+    card("Liebster Champion der Gruppe", favG ? champName(favG.c) : "—", favG ? favG.n + "× gespielt" : "");
+    /* table */
+    body.textContent = "";
+    $("#st-wrap").hidden = !rows.length;
+    if (!rows.length) {
+      $("#st-prof").hidden = false;
+      $("#st-prof").innerHTML = '<div class="st-empty">Noch keine Spieldaten. Auf der Seite <b>Punkte</b> bei Spiel 1 bis 4 den Link von playaram.gg einfügen, dann erscheinen hier Champions, Schaden, Kills und Augmentierungen für jeden.</div>';
+    } else {
+      if (!rows.some(function (r) { return r.p.id === S.statSel; })) S.statSel = rows[0].p.id;
+      rows.forEach(function (r) {
+        var tr = document.createElement("tr");
+        tr.dataset.id = r.p.id;
+        if (r.p.id === S.statSel) tr.className = "sel";
+        tr.innerHTML = '<td class="name-cell"><div class="who"><span class="av"></span><span class="pname"></span></div></td>' +
+          "<td>" + r.n + "</td><td>" + pct(r.w, r.n) + '</td><td class="num1">' + fmtDmg(Math.round(r.dmg)) + "</td>" +
+          "<td>" + fx1(r.k) + " / " + fx1(r.d) + " / " + fx1(r.a) + "</td><td>" + fx1(r.kda) + "</td>" +
+          "<td>" + (r.fav ? chHTML(r.fav, r.fav.n + "× gespielt") : "–") + "</td>" +
+          "<td>" + (r.strong ? chHTML(r.strong, fmtDmg(Math.round(r.strong.dmg / r.strong.n)) + " Ø Schaden") : "–") + "</td>";
+        setAvatar(tr.querySelector(".av"), r.p);
+        tr.querySelector(".pname").textContent = r.p.name;
+        body.appendChild(tr);
+      });
+      renderProfile(rows.filter(function (r) { return r.p.id === S.statSel; })[0]);
+    }
+    /* settings */
+    var inp = $("#rp-url");
+    if (document.activeElement !== inp) inp.value = S.riotProxy || RIOT_PROXY || "";
+    inp.disabled = S.readOnly || S.mode === "init";
+    if (!$("#rp-status").dataset.manual) $("#rp-status").textContent = proxyUrl() ? "Verbindung eingetragen." : "Noch keine Verbindung eingetragen. Ohne sie können keine Spiele geladen werden.";
+    renderRiotIds();
+  }
+  function renderProfile(r) {
+    var box = $("#st-prof");
+    box.hidden = !r;
+    if (!r) return;
+    var key = r.p.id + "|" + r.n + "|" + (AUG.map ? 1 : 0) + "|" + r.g.map(function (it) { return it.m.id; }).join(",") + "|" + (r.p.riot || []).join(",");
+    if (box.dataset.key === key) return;
+    box.dataset.key = key;
+    var h = '<div class="sp-head"><span class="av"></span><div><div class="sp-name"></div><div class="sp-rid"></div></div></div>' +
+      '<div class="sp-kpis">' +
+        '<div class="sp-kpi"><div class="eyebrow">Spiele</div><div class="v">' + r.n + '</div><div class="sub">' + r.w + (r.w === 1 ? " Sieg · " : " Siege · ") + pct(r.w, r.n) + "</div></div>" +
+        '<div class="sp-kpi"><div class="eyebrow">Ø Schaden</div><div class="v">' + fmtDmg(Math.round(r.dmg)) + '</div><div class="sub">an Champions</div></div>' +
+        '<div class="sp-kpi"><div class="eyebrow">Ø K / T / A</div><div class="v">' + fx1(r.k) + " / " + fx1(r.d) + " / " + fx1(r.a) + '</div><div class="sub">KDA ' + fx1(r.kda) + "</div></div>" +
+        '<div class="sp-kpi"><div class="eyebrow">Bestes Spiel</div><div class="v" id="sp-best"></div><div class="sub" id="sp-best-s"></div></div>' +
+      "</div>" +
+      '<div class="sp-grid"><div class="sp-box"><h3>Champions</h3><div class="tbl-wrap"><table><thead><tr><th>Champion</th><th>Spiele</th><th>Siege</th><th>Ø Schaden</th><th>KDA</th></tr></thead><tbody id="sp-ch"></tbody></table></div></div>' +
+      '<div class="sp-box"><h3>Augmentierungen</h3><ul class="aug-list" id="sp-aug"></ul></div></div>' +
+      '<div class="sp-box"><h3>Letzte Spiele</h3><ul class="sp-games" id="sp-games"></ul></div>';
+    box.innerHTML = h;
+    setAvatar(box.querySelector(".av"), r.p);
+    box.querySelector(".sp-name").textContent = r.p.name;
+    box.querySelector(".sp-rid").textContent = (r.p.riot || []).join(" · ");
+    var bestG = r.g.slice().sort(function (a, b) { return b.x.dmg - a.x.dmg; })[0];
+    if (bestG) { $("#sp-best").textContent = fmtDmg(bestG.x.dmg); $("#sp-best-s").textContent = champName(bestG.x.c) + " · " + fmtDate(new Date(bestG.m.at).toISOString()); }
+    var tb = $("#sp-ch");
+    r.champs.slice(0, 12).forEach(function (c) {
+      var tr = document.createElement("tr");
+      tr.innerHTML = "<td>" + chHTML(c) + "</td><td>" + c.n + "</td><td>" + pct(c.w, c.n) + "</td><td>" + fmtDmg(Math.round(c.dmg / c.n)) + "</td><td>" + fx1((c.k + c.a) / Math.max(1, c.d)) + "</td>";
+      tb.appendChild(tr);
+    });
+    var ul = $("#sp-aug");
+    var winner = r.augs.filter(function (a) { return a.n >= 2; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.n - a.n; })[0];
+    if (!r.augs.length) ul.innerHTML = '<li><span></span><span class="aug-nm">Noch keine Augmentierungen in den Spieldaten</span><span></span></li>';
+    r.augs.slice(0, 10).forEach(function (a) {
+      var li = document.createElement("li");
+      if (winner && a.id === winner.id) li.className = "star";
+      var ic = augIcon(a.id);
+      li.innerHTML = (ic ? '<img class="aug-ic" alt="" loading="lazy">' : '<span class="aug-ic"></span>') + '<span class="aug-nm"></span><span class="aug-v"><b>' + a.n + "×</b><br>" + pct(a.w, a.n) + " Siege</span>";
+      if (ic) li.querySelector("img").src = ic;
+      li.querySelector(".aug-nm").textContent = augName(a.id);
+      if (winner && a.id === winner.id) { var sm = document.createElement("small"); sm.textContent = "Bringt am häufigsten den Sieg"; li.querySelector(".aug-nm").appendChild(sm); }
+      ul.appendChild(li);
+    });
+    var gl = $("#sp-games");
+    r.g.slice(0, 12).forEach(function (it) {
+      var x = it.x, li = document.createElement("li");
+      li.innerHTML = '<img class="ch-ic" alt="" loading="lazy"><div><div class="g1"></div><div class="g2"></div></div><div class="g3"></div>';
+      li.querySelector("img").src = champIcon(x.ci);
+      li.querySelector(".g1").innerHTML = esc(champName(x.c)) + ' · <b class="' + (x.w ? "w" : "l") + '">' + (x.w ? "Sieg" : "Niederlage") + "</b>";
+      var g2 = li.querySelector(".g2");
+      g2.textContent = fmtDate(new Date(it.m.at).toISOString()) + " · " + x.k + " / " + x.d + " / " + x.a + (it.place ? " · " + it.place + ". im Team" : "") + " ";
+      x.aug.forEach(function (aid) { var ic = augIcon(aid); if (!ic) return; var im = document.createElement("img"); im.src = ic; im.alt = ""; im.title = augName(aid); im.loading = "lazy"; g2.appendChild(im); });
+      li.querySelector(".g3").innerHTML = "<b>" + fmtDmg(x.dmg) + '</b><a target="_blank" rel="noopener">ansehen</a>';
+      li.querySelector("a").href = playaramLink(it.m, x);
+      gl.appendChild(li);
+    });
+  }
+  function renderRiotIds() {
+    var box = $("#rid-list"), locked = S.readOnly || S.mode === "init";
+    var key = S.players.map(function (p) { return p.id + ":" + p.name + ":" + (p.riot || []).join(","); }).join("|") + (locked ? 1 : 0);
+    if (box.dataset.key === key) return;
+    box.dataset.key = key;
+    box.textContent = "";
+    S.players.forEach(function (p) {
+      var row = document.createElement("div");
+      row.className = "rid-row";
+      row.innerHTML = '<span class="who"></span><span class="rid-chips"></span>';
+      row.querySelector(".who").textContent = p.name;
+      var chips = row.querySelector(".rid-chips");
+      (p.riot || []).forEach(function (r, i) {
+        var c = document.createElement("span"); c.className = "rid-chip";
+        c.innerHTML = '<span></span><button type="button" aria-label="Entfernen">×</button>';
+        c.firstChild.textContent = r;
+        c.querySelector("button").dataset.pid = p.id; c.querySelector("button").dataset.i = String(i);
+        c.querySelector("button").disabled = locked;
+        chips.appendChild(c);
+      });
+      var add = document.createElement("input");
+      add.className = "rid-add"; add.placeholder = "Name#TAG hinzufügen"; add.dataset.pid = p.id; add.disabled = locked;
+      add.setAttribute("aria-label", "Riot-Namen für " + p.name + " hinzufügen");
+      chips.appendChild(add);
+      box.appendChild(row);
+    });
+  }
+  $("#rid-list").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-pid]"); if (!b) return;
+    var p = S.players.filter(function (q) { return q.id === b.dataset.pid; })[0]; if (!p) return;
+    p.riot = (p.riot || []).filter(function (_, i) { return String(i) !== b.dataset.i; });
+    persistPlayer(p, 0);
+    renderStats(); renderGameLinks();
+  });
+  $("#rid-list").addEventListener("keydown", function (e) {
+    var inp = e.target.closest(".rid-add"); if (!inp || e.key !== "Enter") return;
+    e.preventDefault();
+    var v = inp.value.trim(); if (!v) return;
+    var parts = v.split("#"), p = S.players.filter(function (q) { return q.id === inp.dataset.pid; })[0];
+    if (!p) return;
+    addRiot(p, parts[0].trim(), (parts[1] || "").trim());
+    renderStats(); renderGameLinks();
+  });
+  $("#st-body").addEventListener("click", function (e) {
+    var tr = e.target.closest("tr[data-id]"); if (!tr) return;
+    S.statSel = tr.dataset.id;
+    renderStats();
+    var pr = $("#st-prof");
+    if (pr.scrollIntoView) pr.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+  });
+  $("#rp-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (S.readOnly) return;
+    var v = $("#rp-url").value.trim().replace(/\/+$/, "");
+    S.riotProxy = v; persistRiot();
+    var stEl = $("#rp-status");
+    stEl.dataset.manual = "1";
+    var u = proxyUrl();
+    if (!u) { stEl.textContent = "Verbindung entfernt."; return; }
+    stEl.textContent = "Teste die Verbindung…";
+    fetch(u + "?ping=1").then(function (r) { return r.json().then(function (b) { return { ok: r.ok, b: b }; }); }).then(function (res) {
+      if (res.ok && res.b && res.b.ok) stEl.textContent = "Verbindung steht, der Riot-Schlüssel funktioniert.";
+      else if (res.b && res.b.error === "no-key") stEl.textContent = "Verbindung steht, aber der Schlüssel RIOT_KEY fehlt noch bei Cloudflare.";
+      else if (res.b && res.b.error === "origin") stEl.textContent = "Die Verbindung lässt diese Seite nicht zu.";
+      else stEl.textContent = "Verbindung steht, aber Riot lehnt den Schlüssel ab (abgelaufen?). Neuen Schlüssel bei Cloudflare eintragen.";
+    }).catch(function () { stEl.textContent = "Unter dieser Adresse antwortet nichts. Stimmt die Adresse?"; });
+  });
 
   /* ---------- Schandplatz: der aktuell Letzte, groß und provokant ---------- */
   var TAUNTS = [
@@ -3738,13 +4384,15 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var blz = !viaDuel && ids.length === 1 ? blitzFor(st) : null;
     if (blz && blz.p.id === ids[0]) r.blitz = true;
     if (!viaDuel && st.bottom.length >= 3 && S.endRule && ids[0] === S.endRule) r.regel = "erster";
+    var linked = S.roundMatches.filter(Boolean);
+    if (linked.length) r.spiele = linked;
     saveRound(r);
     Sound.stamp();
     S.players.forEach(function (x) {
       var used = x.p.some(function (v) { return v !== null; });
       if (used || x.dbl) { x.p = emptyP(); x.dbl = false; persistPlayer(x, 0); }
     });
-    S.games = BASE_GAMES; persistRunde();
+    S.games = BASE_GAMES; S.roundMatches = []; GL.state = {}; persistRunde();
     var mNames = ids.map(function (id) { return esc(playerName(id)); }).join(" & ");
     S.ending = false; S.endPick = []; S.endRule = null;
     flash("Runde eingetragen. Die Mimik macht <b>" + mNames + "</b>" + (viaDuel ? " nach dem Duell" : "") +
@@ -4014,7 +4662,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       S.players.forEach(function (p) {
         if (p.p.some(function (x) { return x !== null; })) { p.p = emptyP(); persistPlayer(p); }
       });
-      if (S.games !== BASE_GAMES) { S.games = BASE_GAMES; persistRunde(); }
+      if (S.games !== BASE_GAMES || S.roundMatches.some(Boolean)) { S.games = BASE_GAMES; S.roundMatches = []; GL.state = {}; persistRunde(); }
       renderPoints();
     });
   });
@@ -4113,7 +4761,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     }
     if (act.length >= 2) {
       var hi = Math.max.apply(null, act.map(function (a) { return a.pct; })), lo = Math.min.apply(null, act.map(function (a) { return a.pct; }));
-      give(act.filter(function (a) { return a.pct === hi; }), "Schadensgott", "gold");
+      give(act.filter(function (a) { return a.pct === hi; }), "Schadenskönig", "gold");
       if (lo < hi) give(act.filter(function (a) { return a.pct === lo; }), "Schlusslicht", "bad");
       act.filter(function (a) { return a.mimiks === 0; }).forEach(function (a) { if (!out.has(a.p.id)) out.set(a.p.id, []); out.get(a.p.id).push(["Unantastbar", "good"]); });
     }
@@ -4665,7 +5313,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
   var TEST = { backup: null, pending: {}, readOnly: false };
   function dataCopy() {
     return JSON.parse(JSON.stringify({ players: S.players, wheel: S.wheel, rounds: S.rounds, superDone: S.superDone, games: S.games,
-      seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince }));
+      seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince,
+      matches: S.matches, roundMatches: S.roundMatches, riotProxy: S.riotProxy }));
   }
   function renderTestUI() {
     var on = !!S.test;
@@ -4696,6 +5345,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     S.test = false; S.readOnly = TEST.readOnly;
     S.players = b.players; S.wheel = b.wheel; S.rounds = b.rounds; S.superDone = b.superDone; S.games = b.games;
     S.seasons = b.seasons; S.superWho = b.superWho; S.superNames = b.superNames; S.superSince = b.superSince;
+    S.matches = b.matches; S.roundMatches = b.roundMatches; S.riotProxy = b.riotProxy; GL.state = {};
     S.ending = false; S.endPick = []; S.flash = "";
     quietShame();
     var pend = TEST.pending; TEST.pending = {}; TEST.backup = null;
@@ -4747,12 +5397,14 @@ td.extra { background: rgba(229, 88, 95, .07); }
   });
 
   /* ---------- tabs ---------- */
-  var VIEWS = ["rad", "punkte", "rangliste", "super"];
+  var VIEWS = ["rad", "punkte", "rangliste", "statistik", "super"];
   function showView(v) {
     if (VIEWS.indexOf(v) < 0) v = "rad";
     document.querySelectorAll(".tab").forEach(function (t) { t.setAttribute("aria-selected", String(t.dataset.view === v)); });
     VIEWS.forEach(function (x) { $("#view-" + x).hidden = x !== v; });
     if (v === "rad") requestAnimationFrame(draw);
+    if (v === "statistik") { loadAugs(); renderStats(); }
+    if (v !== "punkte") { clearTimeout(SHAME.roastTimer); $("#roast").hidden = true; }
   }
   document.querySelectorAll(".tab").forEach(function (t) {
     t.addEventListener("click", function () {
@@ -4764,7 +5416,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   });
   window.addEventListener("hashchange", function () { showView(location.hash.replace("#", "")); });
 
-  function renderAll() { renderWheelPanel(); renderPoints(); renderRanking(); }
+  function renderAll() { renderWheelPanel(); renderPoints(); renderRanking(); renderStats(); }
 
   /* Howling Abyss: drifting snow behind everything */
   (function () {
