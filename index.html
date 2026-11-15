@@ -393,7 +393,23 @@ button.av:disabled { cursor: default; }
 .st-ch { display: inline-flex; align-items: center; gap: 8px; text-align: left; }
 .st-ch small { display: block; color: var(--mute); font-size: 12px; }
 .st-empty { padding: 22px 20px; color: var(--mute); }
-.st-prof { padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; }
+.st-prof { padding: 4px 22px 20px; display: flex; flex-direction: column; gap: 18px; }
+.acc { display: flex; flex-direction: column; gap: 10px; }
+.acc-item { overflow: hidden; }
+.acc-item.open { border-color: var(--gold); }
+.acc-head { appearance: none; width: 100%; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto 22px; gap: 14px; align-items: center; padding: 12px 18px; }
+.acc-head:hover { background: rgba(200, 170, 110, .06); }
+.acc-head:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.acc-head .av { width: 44px; height: 44px; font-size: 17px; }
+.acc-nm { min-width: 0; }
+.acc-nm b { display: block; font-family: var(--f-display); font-size: 22px; line-height: 1.15; color: var(--gold-hi); }
+.acc-q { color: var(--mute); font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+.acc-q b { color: var(--ink); font-weight: 700; }
+.acc-chev { width: 22px; height: 22px; display: grid; place-items: center; color: var(--gold); transition: transform .2s; }
+.acc-item.open .acc-chev { transform: rotate(180deg); }
+@media (max-width: 640px) { .acc-head { grid-template-columns: 40px minmax(0, 1fr) 22px; padding: 10px 14px; } .acc-head .av { width: 40px; height: 40px; } .acc-q { grid-column: 2 / 4; grid-row: 2; text-align: left; } .acc-nm b { font-size: 19px; } .st-prof { padding: 4px 14px 16px; } }
+.st-empty-box { padding: 0; }
 .sp-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .sp-head .av { width: 64px; height: 64px; font-size: 24px; }
 .sp-name { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--gold-hi); }
@@ -1417,7 +1433,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       <div class="tbl-wrap panel" id="st-wrap">
         <table class="st-tbl">
           <thead><tr id="st-head">
-            <th class="name-cell" scope="col">Spieler</th><th scope="col" data-sort="n">Spiele</th><th scope="col" data-sort="wr">Siege</th><th scope="col" data-sort="dmg">Ø Schaden</th>
+            <th class="name-cell" scope="col">Spieler</th><th scope="col" data-sort="n">Spiele</th><th scope="col" data-sort="dmg">Ø Schaden</th>
             <th scope="col" data-sort="tk">Kills</th><th scope="col" data-sort="td">Tode</th><th scope="col" data-sort="ta">Assists</th><th scope="col" data-sort="kda">KDA</th>
             <th scope="col" data-sort="share" title="Anteil am Schaden des eigenen Teams">Schaden-Anteil</th><th scope="col" data-sort="kp" title="Anteil an allen Kills des Teams (eigene Kills + Assists)">Kill-Beteil.</th><th scope="col" data-sort="nc">Champions</th>
             <th scope="col">Lieblings-Champion</th><th scope="col">Stärkster Champion</th>
@@ -1425,16 +1441,16 @@ td.extra { background: rgba(229, 88, 95, .07); }
           <tbody id="st-body"></tbody>
         </table>
       </div>
-      <div class="panel st-prof" id="st-prof" hidden></div>
+      <div class="panel st-empty-box" id="st-empty" hidden></div>
       <div id="st-more">
         <div class="sec-head"><h2>Duell</h2><span class="note">Nur Spiele, in denen beide dabei waren</span></div>
         <div class="panel duel-box"><div class="duel-pick"><select id="du-a" aria-label="Spieler 1"></select><span>gegen</span><select id="du-b" aria-label="Spieler 2"></select></div><div id="du-out"></div></div>
+        <div class="sec-head"><h2>Spieler</h2><span class="note">Auf einen Namen tippen, dann klappt alles zu ihm auf</span></div>
+        <div class="acc" id="st-acc"></div>
         <div class="sec-head"><h2>Beste und peinlichste Spiele</h2><span class="note">Die Top 5 aus einzelnen Spielen</span></div>
         <div class="tops" id="st-tops"></div>
-        <div class="sec-head"><h2>Beste Kombis</h2><span class="note">Wer und was zusammen am häufigsten gewinnt</span></div>
-        <div class="kombi" id="st-kombi"></div>
         <div class="sec-head"><h2>Champions der Gruppe</h2><span class="note" id="st-ch-note"></span></div>
-        <div class="tbl-wrap panel"><table class="ch-tbl"><thead><tr><th scope="col">Champion</th><th scope="col">Gespielt</th><th scope="col">Wer</th><th scope="col">Siege</th><th scope="col">Ø Schaden</th><th scope="col">Ø K / T / A</th><th scope="col">KDA</th></tr></thead><tbody id="st-ch"></tbody></table></div>
+        <div class="tbl-wrap panel"><table class="ch-tbl"><thead><tr><th scope="col">Champion</th><th scope="col">Gespielt</th><th scope="col">Wer</th><th scope="col">Ø Schaden</th><th scope="col">Ø K / T / A</th><th scope="col">KDA</th></tr></thead><tbody id="st-ch"></tbody></table></div>
         <button class="btn ghost ch-more" id="st-ch-more" type="button" hidden>Alle Champions anzeigen</button>
       </div>
       <div class="sec-head"><h2>Einstellungen</h2></div>
@@ -4317,13 +4333,14 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function pct(a, b) { return b ? Math.round(a / b * 100) + " %" : "–"; }
   function fx1(v) { return (Math.round(v * 10) / 10).toLocaleString("de-DE"); }
-  var ST_SORT = { k: "dmg", up: false };
+  var ST_SORT = { k: "dmg", up: false }, ST_OPEN = {};
   function pctN(v) { return Math.round(v * 100) + "\u00a0%"; }
   function renderStats() {
     var body = $("#st-body");
     if (!body) return;
     var ms = statMatches(ST_RANGE);
-    var rows = statData(ms).filter(function (r) { return r.n > 0; });
+    var allRows = statData(ms);
+    var rows = allRows.filter(function (r) { return r.n > 0; });
     var titles = statTitles(rows);
     Array.prototype.forEach.call(document.querySelectorAll("#st-range button"), function (b) { b.classList.toggle("on", b.dataset.r === ST_RANGE); b.setAttribute("aria-pressed", b.dataset.r === ST_RANGE); });
     var sk = ST_SORT.k;
@@ -4364,21 +4381,19 @@ td.extra { background: rgba(229, 88, 95, .07); }
     body.textContent = "";
     $("#st-wrap").hidden = !rows.length;
     $("#st-more").hidden = !rows.length;
+    $("#st-empty").hidden = !!rows.length;
     if (!rows.length) {
-      $("#st-prof").hidden = false;
-      $("#st-prof").dataset.key = "";
       $("#st-shame").hidden = true;
-      $("#st-prof").innerHTML = stored ? '<div class="st-empty">In diesem Zeitraum gibt es noch keine Spiele. Oben auf <b>Alle Zeiten</b> umschalten.</div>' : '<div class="st-empty">Noch keine Spieldaten. Auf der Seite <b>Punkte</b> bei Spiel 1 bis 4 die kopierte Spielseite aus Blitz einfügen, dann erscheinen hier Champions, Schaden, Kills und Tode für jeden.</div>';
+      $("#st-empty").innerHTML = stored ? '<div class="st-empty">In diesem Zeitraum gibt es noch keine Spiele. Oben auf <b>Alle Zeiten</b> umschalten.</div>' : '<div class="st-empty">Noch keine Spieldaten. Auf der Seite <b>Punkte</b> bei Spiel 1 bis 4 die kopierte Spielseite aus Blitz einfügen, dann erscheinen hier Champions, Schaden, Kills und Tode für jeden.</div>';
     } else {
-      if (!rows.some(function (r) { return r.p.id === S.statSel; })) S.statSel = rows[0].p.id;
       function nCell(tot, avg) { return '<td class="st-n"><b>' + tot + "</b><small>Ø " + fx1(avg) + "</small></td>"; }
       rows.forEach(function (r) {
         var tr = document.createElement("tr");
         tr.dataset.id = r.p.id;
-        if (r.p.id === S.statSel) tr.className = "sel";
+        if (ST_OPEN[r.p.id]) tr.className = "sel";
         var poolIc = r.champs.slice(0, 3).map(function (c) { return '<img alt="" loading="lazy" title="' + esc(champName(c.c) + " · " + c.n + "×") + '" src="' + esc(champIcon(c.ci, c.c)) + '">'; }).join("");
         tr.innerHTML = '<td class="name-cell"><div class="who"><span class="av"></span><span><span class="pname"></span><span class="st-ttls">' + ttlHTML(titles[r.p.id]) + '</span></span></div></td>' +
-          "<td>" + r.n + '</td><td class="st-n"><b>' + pct(r.w, r.n) + "</b><small>" + r.w + (r.w === 1 ? " Sieg" : " Siege") + '</small></td><td class="num1">' + fmtDmg(Math.round(r.dmg)) + "</td>" +
+          "<td>" + r.n + '</td><td class="num1">' + fmtDmg(Math.round(r.dmg)) + "</td>" +
           nCell(r.tk, r.k) + nCell(r.td, r.d) + nCell(r.ta, r.a) + "<td>" + fx1(r.kda) + "</td><td>" + pctN(r.share) + "</td><td>" + pctN(r.kp) + "</td>" +
           '<td><span class="st-pool"><b>' + r.nc + "</b>" + poolIc + "</span></td>" +
           "<td>" + (r.fav ? chHTML(r.fav, r.fav.n + "× gespielt") : "–") + "</td>" +
@@ -4387,11 +4402,10 @@ td.extra { background: rgba(229, 88, 95, .07); }
         tr.querySelector(".pname").textContent = r.p.name;
         body.appendChild(tr);
       });
-      renderProfile(rows.filter(function (r) { return r.p.id === S.statSel; })[0], titles);
+      renderPlayers(rows.concat(allRows.filter(function (r) { return !r.n; })), titles);
       renderDayShame(rows);
       renderDuel(rows);
       renderTops(rows);
-      renderKombis(ms);
       renderGroupChamps(cc);
     }
     /* settings */
@@ -4421,7 +4435,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var who = Object.keys(o.by).map(function (id) { return { id: id, n: o.by[id] }; }).sort(function (a, b) { return b.n - a.n; })
         .map(function (b) { return "<span>" + esc(playerName(b.id)) + " <b>" + b.n + "×</b></span>"; }).join("");
       tr.innerHTML = "<td>" + chHTML(o) + '</td><td><b>' + o.n + '×</b><span class="ch-bar" style="width:' + Math.max(4, Math.round(o.n / max * 60)) + 'px"></span></td>' +
-        '<td><div class="ch-who">' + who + "</div></td><td>" + pct(o.w, o.n) + "</td><td>" + fmtDmg(Math.round(o.dmg / o.n)) + "</td>" +
+        '<td><div class="ch-who">' + who + "</div></td><td>" + fmtDmg(Math.round(o.dmg / o.n)) + "</td>" +
         "<td>" + fx1(o.k / o.n) + " / " + fx1(o.d / o.n) + " / " + fx1(o.a / o.n) + "</td><td>" + fx1((o.k + o.a) / Math.max(1, o.d)) + "</td>";
       tb.appendChild(tr);
     });
@@ -4518,45 +4532,6 @@ td.extra { background: rgba(229, 88, 95, .07); }
     top("Meiste Tode", function (x) { return x.d; }, false, String, "loser");
     top("Wenigster Schaden", function (x) { return x.dmg; }, true, fmtDmg, "loser");
   }
-  function renderKombis(ms) {
-    var box = $("#st-kombi");
-    box.textContent = "";
-    var duo = {}, cduo = {};
-    ms.forEach(function (m) {
-      var tm = ourTeam(m); if (tm === null) return;
-      var mine = m.p.filter(function (x) { return x.tm === tm && playerByRiot(x); });
-      for (var i = 0; i < mine.length; i++) for (var j = i + 1; j < mine.length; j++) {
-        var a = mine[i], b = mine[j], pa = playerByRiot(a), pb = playerByRiot(b), w = a.w ? 1 : 0;
-        var k = [pa.id, pb.id].sort().join("|"), o = duo[k] || (duo[k] = { names: [pa.name, pb.name].sort(), n: 0, w: 0 });
-        o.n++; o.w += w;
-        var cs = [a, b].sort(function (x, y) { return x.c < y.c ? -1 : 1; }), ck = cs[0].c + "|" + cs[1].c, c = cduo[ck] || (cduo[ck] = { cs: cs, n: 0, w: 0 });
-        c.n++; c.w += w;
-      }
-    });
-    function best(map) {
-      var l = Object.keys(map).map(function (k) { return map[k]; });
-      var min = l.some(function (o) { return o.n >= 2; }) ? 2 : 1;
-      return l.filter(function (o) { return o.n >= min; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.n - a.n; }).slice(0, 6);
-    }
-    function boxOf(title, list, fill) {
-      var d = document.createElement("div");
-      d.className = "panel top-box";
-      d.innerHTML = '<div class="eyebrow"></div><ol></ol>';
-      d.firstChild.textContent = title;
-      if (!list.length) { var e = document.createElement("div"); e.className = "note"; e.textContent = "Erscheint, sobald mindestens zwei von euch in einem Spiel erkannt wurden."; d.appendChild(e); }
-      list.forEach(function (o, i) {
-        var li = document.createElement("li");
-        li.innerHTML = '<span class="r">' + (i + 1) + '.</span><span class="n"></span><span class="x">' + pct(o.w, o.n) + ' <small style="color:var(--mute);font-weight:400">' + o.w + " von " + o.n + "</small></span>";
-        fill(li.querySelector(".n"), o);
-        d.lastChild.appendChild(li);
-      });
-      box.appendChild(d);
-    }
-    boxOf("Spieler-Duos mit den meisten Siegen", best(duo), function (el, o) { el.textContent = o.names.join(" + "); });
-    boxOf("Champion-Duos mit den meisten Siegen", best(cduo), function (el, o) {
-      el.innerHTML = o.cs.map(function (x) { return '<img class="ch-ic" alt="" loading="lazy" style="width:22px;height:22px" src="' + esc(champIcon(x.ci, x.c)) + '">' + esc(champName(x.c)); }).join(" + ");
-    });
-  }
   function formSvg(r) {
     var g = r.g.slice(0, 15).reverse(), W = 600, H = 110, n = g.length, max = Math.max.apply(null, g.map(function (it) { return it.x.dmg; }).concat([1]));
     var bw = Math.min(46, (W - 8) / Math.max(n, 1) - 6), step = (W - 8) / Math.max(n, 1), out = "";
@@ -4567,10 +4542,41 @@ td.extra { background: rgba(229, 88, 95, .07); }
     });
     return '<svg class="form-svg" viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Schaden der letzten ' + n + ' Spiele">' + out + "</svg>";
   }
-  function renderProfile(r, titles) {
-    var box = $("#st-prof");
-    box.hidden = !r;
-    if (!r) return;
+  function renderPlayers(list, titles) {
+    var acc = $("#st-acc"), seen = {};
+    list.forEach(function (r) {
+      var id = r.p.id, it = acc.querySelector('.acc-item[data-id="' + CSS.escape(id) + '"]');
+      seen[id] = true;
+      if (!it) {
+        it = document.createElement("div");
+        it.className = "panel acc-item";
+        it.dataset.id = id;
+        it.innerHTML = '<button type="button" class="acc-head" aria-expanded="false"><span class="av"></span><span class="acc-nm"><b></b><span class="st-ttls"></span></span><span class="acc-q"></span>' +
+          '<span class="acc-chev" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>' +
+          '<div class="st-prof" hidden></div>';
+        it.querySelector(".acc-head").setAttribute("aria-controls", "acc-" + id);
+        it.querySelector(".st-prof").id = "acc-" + id;
+      }
+      acc.appendChild(it);
+      setAvatar(it.querySelector(".av"), r.p);
+      it.querySelector(".acc-nm b").textContent = r.p.name;
+      it.querySelector(".acc-nm .st-ttls").innerHTML = ttlHTML(titles && titles[id]);
+      it.querySelector(".acc-q").innerHTML = r.n
+        ? "<b>" + r.n + "</b> " + (r.n === 1 ? "Spiel" : "Spiele") + " · Ø <b>" + fmtDmg(Math.round(r.dmg)) + "</b> Schaden · <b>" + fx1(r.k) + " / " + fx1(r.d) + " / " + fx1(r.a) + "</b>"
+        : "Noch keine Spiele" + (ST_RANGE === "all" ? "" : " in diesem Zeitraum");
+      var open = !!ST_OPEN[id], body = it.querySelector(".st-prof");
+      it.classList.toggle("open", open);
+      it.querySelector(".acc-head").setAttribute("aria-expanded", open ? "true" : "false");
+      body.hidden = !open;
+      if (open) renderProfile(r, titles, body);
+    });
+    Array.prototype.slice.call(acc.children).forEach(function (el) { if (!seen[el.dataset.id]) acc.removeChild(el); });
+  }
+  function renderProfile(r, titles, box) {
+    if (!r.n) {
+      if (box.dataset.key !== "none") { box.dataset.key = "none"; box.innerHTML = '<div class="st-empty">Noch keine Spiele' + (ST_RANGE === "all" ? "" : " in diesem Zeitraum") + '. Sobald ' + esc(r.p.name) + ' in einem eingefügten Spiel erkannt wird, steht hier alles zu ihm.</div>'; }
+      return;
+    }
     var ttl = ttlHTML(titles && titles[r.p.id]);
     var key = ST_RANGE + ttl + r.p.id + "|" + r.n + "|" + (AUG.map ? 1 : 0) + "|" + r.g.map(function (it) { return it.m.id; }).join(",") + "|" + (r.p.riot || []).join(",");
     if (box.dataset.key === key) return;
@@ -4578,37 +4584,35 @@ td.extra { background: rgba(229, 88, 95, .07); }
     function kpi(t, v, sub) { return '<div class="sp-kpi"><div class="eyebrow">' + t + '</div><div class="v">' + v + '</div><div class="sub">' + sub + "</div></div>"; }
     function recSub(it, unit) { return it ? "Rekord " + unit(it.x) + " · " + esc(champName(it.x.c)) : ""; }
     var hasAug = r.augs.length > 0;
-    var h = '<div class="sp-head"><span class="av"></span><div><div class="sp-name"></div><div class="sp-rid"></div><div class="st-ttls">' + ttl + '</div></div></div>' +
+    var h = '<div class="sp-rid"></div>' +
       '<div class="sp-kpis">' +
-        kpi("Spiele", r.n, r.w + (r.w === 1 ? " Sieg · " : " Siege · ") + pct(r.w, r.n) + " · Serie: " + r.streak + (r.streakW ? (r.streak === 1 ? " Sieg" : " Siege") : (r.streak === 1 ? " Niederlage" : " Niederlagen"))) +
-        kpi("Ø Schaden", fmtDmg(Math.round(r.dmg)), pctN(r.share) + " vom Teamschaden" + (r.place ? " · Ø Platz " + fx1(r.place) : "")) +
+        kpi("Spiele", r.n, r.place ? "im Schnitt Platz " + fx1(r.place) + " im Team" : "") +
+        kpi("Ø Schaden", fmtDmg(Math.round(r.dmg)), pctN(r.share) + " vom Teamschaden") +
         kpi("Kills", r.tk, "Ø " + fx1(r.k) + " · " + recSub(r.maxK, function (x) { return x.k; })) +
         kpi("Tode", r.td, "Ø " + fx1(r.d) + " · " + recSub(r.maxD, function (x) { return x.d; })) +
         kpi("Assists", r.ta, "Ø " + fx1(r.a) + " · " + recSub(r.maxA, function (x) { return x.a; })) +
         kpi("KDA", fx1(r.kda), "Kill-Beteiligung " + pctN(r.kp)) +
         kpi("Champions", r.nc, r.nc === 1 ? "nur einer gespielt" : "verschiedene gespielt") +
-        '<div class="sp-kpi"><div class="eyebrow">Bestes Spiel</div><div class="v" id="sp-best"></div><div class="sub" id="sp-best-s"></div></div>' +
+        '<div class="sp-kpi"><div class="eyebrow">Bestes Spiel</div><div class="v sp-best"></div><div class="sub sp-best-s"></div></div>' +
       "</div>" +
-      '<div class="sp-grid"><div class="sp-box pad"><h3>Formkurve · Schaden der letzten Spiele</h3>' + formSvg(r) + '<div class="form-leg">Grün = Sieg, rot = Niederlage, Zahl = Kills. Längste Siegesserie: ' + r.bestW + ", längste Niederlagenserie: " + r.bestL + '</div></div>' +
+      '<div class="sp-grid"><div class="sp-box pad"><h3>Formkurve · Schaden der letzten Spiele</h3>' + formSvg(r) + '<div class="form-leg">Grün = Sieg, rot = Niederlage, Zahl über dem Balken = Kills</div></div>' +
       '<div class="sp-box pad"><h3>Platz im Team nach Schaden</h3><div class="pl-bars">' + r.plc.map(function (c, i) { return "<div><span>" + (i + 1) + '.</span><span><i style="width:' + Math.round(c / Math.max(1, Math.max.apply(null, r.plc)) * 100) + '%"></i></span><b>' + c + "×</b></div>"; }).join("") + "</div></div></div>" +
-      '<div class="sp-grid' + (hasAug ? "" : " one") + '"><div class="sp-box"><h3>Champions · wie oft gespielt</h3><div class="tbl-wrap"><table><thead><tr><th>Champion</th><th>Gespielt</th><th>Siege</th><th>Ø Schaden</th><th>Ø K / T / A</th><th>KDA</th></tr></thead><tbody id="sp-ch"></tbody></table></div></div>' +
-      (hasAug ? '<div class="sp-box"><h3>Augmentierungen</h3><ul class="aug-list" id="sp-aug"></ul></div>' : "") + "</div>" +
-      '<div class="sp-box"><h3>Letzte Spiele</h3><ul class="sp-games" id="sp-games"></ul></div>';
+      '<div class="sp-grid' + (hasAug ? "" : " one") + '"><div class="sp-box"><h3>Champions · wie oft gespielt</h3><div class="tbl-wrap"><table><thead><tr><th>Champion</th><th>Gespielt</th><th>Ø Schaden</th><th>Ø K / T / A</th><th>KDA</th></tr></thead><tbody class="sp-ch"></tbody></table></div></div>' +
+      (hasAug ? '<div class="sp-box"><h3>Augmentierungen</h3><ul class="aug-list sp-aug"></ul></div>' : "") + "</div>" +
+      '<div class="sp-box"><h3>Letzte Spiele</h3><ul class="sp-games sp-gl"></ul></div>';
     box.innerHTML = h;
-    setAvatar(box.querySelector(".av"), r.p);
-    box.querySelector(".sp-name").textContent = r.p.name;
     box.querySelector(".sp-rid").textContent = (r.p.riot || []).join(" · ");
     var bestG = r.g.slice().sort(function (a, b) { return b.x.dmg - a.x.dmg; })[0];
-    if (bestG) { $("#sp-best").textContent = fmtDmg(bestG.x.dmg); $("#sp-best-s").textContent = champName(bestG.x.c) + " · " + fmtDate(new Date(bestG.m.at).toISOString()); }
-    var tb = $("#sp-ch");
+    if (bestG) { box.querySelector(".sp-best").textContent = fmtDmg(bestG.x.dmg); box.querySelector(".sp-best-s").textContent = champName(bestG.x.c) + " · " + fmtDate(new Date(bestG.m.at).toISOString()); }
+    var tb = box.querySelector(".sp-ch");
     var cmax = r.champs.length ? r.champs[0].n : 1;
     r.champs.forEach(function (c) {
       var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + chHTML(c) + "</td><td><b>" + c.n + '×</b><span class="ch-bar" style="width:' + Math.max(4, Math.round(c.n / cmax * 48)) + 'px"></span></td><td>' + pct(c.w, c.n) + "</td><td>" + fmtDmg(Math.round(c.dmg / c.n)) + "</td>" +
+      tr.innerHTML = "<td>" + chHTML(c) + "</td><td><b>" + c.n + '×</b><span class="ch-bar" style="width:' + Math.max(4, Math.round(c.n / cmax * 48)) + 'px"></span></td><td>' + fmtDmg(Math.round(c.dmg / c.n)) + "</td>" +
         "<td>" + fx1(c.k / c.n) + " / " + fx1(c.d / c.n) + " / " + fx1(c.a / c.n) + "</td><td>" + fx1((c.k + c.a) / Math.max(1, c.d)) + "</td>";
       tb.appendChild(tr);
     });
-    var ul = $("#sp-aug");
+    var ul = box.querySelector(".sp-aug");
     if (ul) {
     var winner = r.augs.filter(function (a) { return a.n >= 2; }).sort(function (a, b) { return b.w / b.n - a.w / a.n || b.n - a.n; })[0];
     if (!r.augs.length) ul.innerHTML = '<li><span></span><span class="aug-nm">Keine Augmentierungen gespeichert<small>Blitz gibt sie beim Kopieren nicht mit heraus</small></span><span></span></li>';
@@ -4623,7 +4627,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       ul.appendChild(li);
     });
     }
-    var gl = $("#sp-games");
+    var gl = box.querySelector(".sp-gl");
     r.g.slice(0, 12).forEach(function (it) {
       var x = it.x, li = document.createElement("li");
       li.innerHTML = '<img class="ch-ic" alt="" loading="lazy"><div><div class="g1"></div><div class="g2"></div></div><div class="g3"></div>';
@@ -4689,12 +4693,18 @@ td.extra { background: rgba(229, 88, 95, .07); }
   $("#st-range").addEventListener("click", function (e) { var b = e.target.closest("button[data-r]"); if (!b) return; ST_RANGE = b.dataset.r; renderStats(); });
   $("#du-a").addEventListener("change", function () { DUEL.a = this.value; if (DUEL.b === DUEL.a) DUEL.b = ""; renderStats(); });
   $("#du-b").addEventListener("change", function () { DUEL.b = this.value; if (DUEL.b === DUEL.a) DUEL.a = ""; renderStats(); });
+  $("#st-acc").addEventListener("click", function (e) {
+    var hd = e.target.closest(".acc-head"); if (!hd) return;
+    var id = hd.parentNode.dataset.id;
+    if (ST_OPEN[id]) delete ST_OPEN[id]; else ST_OPEN[id] = true;
+    renderStats();
+  });
   $("#st-body").addEventListener("click", function (e) {
     var tr = e.target.closest("tr[data-id]"); if (!tr) return;
-    S.statSel = tr.dataset.id;
+    ST_OPEN[tr.dataset.id] = true;
     renderStats();
-    var pr = $("#st-prof");
-    if (pr.scrollIntoView) pr.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+    var it = $("#st-acc").querySelector('.acc-item[data-id="' + CSS.escape(tr.dataset.id) + '"]');
+    if (it && it.scrollIntoView) it.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
   });
   $("#rp-form").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -5994,7 +6004,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 
   /* a tab that stays open for hours keeps old code: look for a newer version and offer (or do) a reload */
-  var BUILD = "2026-11-16a";
+  var BUILD = "2026-11-16b";
   (function () {
     if (!/github\.io$/.test(location.hostname) || !window.fetch) return;
     var bar = null, busy = false;
