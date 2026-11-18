@@ -748,7 +748,7 @@ th[aria-sort="descending"] .sort-btn, th[aria-sort="ascending"] .sort-btn { colo
 .ttl.bad { color: #FFB3B6; border-color: var(--blood); background: rgba(229, 88, 95, .14); }
 .ttl.good { color: #9BE7BE; border-color: #55C98F; background: rgba(85, 201, 143, .12); }
 .ttl.gold { color: var(--gold-hi); border-color: var(--gold); background: rgba(200, 170, 110, .14); }
-.ttl.blitz { color: #04122A; border-color: #8FD3FF; background: #8FD3FF; }
+.ttl.volt { color: #04122A; border-color: #8FD3FF; background: #8FD3FF; }
 .sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding-top: 8px; }
 .records { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 @media (max-width: 860px) { .records { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -907,7 +907,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
 .badge2.x2 { background: var(--gold); color: var(--gold-ink); }
 .badge2.duel { border: 1px solid var(--blood); color: var(--blood); }
 .badge2.extra { border: 1px solid var(--ice); color: var(--ice); }
-.badge2.blitz { background: #8FD3FF; color: #04122A; }
+.badge2.volt { background: #8FD3FF; color: #04122A; }
 .badge2.regel { border: 1px solid var(--gold); color: var(--gold); }
 .blitz-inline { display: inline-block; margin-left: 6px; font-size: 13px; font-weight: 700; letter-spacing: .06em; color: #04122A; background: #8FD3FF; border-radius: 999px; padding: 2px 10px; vertical-align: 2px; }
 .safe-inline { color: var(--win, #55C98F); font-weight: 700; }
@@ -5318,7 +5318,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var pl = rows.filter(function (a) { return a.runden > 0; }), act = rows.filter(function (a) { return a.runden >= 3; });
     if (pl.length >= 2) {
       give(tops(pl, "mimiks"), "Müllkönig", "bad");
-      give(tops(pl, "blitz"), "Blitzableiter", "blitz");
+      give(tops(pl, "blitz"), "Blitzableiter", "volt");
       give(tops(pl, "duelL"), "Duell-Opfer", "bad");
       give(tops(pl, "dbl"), "Zocker", "gold");
     }
@@ -5551,7 +5551,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var bd = li.querySelector(".badges");
       if (r.mimik.some(function (id) { return isDbl(r, id); })) bd.insertAdjacentHTML("beforeend", '<span class="badge2 x2">×2</span>');
       if (r.duel) bd.insertAdjacentHTML("beforeend", '<span class="badge2 duel">Duell</span>');
-      if (r.blitz) bd.insertAdjacentHTML("beforeend", '<span class="badge2 blitz">⚡ Geblitzt</span>');
+      if (r.blitz) bd.insertAdjacentHTML("beforeend", '<span class="badge2 volt">⚡ Geblitzt</span>');
       if (r.regel) bd.insertAdjacentHTML("beforeend", '<span class="badge2 regel">Erster-Regel</span>');
       if (r.games > BASE_GAMES) bd.insertAdjacentHTML("beforeend", '<span class="badge2 extra">Spiel ' + r.games + '</span>');
       if (bestE) li.querySelector(".what em").textContent = nameOf(bestE.id) + " (" + bestE.punkte + " P)";
@@ -6004,7 +6004,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 
   /* a tab that stays open for hours keeps old code: look for a newer version and offer (or do) a reload */
-  var BUILD = "2026-11-16b";
+  var BUILD = "2026-11-18a";
   (function () {
     if (!/github\.io$/.test(location.hostname) || !window.fetch) return;
     var bar = null, busy = false;
