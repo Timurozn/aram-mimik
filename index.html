@@ -518,6 +518,70 @@ button.av:disabled { cursor: default; }
 @keyframes poke-r { from { transform: translate(10px, -50%); } to { transform: translate(-6px, -50%); } }
 @keyframes wobble { 0%, 100% { transform: rotate(-5deg) scale(1); } 50% { transform: rotate(5deg) scale(1.04); } }
 .shame-text { position: relative; z-index: 2; min-width: 0; }
+/* Was jeder braucht: rechts neben dem Müllhaufen */
+.shame.has-need { grid-template-columns: auto minmax(0, 1fr) minmax(320px, 430px); gap: 40px; }
+@media (max-width: 1180px) { .shame.has-need { grid-template-columns: auto minmax(0, 1fr); } .shame.has-need .need { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .shame.has-need { grid-template-columns: minmax(0, 1fr); gap: 14px; } }
+.need { position: relative; z-index: 2; min-width: 0; text-align: left; background: rgba(8, 10, 18, .72); border: 1px solid rgba(229, 88, 95, .45); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.need-solo { padding: 14px 16px; }
+.need-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.need-h .eyebrow { color: #FFB3B6; }
+.need-h small { color: var(--mute); font-size: 12px; }
+.need-grid { display: grid; grid-template-columns: minmax(0, 1fr) repeat(var(--nc, 5), 26px) 46px; gap: 4px 4px; align-items: center; }
+.need-grid .hd { font-size: 11px; font-weight: 700; color: var(--mute); text-align: center; letter-spacing: .04em; }
+.need-grid .hd.l { text-align: left; }
+.need-nm { min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+.need-nm .av { width: 24px; height: 24px; font-size: 10px; flex: none; }
+.need-nm span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.need-nm small { color: var(--mute); font-weight: 400; font-size: 12px; white-space: nowrap; }
+.nc { height: 24px; border-radius: 6px; display: grid; place-items: center; font-size: 12px; font-weight: 800; cursor: help; border: 1px solid transparent; }
+.nc.g { background: rgba(85, 201, 143, .2); border-color: #55C98F; color: #9BE7BE; }
+.nc.r { background: rgba(229, 88, 95, .28); border-color: var(--blood); color: #FFB3B6; }
+.nc.d { background: rgba(200, 170, 110, .22); border-color: var(--gold); color: var(--gold-hi); }
+.nc.y { background: rgba(255, 210, 90, .16); border-color: #E8C35A; color: #FFE08A; }
+.nc.x { background: transparent; border-color: var(--line); color: var(--mute); opacity: .5; }
+.need-pct { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 15px; color: var(--ink); }
+.need-pct.hot { color: #FF8A90; }
+.need-txt { grid-column: 1 / -1; font-size: 13px; color: #E9D9DB; line-height: 1.35; margin: -1px 0 6px 32px; }
+.need-txt b { color: #fff; }
+.need-safe { font-size: 13px; color: #9BE7BE; }
+.need-leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--mute); }
+.need-leg i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; border: 1px solid; }
+.need-leg i.g { background: rgba(85, 201, 143, .3); border-color: #55C98F; } .need-leg i.d { background: rgba(200, 170, 110, .3); border-color: var(--gold); }
+.need-leg i.y { background: rgba(255, 210, 90, .25); border-color: #E8C35A; } .need-leg i.r { background: rgba(229, 88, 95, .35); border-color: var(--blood); }
+@media (max-width: 640px) { .need { padding: 10px; } .need-grid { grid-template-columns: minmax(0, 1fr) repeat(var(--nc, 5), 24px) 40px; } .need-txt { margin-left: 0; } }
+/* Tipp-Spiel */
+.tipp { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+.tipp-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 14px; flex-wrap: wrap; }
+.tipp-h h2 { margin: 0; font-family: var(--f-display); font-size: 19px; letter-spacing: .06em; color: var(--gold-hi); }
+.tipp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.tipp-row { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; background: var(--abyss); }
+.tipp-row .av { width: 28px; height: 28px; font-size: 11px; }
+.tipp-row label { display: block; font-size: 12px; color: var(--mute); }
+.tipp-row select { width: 100%; height: 30px; border: 1px solid var(--line); border-radius: 6px; background: var(--deep); color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; padding: 0 6px; }
+.tipp-row select:disabled { opacity: .75; }
+.tipp-row.set { border-color: rgba(200, 170, 110, .55); }
+.tipp-sum { font-size: 14px; color: var(--mute); }
+.tipp-sum b { color: var(--gold-hi); }
+/* Rangliste: Erzfeinde und Tipp-Auswertung */
+.foes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.foe { padding: 12px 14px; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: center; }
+.foe .av { width: 44px; height: 44px; font-size: 16px; }
+.foe .fn { font-weight: 700; font-size: 16px; }
+.foe .fe { font-size: 14px; color: var(--ink); margin-top: 2px; }
+.foe .fe b { color: #FF8A90; }
+.foe .fa { font-size: 12.5px; color: var(--mute); margin-top: 2px; }
+.tipst td, .tipst th { padding: 8px 12px; font-size: 15px; }
+.ttl[title] { cursor: help; }
+/* Rollen im Spieler-Profil */
+.sp-grid.three { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 1100px) { .sp-grid.three { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .sp-grid.three > :first-child { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .sp-grid.three { grid-template-columns: minmax(0, 1fr); } }
+.role-fav { font-size: 14px; color: var(--mute); margin: -2px 0 8px; }
+.role-fav b { color: var(--gold-hi); font-size: 16px; }
+.role-bars div { grid-template-columns: 74px minmax(0, 1fr) 62px !important; }
+.role-bars i { background: var(--ice) !important; }
+.role-bars div.top i { background: var(--gold) !important; }
 .shame-k { font-size: 13px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; color: #FFB3B6; }
 .shame-title {
   margin: 6px 0 6px; font-family: "Bebas Neue", Impact, "Arial Narrow", sans-serif; font-size: clamp(42px, 6.2vw, 84px); line-height: .9; letter-spacing: .02em;
@@ -1317,6 +1381,13 @@ td.extra { background: rgba(229, 88, 95, .07); }
           <div class="shame-taunt" id="shame-taunt"></div>
           <div class="shame-stats" id="shame-stats"></div>
         </div>
+        <div class="need" id="need" hidden></div>
+      </div>
+      <div class="panel need-solo" id="need-solo" hidden></div>
+
+      <div class="panel tipp" id="tipp" hidden>
+        <div class="tipp-h"><h2>Tipp-Spiel · Wer macht die Mimik?</h2><span class="tipp-sum" id="tipp-sum"></span></div>
+        <div class="tipp-grid" id="tipp-grid"></div>
       </div>
 
       <div class="panel gl" id="gl">
@@ -1397,6 +1468,16 @@ td.extra { background: rgba(229, 88, 95, .07); }
 
       <div class="sec-head"><h2>Rekorde</h2><span class="eyebrow" id="rec-scope"></span></div>
       <div class="records" id="records"></div>
+
+      <div id="foe-wrap" hidden>
+        <div class="sec-head"><h2>Erzfeinde</h2><span class="eyebrow">Wer wen in die Mimik geschickt hat</span></div>
+        <div class="foes" id="foes"></div>
+      </div>
+
+      <div id="tip-wrap" hidden>
+        <div class="sec-head"><h2>Tipp-Spiel</h2><span class="eyebrow" id="tip-scope">Wer richtig getippt hat, wer die Mimik macht</span></div>
+        <div class="tbl-wrap panel"><table class="tipst"><thead><tr><th class="name-cell" scope="col">Spieler</th><th scope="col">Tipps</th><th scope="col">Richtig</th><th scope="col">Trefferquote</th><th scope="col">Zuletzt</th></tr></thead><tbody id="tip-body"></tbody></table></div>
+      </div>
 
       <div id="hall-wrap" hidden>
         <div class="sec-head"><h2>Halle der Schande</h2><span class="eyebrow" id="hall-count"></span></div>
@@ -1598,7 +1679,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     rot: 0, spinning: false, spinSegs: null, spinHistory: [],
     ending: false, endPick: [], sortKey: "pct", sortDir: -1, flash: "", superDone: [],
     games: BASE_GAMES, doppelt: false, seasons: [], superWho: [], superNames: [], superSince: "", rankView: "aktuell",
-    matches: {}, roundMatches: [], riotProxy: "", statSel: ""
+    matches: {}, roundMatches: [], riotProxy: "", statSel: "", tipps: {}
   };
   var DB = null;
   var dirty = new Set();
@@ -1678,13 +1759,26 @@ td.extra { background: rgba(229, 88, 95, .07); }
     var mimik = Array.isArray(r.mimik) ? r.mimik.map(String) : [];
     return { id: String(r.id || uid()), at: String(r.at || ""), entries: entries, mimik: mimik,
       doppelt: !!r.doppelt, dbl: strList(r.dbl), duel: !!r.duel, games: num(r.games) || 0, saison: r.saison ? String(r.saison) : "",
-      blitz: !!r.blitz, regel: r.regel ? String(r.regel) : "", spiele: toArr(r.spiele).map(String).filter(Boolean) };
+      blitz: !!r.blitz, regel: r.regel ? String(r.regel) : "", spiele: toArr(r.spiele).map(String).filter(Boolean),
+      tipps: normTipps(r.tipps), plc: normPlc(r.plc) };
+  }
+  function normTipps(t) {
+    var o = {};
+    if (t && typeof t === "object") Object.keys(t).forEach(function (k) { if (t[k]) o[String(k)] = String(t[k]); });
+    return o;
+  }
+  function normPlc(v) {
+    var o = {};
+    if (v && typeof v === "object") Object.keys(v).forEach(function (k) { o[String(k)] = toArr(v[k]).map(function (x) { return normPlace(x) || 0; }); });
+    return o;
   }
   function roundBody(r) {
     var b = { at: r.at, entries: r.entries, mimik: r.mimik, doppelt: !!r.doppelt, dbl: (r.dbl || []).slice(), duel: !!r.duel, games: r.games || 0, saison: r.saison || "" };
     if (r.blitz) b.blitz = true;
     if (r.regel) b.regel = r.regel;
     if (r.spiele && r.spiele.length) b.spiele = r.spiele.slice();
+    if (r.tipps && Object.keys(r.tipps).length) b.tipps = Object.assign({}, r.tipps);
+    if (r.plc && Object.keys(r.plc).length) b.plc = r.plc;
     return b;
   }
   function isDbl(r, id) { return r.dbl && r.dbl.length ? r.dbl.indexOf(id) >= 0 : !!r.doppelt; }
@@ -1761,7 +1855,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   function lsBody() {
     return { players: S.players, wheel: S.wheel, rounds: S.rounds, superDone: S.superDone, games: S.games, doppelt: S.doppelt,
       seasons: S.seasons, superWho: S.superWho, superNames: S.superNames, superSince: S.superSince,
-      matches: S.matches, roundMatches: S.roundMatches, riotProxy: S.riotProxy };
+      matches: S.matches, roundMatches: S.roundMatches, riotProxy: S.riotProxy, tipps: S.tipps };
   }
   function live() { return S.mode === "db" && !S.test; }
   function lsSaveNow() {
@@ -1844,7 +1938,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
   function persistRunde() {
     if (S.mode === "local") lsSaveSoon();
-    else if (live()) queueWrite("rad/runde", function () { return { games: S.games, spiele: S.roundMatches.map(function (x) { return x || ""; }) }; }, 0);
+    else if (live()) queueWrite("rad/runde", function () { return { games: S.games, spiele: S.roundMatches.map(function (x) { return x || ""; }), tipps: Object.assign({}, S.tipps) }; }, 0);
   }
   function persistMatch(m) {
     if (S.mode === "local") lsSaveSoon();
@@ -1879,7 +1973,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       seasons: Array.isArray(d.seasons) ? d.seasons.map(normSeason) : [],
       superWho: strList(d.superWho), superNames: strList(d.superNames), superSince: String(d.superSince || ""),
       matches: (function () { var o = {}; if (d.matches && typeof d.matches === "object") Object.keys(d.matches).forEach(function (k) { o[k] = normMatch(d.matches[k], k); }); return o; })(),
-      roundMatches: toArr(d.roundMatches).map(function (x) { return x ? String(x) : ""; }), riotProxy: String(d.riotProxy || "")
+      roundMatches: toArr(d.roundMatches).map(function (x) { return x ? String(x) : ""; }), riotProxy: String(d.riotProxy || ""), tipps: normTipps(d.tipps)
     };
     return {
       players: DEFAULT_PLAYERS.map(function (n, i) { return { id: "p" + i, name: n, order: i, p: emptyP(), avatar: "" }; }),
@@ -1892,7 +1986,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
     S.players = d.players; S.wheel = d.wheel; S.rounds = d.rounds; S.superDone = d.superDone;
     S.games = d.games; S.doppelt = d.doppelt; S.seasons = d.seasons;
     S.superWho = d.superWho; S.superNames = d.superNames; S.superSince = d.superSince;
-    S.matches = d.matches || {}; S.roundMatches = d.roundMatches || []; S.riotProxy = d.riotProxy || "";
+    S.matches = d.matches || {}; S.roundMatches = d.roundMatches || []; S.riotProxy = d.riotProxy || ""; S.tipps = d.tipps || {};
   }
   function startLocal() {
     S.mode = "local";
@@ -2026,6 +2120,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
         S.games = clampGames(data.games);
         S.doppelt = !!data.doppelt;
         S.roundMatches = toArr(data.spiele).map(function (x) { return x ? String(x) : ""; });
+        S.tipps = normTipps(data.tipps);
       }
       renderPoints();
     }), fail);
@@ -3698,6 +3793,248 @@ td.extra { background: rgba(229, 88, 95, .07); }
     return b && st.bottom.length === 1 && st.bottom[0].p.id === b.p.id ? b : null;
   }
 
+  /* ---------- Was jeder braucht: alle möglichen Platzierungen der restlichen Spiele durchspielen ---------- */
+  var ORD = ["Erster", "Zweiter", "Dritter", "Vierter", "Letzter"];
+  function ordWord(q, maxQ) { return q === maxQ ? "Letzter" : ORD[q - 1]; }
+  function placesWord(list, maxQ) {
+    list = list.slice().sort(function (a, b) { return a - b; });
+    var w = list.map(function (q) { return ordWord(q, maxQ); });
+    return w.length === 1 ? w[0] : w.slice(0, -1).join(", ") + " oder " + w[w.length - 1];
+  }
+  function arrangements(n, fixed) {
+    var out = [], cur = [], used = {};
+    (function rec(i) {
+      if (i === n) { out.push(cur.slice()); return; }
+      for (var q = 1; q <= 5; q++) {
+        if (used[q] || (fixed[i] && fixed[i] !== q)) continue;
+        used[q] = true; cur.push(q); rec(i + 1); cur.pop(); used[q] = false;
+      }
+    })(0);
+    return out;
+  }
+  /* outcome for every player of one finished round: 0 safe, 1 1-gegen-1, 2 Stechen, 3 Mimik; c = chance */
+  function judge(tot, first) {
+    var n = tot.length, min = Math.min.apply(null, tot), L = [], res = [], c = [];
+    for (var i = 0; i < n; i++) { res.push(0); c.push(0); if (tot[i] === min) L.push(i); }
+    if (L.length === 1) { res[L[0]] = 3; c[L[0]] = 1; return { res: res, c: c }; }
+    if (L.length === 2) { L.forEach(function (i) { res[i] = 1; c[i] = 0.5; }); return { res: res, c: c }; }
+    /* ab 3 im Gleichstand: wer mal Erster war, ist sicher */
+    var left = L.filter(function (i) { return !first[i]; });
+    if (left.length === 1) { res[left[0]] = 3; c[left[0]] = 1; }
+    else if (left.length === 2) left.forEach(function (i) { res[i] = 1; c[i] = 0.5; });
+    else L.forEach(function (i) { res[i] = 2; c[i] = 1 / L.length; });
+    return { res: res, c: c };
+  }
+  var NEED = { key: "", data: null };
+  function needData() {
+    if (S.games > BASE_GAMES) return null;
+    var act = S.players.filter(function (p) { return p.p.slice(0, BASE_GAMES).some(Boolean); });
+    var n = act.length;
+    if (n < 3 || n > 5) return null;
+    var k = 0;
+    while (k < BASE_GAMES && act.every(function (p) { return !!p.p[k]; })) k++;
+    var R = BASE_GAMES - k;
+    if (k < 2 || R < 1 || R > 2) return null;
+    for (var g = 0; g < BASE_GAMES; g++) {
+      var seen = {};
+      for (var i = 0; i < n; i++) { var v = act[i].p[g]; if (v) { if (seen[v]) return null; seen[v] = 1; } }
+    }
+    var key = act.map(function (p) { return p.id + ":" + p.p.slice(0, BASE_GAMES).join(","); }).join("|");
+    if (NEED.key === key) return NEED.data;
+    var base = act.map(function (p) { var t = 0; for (var g2 = 0; g2 < k; g2++) t += pts(p.p[g2]); return t; });
+    var first0 = act.map(function (p) { return p.p.slice(0, k).some(function (v) { return v === 1; }); });
+    var A = arrangements(n, act.map(function (p) { return p.p[k] || 0; }));
+    var B = R === 2 ? arrangements(n, act.map(function (p) { return p.p[k + 1] || 0; })) : [null];
+    var maxQ = 5, cnt = 0, chance = base.map(function () { return 0; });
+    /* per player: by own points from the rest (R=1: by place) the list of outcomes with the places of the others */
+    var cells = act.map(function () { return {}; });
+    A.forEach(function (a) {
+      B.forEach(function (b) {
+        var tot = [], fst = [];
+        for (var i = 0; i < n; i++) {
+          tot.push(base[i] + pts(a[i]) + (b ? pts(b[i]) : 0));
+          fst.push(first0[i] || a[i] === 1 || (b && b[i] === 1));
+        }
+        var j = judge(tot, fst);
+        cnt++;
+        for (var i2 = 0; i2 < n; i2++) {
+          chance[i2] += j.c[i2];
+          var own = R === 1 ? a[i2] : pts(a[i2]) + pts(b[i2]);
+          var cell = cells[i2][own] || (cells[i2][own] = { res: [0, 0, 0, 0], sc: [] });
+          cell.res[j.res[i2]]++;
+          if (R === 1) cell.sc.push({ a: a, r: j.res[i2] });
+        }
+      });
+    });
+    var rows = act.map(function (p, i) {
+      return { p: p, i: i, base: base[i], chance: chance[i] / cnt, cells: cells[i] };
+    });
+    NEED.key = key;
+    NEED.data = { rows: rows, R: R, k: k, n: n, maxQ: maxQ, act: act };
+    return NEED.data;
+  }
+  function cellKind(c) {
+    if (!c) return "x";
+    var t = c.res[0] + c.res[1] + c.res[2] + c.res[3];
+    if (c.res[0] === t) return "g";
+    if (c.res[3] === t) return "r";
+    if (c.res[1] + c.res[2] === t) return "d";
+    return "y";
+  }
+  var OUTW = ["sicher", "1 gegen 1", "Stechen", "Mimik"];
+  /* explain a mixed cell with one other player: "1 gegen 1, wenn Besnik Letzter wird, sonst Mimik" */
+  function cellWhy(nd, row, c) {
+    var kinds = [0, 1, 2, 3].filter(function (x) { return c.res[x] > 0; });
+    if (kinds.length < 2 || !c.sc.length) return OUTW[kinds[0]];
+    for (var j = 0; j < nd.n; j++) {
+      if (j === row.i) continue;
+      var by = {}, ok = true;
+      c.sc.forEach(function (sc) { var q = sc.a[j]; if (by[q] === undefined) by[q] = sc.r; else if (by[q] !== sc.r) ok = false; });
+      if (!ok) continue;
+      var nm = nd.act[j].name, groups = kinds.map(function (o) { return { o: o, q: Object.keys(by).filter(function (q) { return by[q] === o; }).map(Number) }; });
+      if (groups.length === 2 && groups[1].q.length < groups[0].q.length) groups.reverse();
+      return groups.map(function (gr, i) {
+        return i === groups.length - 1 ? "sonst " + OUTW[gr.o] : OUTW[gr.o] + ", wenn " + nm + " " + placesWord(gr.q, nd.maxQ) + " wird";
+      }).join(", ");
+    }
+    return "hängt von mehreren ab, bestenfalls " + OUTW[kinds[0]] + ", schlimmstenfalls " + OUTW[kinds[kinds.length - 1]];
+  }
+  function pairFor(sum) {
+    var best = null;
+    for (var a = 1; a <= 5; a++) for (var b = a; b <= 5; b++) if (pts(a) + pts(b) === sum && (!best || b - a < best[1] - best[0])) best = [a, b];
+    return best ? (best[0] === best[1] ? "2× Platz " + best[0] : "Platz " + best[0] + " + " + best[1]) : "";
+  }
+  function needSentence(nd, row) {
+    var keys = Object.keys(row.cells).map(Number).sort(function (a, b) { return a - b; });
+    var kinds = {};
+    keys.forEach(function (q) { kinds[q] = cellKind(row.cells[q]); });
+    var all = keys.map(function (q) { return kinds[q]; });
+    if (all.every(function (x) { return x === "g"; })) return { safe: true, txt: "sicher, kann nicht mehr Letzter werden" };
+    if (all.every(function (x) { return x === "r"; })) return { txt: "⚡ kommt nicht mehr raus, egal welcher Platz" };
+    var parts = [];
+    if (nd.R === 1) {
+      /* keys are the places still free for him, better first */
+      var qS = 0;
+      while (qS < keys.length && kinds[keys[qS]] === "g") qS++;
+      if (qS > 0) parts.push(qS === 1 && keys[0] === 1 && keys.length > 1 ? "<b>muss Erster werden</b>, dann sicher" : "<b>sicher mit Platz " + keys[0] + (qS > 1 ? "–" + keys[qS - 1] : "") + "</b>");
+      var redFrom = null;
+      for (var x = keys.length - 1; x >= 0 && kinds[keys[x]] === "r"; x--) redFrom = keys[x];
+      var mids = keys.filter(function (q, i) { return i >= qS && (redFrom === null || q < redFrom); });
+      var shown = 0, lastTxt = null;
+      mids.forEach(function (q) {
+        var c = row.cells[q], kd = kinds[q];
+        var t = kd === "d" ? (c.res[1] ? "1 gegen 1" : "Stechen") : kd === "r" ? "Mimik" : kd === "g" ? "sicher" : cellWhy(nd, row, c);
+        if (t === lastTxt) { parts[parts.length - 1] = parts[parts.length - 1].replace(/^Als ([^:]+):/, "Als $1 oder " + ordWord(q, nd.maxQ) + ":"); return; }
+        if (shown >= 2) return;
+        shown++; lastTxt = t;
+        parts.push("Als " + ordWord(q, nd.maxQ) + ": " + esc(t));
+      });
+      if (redFrom !== null) parts.push(redFrom === keys[0] ? "<b>Mimik bei jedem Platz</b>" : redFrom === keys[keys.length - 1] ? "als Letzter <b>Mimik</b>" : "ab Platz " + redFrom + " <b>Mimik</b>");
+      var txt = parts.join(" · ");
+      return { txt: txt.charAt(0).toUpperCase() + txt.slice(1) };
+    }
+    /* R=2: keys are points from the last two games */
+    var hi = keys[keys.length - 1], sS = null, sR = null;
+    for (var y = keys.length - 1; y >= 0 && kinds[keys[y]] === "g"; y--) sS = keys[y];
+    for (var z = 0; z < keys.length && kinds[keys[z]] === "r"; z++) sR = keys[z];
+    if (sS !== null) parts.push("<b>braucht mind. " + sS + " Punkte</b> aus Spiel 3 + 4 (z. B. " + pairFor(sS) + ")");
+    else parts.push("<b>kann es nicht allein schaffen</b>, braucht auch mit " + pairFor(hi) + " Hilfe von den anderen");
+    if (sR !== null) parts.push("mit " + sR + " Punkten oder weniger <b>Mimik</b>");
+    var t2 = parts.join(" · ");
+    return { txt: t2.charAt(0).toUpperCase() + t2.slice(1) };
+  }
+  function renderNeed() {
+    var box = $("#need"), solo = $("#need-solo"), shame = $("#shame");
+    var nd = needData();
+    var host = !shame.hidden ? box : solo;
+    shame.classList.toggle("has-need", !!nd && !shame.hidden);
+    box.hidden = true; solo.hidden = true;
+    if (!nd) return;
+    host.hidden = false;
+    var rows = nd.rows.slice().sort(function (a, b) { return b.chance - a.chance || a.base - b.base; });
+    var safe = [], h = "";
+    var nextG = nd.k + 1;
+    var cols = nd.R === 1 ? [1, 2, 3, 4, 5] : [];
+    h += '<div class="need-h"><span class="eyebrow">' + (nd.R === 1 ? "Vor Spiel " + nextG + " · was jeder braucht" : "Vor Spiel " + nextG + " und " + (nextG + 1) + " · was jeder braucht") + "</span><small>Chance = wenn die Plätze zufällig fallen</small></div>";
+    h += '<div class="need-grid" style="--nc:' + cols.length + '"><span class="hd l">' + (nd.R === 1 ? "Platz in Spiel " + nextG + " →" : "") + "</span>" +
+      cols.map(function (q) { return '<span class="hd">' + q + ".</span>"; }).join("") + '<span class="hd">Mimik</span>';
+    rows.forEach(function (row) {
+      var sen = needSentence(nd, row);
+      if (sen.safe) { safe.push(row); return; }
+      h += '<span class="need-nm"><span class="av" data-pid="' + esc(row.p.id) + '"></span><span>' + esc(row.p.name) + "</span><small>" + row.base + " P</small></span>";
+      cols.forEach(function (q) {
+        var c = row.cells[q], kd = cellKind(c);
+        var lab = { g: "✓", r: "✗", d: "⚔", y: "?", x: "–" }[kd];
+        var tip = kd === "x" ? "Platz schon vergeben" : "Platz " + q + ": " + (kd === "y" ? cellWhy(nd, row, c) : kd === "d" ? (c.res[1] ? "1 gegen 1" : "Stechen") : OUTW[kd === "g" ? 0 : 3]);
+        h += '<span class="nc ' + kd + '" title="' + esc(tip) + '">' + lab + "</span>";
+      });
+      var pc = Math.round(row.chance * 100);
+      h += '<span class="need-pct' + (pc >= 50 ? " hot" : "") + '">' + (row.chance > 0 && pc < 1 ? "<1" : pc) + " %</span>";
+      h += '<div class="need-txt">' + sen.txt + "</div>";
+    });
+    h += "</div>";
+    if (safe.length) h += '<div class="need-safe">✓ Schon sicher: ' + esc(safe.map(function (r) { return r.p.name; }).join(", ")) + "</div>";
+    if (nd.R === 1) h += '<div class="need-leg"><span><i class="g"></i>sicher</span><span><i class="d"></i>1 gegen 1</span><span><i class="y"></i>hängt von anderen ab (antippen)</span><span><i class="r"></i>Mimik</span></div>';
+    if (host.dataset.h !== h) {
+      host.dataset.h = h;
+      host.innerHTML = h;
+      host.querySelectorAll(".av[data-pid]").forEach(function (el) { var p = S.players.filter(function (x) { return x.id === el.dataset.pid; })[0]; if (p) setAvatar(el, p); });
+    }
+  }
+  /* tapping a "?" shows its explanation (touch screens have no hover) */
+  document.addEventListener("click", function (e) {
+    var c = e.target.closest && e.target.closest(".nc[title]");
+    if (!c) return;
+    var row = c.parentNode, old = row.querySelector(".need-pop");
+    if (old) old.remove();
+    var pop = document.createElement("div");
+    pop.className = "need-txt need-pop";
+    pop.style.color = "#FFE08A";
+    pop.textContent = c.title;
+    var nxt = c; while (nxt && !(nxt.classList && nxt.classList.contains("need-txt"))) nxt = nxt.nextElementSibling;
+    if (nxt) nxt.parentNode.insertBefore(pop, nxt.nextSibling); else row.appendChild(pop);
+  });
+
+  /* ---------- Tipp-Spiel ---------- */
+  function tipsLocked() {
+    if (S.games > BASE_GAMES) return true;
+    var act = S.players.filter(function (p) { return p.p.slice(0, BASE_GAMES).some(Boolean); });
+    return act.length >= 2 && act.every(function (p) { return !!p.p[BASE_GAMES - 1]; });
+  }
+  function renderTipps() {
+    var box = $("#tipp"), grid = $("#tipp-grid");
+    box.hidden = !S.players.length || S.mode === "init";
+    if (box.hidden) return;
+    var locked = tipsLocked() || S.readOnly;
+    var opts = '<option value="">– noch kein Tipp –</option>' + S.players.map(function (q) { return '<option value="' + esc(q.id) + '">' + esc(q.name) + "</option>"; }).join("");
+    var key = S.players.map(function (p) { return p.id + p.name + (p.avatar ? 1 : 0); }).join("|") + "|" + (locked ? 1 : 0) + "|" + JSON.stringify(S.tipps);
+    if (grid.dataset.key !== key) {
+      grid.dataset.key = key;
+      grid.textContent = "";
+      S.players.forEach(function (p) {
+        var row = document.createElement("div");
+        row.className = "tipp-row" + (S.tipps[p.id] ? " set" : "");
+        row.innerHTML = '<span class="av"></span><div><label></label><select></select></div>';
+        setAvatar(row.querySelector(".av"), p);
+        var lab = row.querySelector("label"), sel = row.querySelector("select");
+        lab.textContent = p.name + " tippt auf";
+        sel.id = "tipp-" + p.id; lab.htmlFor = sel.id;
+        sel.innerHTML = opts; sel.value = S.tipps[p.id] || ""; sel.dataset.pid = p.id; sel.disabled = locked;
+        grid.appendChild(row);
+      });
+    }
+    var cnt = {};
+    Object.keys(S.tipps).forEach(function (v) { var t = S.tipps[v]; cnt[t] = (cnt[t] || 0) + 1; });
+    var list = Object.keys(cnt).sort(function (a, b) { return cnt[b] - cnt[a]; }).map(function (t) { return "<b>" + esc(playerName(t)) + "</b> " + cnt[t] + "×"; });
+    $("#tipp-sum").innerHTML = (locked && !S.readOnly ? "🔒 Tipps sind zu, das letzte Spiel ist eingetragen. " : "Ohne Punkte, nur zum Angeben. Zu, sobald Spiel " + BASE_GAMES + " eingetragen ist. ") + (list.length ? "Getippt: " + list.join(" · ") : "");
+  }
+  $("#tipp-grid").addEventListener("change", function (e) {
+    var sel = e.target.closest("select[data-pid]"); if (!sel || tipsLocked() || S.readOnly) return;
+    if (sel.value) S.tipps[sel.dataset.pid] = sel.value; else delete S.tipps[sel.dataset.pid];
+    persistRunde();
+    renderTipps();
+  });
+
   function placeOptions() {
     var h = '<option value="">—</option>';
     for (var v = 1; v <= 5; v++) h += '<option value="' + v + '">' + v + ". Platz</option>";
@@ -3835,6 +4172,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
     $("#flash").innerHTML = S.flash;
     renderEndBox(st);
     updateShame(st);
+    renderNeed();
+    renderTipps();
     renderGameLinks();
   }
 
@@ -4532,6 +4871,36 @@ td.extra { background: rgba(229, 88, 95, .07); }
     top("Meiste Tode", function (x) { return x.d; }, false, String, "loser");
     top("Wenigster Schaden", function (x) { return x.dmg; }, true, fmtDmg, "loser");
   }
+  /* typische Rolle je Champion (in ARAM gibt es keine Lanes, also die Rolle, in der der Champion sonst meistens gespielt wird) */
+  var ROLE_LIST = {
+    Top: "Aatrox Ambessa Camille Chogath Darius DrMundo Fiora Gangplank Garen Gnar Gwen Illaoi Irelia Jax Jayce Kayle Kennen Kled KSante Malphite Mordekaiser Nasus Olaf Ornn Pantheon Poppy Quinn Renekton Riven Rumble Sett Shen Singed Sion Teemo Tryndamere Urgot Volibear MonkeyKing Wukong Yorick Zaahen",
+    Jungle: "Amumu Belveth Briar Diana Ekko Elise Evelynn Fiddlesticks Graves Gragas Hecarim Ivern JarvanIV Karthus Kayn Khazix Kindred LeeSin Lillia MasterYi Nidalee Nocturne Nunu NunuWillump RekSai Rammus Sejuani Shaco Shyvana Skarner Trundle Udyr Vi Viego Warwick XinZhao Zac",
+    Mid: "Ahri Akali Akshan Anivia Annie AurelionSol Aurora Azir Cassiopeia Corki Fizz Galio Heimerdinger Hwei Kassadin Katarina Leblanc Lissandra Malzahar Mel Naafiri Neeko Orianna Qiyana Ryze Sylas Syndra Taliyah Talon TwistedFate Veigar Velkoz Vex Viktor Vladimir Xerath Yasuo Yone Zed Ziggs Zoe",
+    ADC: "Aphelios Ashe Caitlyn Draven Ezreal Jhin Jinx Kaisa Kalista Kogmaw Lucian MissFortune Nilah Samira Sivir Smolder Tristana Twitch Varus Vayne Xayah Yunara Zeri",
+    Support: "Alistar Bard Blitzcrank Brand Braum Janna Karma Leona Lulu Lux Maokai Milio Morgana Nami Nautilus Pyke Rakan Rell Renata RenataGlasc Senna Seraphine Sona Soraka Swain TahmKench Taric Thresh Yuumi Zilean Zyra"
+  };
+  var ROLES = ["Top", "Jungle", "Mid", "ADC", "Support"], ROLE_OF = {};
+  ROLES.forEach(function (r) { ROLE_LIST[r].split(" ").forEach(function (c) { ROLE_OF[c.toLowerCase()] = r; }); });
+  function roleOf(c) { return ROLE_OF[String(c || "").toLowerCase().replace(/[^a-z0-9]/g, "")] || ""; }
+  function favRole(r) {
+    var cnt = {}; r.g.forEach(function (it) { var x = roleOf(it.x.c); if (x) cnt[x] = (cnt[x] || 0) + 1; });
+    var mx = Math.max.apply(null, Object.keys(cnt).map(function (k) { return cnt[k]; }).concat([0]));
+    var best = ROLES.filter(function (k) { return cnt[k] === mx && mx > 0; });
+    return best.length && best.length <= 2 ? " · meist <b>" + best.join("/") + "</b>" : "";
+  }
+  function rolesHTML(r) {
+    var cnt = { Top: 0, Jungle: 0, Mid: 0, ADC: 0, Support: 0 }, unk = 0;
+    r.g.forEach(function (it) { var x = roleOf(it.x.c); if (x) cnt[x]++; else unk++; });
+    var known = r.g.length - unk, mx = Math.max.apply(null, ROLES.map(function (x) { return cnt[x]; }));
+    var fav = ROLES.filter(function (x) { return cnt[x] === mx && mx > 0; });
+    var h = '<div class="sp-box pad"><h3>Rollen · was er am meisten spielt</h3>' +
+      (fav.length ? '<div class="role-fav">Am liebsten <b>' + fav.join(" & ") + "</b> · " + Math.round(mx / Math.max(1, known) * 100) + " % seiner Spiele</div>" : "") +
+      '<div class="pl-bars role-bars">' + ROLES.map(function (x) {
+        return '<div class="' + (fav.indexOf(x) >= 0 ? "top" : "") + '"><span>' + x + '</span><span><i style="width:' + Math.round(cnt[x] / Math.max(1, mx) * 100) + '%"></i></span><b>' + cnt[x] + "× · " + Math.round(cnt[x] / Math.max(1, known) * 100) + "%</b></div>";
+      }).join("") + "</div>" + (unk ? '<div class="form-leg">' + unk + (unk === 1 ? " Spiel" : " Spiele") + " mit unbekanntem Champion</div>" : "") +
+      '<div class="form-leg">Rolle, in der der Champion sonst meistens gespielt wird</div></div>';
+    return h;
+  }
   function formSvg(r) {
     var g = r.g.slice(0, 15).reverse(), W = 600, H = 110, n = g.length, max = Math.max.apply(null, g.map(function (it) { return it.x.dmg; }).concat([1]));
     var bw = Math.min(46, (W - 8) / Math.max(n, 1) - 6), step = (W - 8) / Math.max(n, 1), out = "";
@@ -4562,7 +4931,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       it.querySelector(".acc-nm b").textContent = r.p.name;
       it.querySelector(".acc-nm .st-ttls").innerHTML = ttlHTML(titles && titles[id]);
       it.querySelector(".acc-q").innerHTML = r.n
-        ? "<b>" + r.n + "</b> " + (r.n === 1 ? "Spiel" : "Spiele") + " · Ø <b>" + fmtDmg(Math.round(r.dmg)) + "</b> Schaden · <b>" + fx1(r.k) + " / " + fx1(r.d) + " / " + fx1(r.a) + "</b>"
+        ? "<b>" + r.n + "</b> " + (r.n === 1 ? "Spiel" : "Spiele") + " · Ø <b>" + fmtDmg(Math.round(r.dmg)) + "</b> Schaden · <b>" + fx1(r.k) + " / " + fx1(r.d) + " / " + fx1(r.a) + "</b>" + favRole(r)
         : "Noch keine Spiele" + (ST_RANGE === "all" ? "" : " in diesem Zeitraum");
       var open = !!ST_OPEN[id], body = it.querySelector(".st-prof");
       it.classList.toggle("open", open);
@@ -4595,7 +4964,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
         kpi("Champions", r.nc, r.nc === 1 ? "nur einer gespielt" : "verschiedene gespielt") +
         '<div class="sp-kpi"><div class="eyebrow">Bestes Spiel</div><div class="v sp-best"></div><div class="sub sp-best-s"></div></div>' +
       "</div>" +
-      '<div class="sp-grid"><div class="sp-box pad"><h3>Formkurve · Schaden der letzten Spiele</h3>' + formSvg(r) + '<div class="form-leg">Grün = Sieg, rot = Niederlage, Zahl über dem Balken = Kills</div></div>' +
+      '<div class="sp-grid three"><div class="sp-box pad"><h3>Formkurve · Schaden der letzten Spiele</h3>' + formSvg(r) + '<div class="form-leg">Grün = Sieg, rot = Niederlage, Zahl über dem Balken = Kills</div></div>' + rolesHTML(r) +
       '<div class="sp-box pad"><h3>Platz im Team nach Schaden</h3><div class="pl-bars">' + r.plc.map(function (c, i) { return "<div><span>" + (i + 1) + '.</span><span><i style="width:' + Math.round(c / Math.max(1, Math.max.apply(null, r.plc)) * 100) + '%"></i></span><b>' + c + "×</b></div>"; }).join("") + "</div></div></div>" +
       '<div class="sp-grid' + (hasAug ? "" : " one") + '"><div class="sp-box"><h3>Champions · wie oft gespielt</h3><div class="tbl-wrap"><table><thead><tr><th>Champion</th><th>Gespielt</th><th>Ø Schaden</th><th>Ø K / T / A</th><th>KDA</th></tr></thead><tbody class="sp-ch"></tbody></table></div></div>' +
       (hasAug ? '<div class="sp-box"><h3>Augmentierungen</h3><ul class="aug-list sp-aug"></ul></div>' : "") + "</div>" +
@@ -4949,18 +5318,27 @@ td.extra { background: rgba(229, 88, 95, .07); }
     if (!viaDuel && st.bottom.length >= 3 && S.endRule && ids[0] === S.endRule) r.regel = "erster";
     var linked = S.roundMatches.filter(Boolean);
     if (linked.length) r.spiele = linked;
+    r.plc = {};
+    st.played.forEach(function (x) { r.plc[x.p.id] = x.p.p.slice(0, games).map(function (v) { return v || 0; }); });
+    var tips = Object.assign({}, S.tipps);
+    if (Object.keys(tips).length) r.tipps = tips;
     saveRound(r);
     Sound.stamp();
     S.players.forEach(function (x) {
       var used = x.p.some(function (v) { return v !== null; });
       if (used || x.dbl) { x.p = emptyP(); x.dbl = false; persistPlayer(x, 0); }
     });
-    S.games = BASE_GAMES; S.roundMatches = []; GL.state = {}; persistRunde();
+    S.games = BASE_GAMES; S.roundMatches = []; GL.state = {}; S.tipps = {}; persistRunde();
     var mNames = ids.map(function (id) { return esc(playerName(id)); }).join(" & ");
+    var tipRes = "";
+    if (Object.keys(tips).length) {
+      var hit = Object.keys(tips).filter(function (v) { return ids.indexOf(tips[v]) >= 0; }).map(playerName);
+      tipRes = hit.length ? " 🔮 Richtig getippt: <b>" + esc(hit.join(", ")) + "</b>." : " 🔮 Keiner hat richtig getippt.";
+    }
     S.ending = false; S.endPick = []; S.endRule = null;
     flash("Runde eingetragen. Die Mimik macht <b>" + mNames + "</b>" + (viaDuel ? " nach dem Duell" : "") +
       (r.blitz ? " – <b>⚡ geblitzt</b>" : "") + (r.regel ? " – nach der Erster-Regel" : "") +
-      (wasDouble ? " – <b>doppelt, zählt als 2 Mimiks</b>" : "") + ". Alles steht jetzt in der Rangliste.");
+      (wasDouble ? " – <b>doppelt, zählt als 2 Mimiks</b>" : "") + "." + tipRes + " Alles steht jetzt in der Rangliste.");
     renderRanking();
   }
 
@@ -5305,11 +5683,41 @@ td.extra { background: rgba(229, 88, 95, .07); }
   }
 
   /* Schand-Titel: Abzeichen neben den Namen. Geteilte Titel gibt es nur für höchstens zwei Spieler. */
-  function shameTitles(rows) {
+  /* extra numbers per player for the fun titles, from the rounds in time order */
+  function funStats(rounds) {
+    var m = {}, last = {};
+    function g(id) { return m[id] || (m[id] = { zitter: 0, top: 0, taken: 0, rep: 0, duelW: 0, comeback: 0, runden: 0, mim: 0, tips: 0, hits: 0 }); }
+    rounds.slice().sort(function (a, b) { return a.at < b.at ? -1 : a.at > b.at ? 1 : 0; }).forEach(function (r) {
+      if (!r.entries.length) return;
+      var ps = r.entries.map(function (e) { return e.punkte; }), min = Math.min.apply(null, ps), max = Math.max.apply(null, ps);
+      var bottom = r.entries.filter(function (e) { return e.punkte === min; }), fighters = bottom;
+      if (bottom.length >= 3) { var lft = bottom.filter(function (e) { return !e.erste; }); if (lft.length === 2) fighters = lft; }
+      var pre = null;
+      if (r.plc && r.entries.every(function (e) { return r.plc[e.id]; })) {
+        pre = {};
+        r.entries.forEach(function (e) { var t = 0; r.plc[e.id].slice(0, BASE_GAMES - 1).forEach(function (v) { t += pts(v); }); pre[e.id] = t; });
+        var minPre = Math.min.apply(null, r.entries.map(function (e) { return pre[e.id]; }));
+      }
+      r.entries.forEach(function (e) {
+        var x = g(e.id), isM = r.mimik.indexOf(e.id) >= 0;
+        x.runden++;
+        if (e.punkte === max) x.top++;
+        if (isM) { x.mim++; if (last[e.id]) x.rep++; }
+        else if (e.punkte === min + 1) x.zitter++;
+        if ((r.dbl || []).indexOf(e.id) >= 0) x.taken++;
+        if (r.duel && !isM && fighters.indexOf(e) >= 0) x.duelW++;
+        if (pre && !isM && pre[e.id] === minPre) x.comeback++;
+        last[e.id] = isM;
+      });
+      Object.keys(r.tipps || {}).forEach(function (v) { var x = g(v); x.tips++; if (r.mimik.indexOf(r.tipps[v]) >= 0) x.hits++; });
+    });
+    return m;
+  }
+  function shameTitles(rows, rounds, best) {
     var out = new Map();
-    function give(list, label, cls) {
+    function give(list, label, cls, why) {
       if (!list.length || list.length > 2) return;
-      list.forEach(function (a) { if (!out.has(a.p.id)) out.set(a.p.id, []); out.get(a.p.id).push([label, cls]); });
+      list.forEach(function (a) { if (!out.has(a.p.id)) out.set(a.p.id, []); out.get(a.p.id).push([label, cls, why || ""]); });
     }
     function tops(list, key) {
       var mx = Math.max.apply(null, list.map(function (a) { return a[key]; }));
@@ -5326,10 +5734,105 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var hi = Math.max.apply(null, act.map(function (a) { return a.pct; })), lo = Math.min.apply(null, act.map(function (a) { return a.pct; }));
       give(act.filter(function (a) { return a.pct === hi; }), "Schadenskönig", "gold");
       if (lo < hi) give(act.filter(function (a) { return a.pct === lo; }), "Schlusslicht", "bad");
-      act.filter(function (a) { return a.mimiks === 0; }).forEach(function (a) { if (!out.has(a.p.id)) out.set(a.p.id, []); out.get(a.p.id).push(["Unantastbar", "good"]); });
+      act.filter(function (a) { return a.mimiks === 0; }).forEach(function (a) { if (!out.has(a.p.id)) out.set(a.p.id, []); out.get(a.p.id).push(["Unantastbar", "good", "Noch keine einzige Mimik"]); });
+    }
+    /* Spaß-Titel aus den Runden */
+    var fs = funStats(rounds || []);
+    var fr = pl.map(function (a) { var f = fs[a.p.id] || {}; return { p: a.p, a: a, zitter: f.zitter || 0, top: f.top || 0, taken: f.taken || 0, rep: f.rep || 0, duelW: f.duelW || 0, comeback: f.comeback || 0, runden: f.runden || 0, mim: f.mim || 0, tips: f.tips || 0, hits: f.hits || 0 }; });
+    function topF(list, key, low) {
+      if (!list.length) return [];
+      var v = list.reduce(function (m, x) { return m === null ? x[key] : low ? Math.min(m, x[key]) : Math.max(m, x[key]); }, null);
+      return list.filter(function (x) { return x[key] === v; });
+    }
+    if (fr.length >= 2) {
+      var zt = topF(fr, "zitter"); if (zt.length && zt[0].zitter >= 1) give(zt, "Zitterpartie", "gold", zt[0].zitter + "× nur 1 Punkt vor dem Letzten gerettet");
+      var rp = topF(fr, "rep"); if (rp.length && rp[0].rep >= 1) give(rp, "Wiederholungstäter", "bad", rp[0].rep + "× Mimik in zwei Runden hintereinander");
+      var dk = topF(fr, "duelW"); if (dk.length && dk[0].duelW >= 1) give(dk, "Duell-König", "gold", dk[0].duelW + "× ein 1 gegen 1 gewonnen");
+      var cb = topF(fr, "comeback"); if (cb.length && cb[0].comeback >= 1) give(cb, "Comeback-Kid", "good", cb[0].comeback + "× vor dem letzten Spiel ganz unten und trotzdem gerettet");
+      var sk = topF(fr, "runden"); if (sk.length && sk[0].runden >= 3) give(sk, "Stammkunde", "ice", sk[0].runden + " Runden gespielt, mehr als alle anderen");
+      var maxR = sk.length ? sk[0].runden : 0;
+      var ff = topF(fr.filter(function (x) { return x.mim >= 1 && x.runden <= Math.max(3, Math.floor(maxR / 3)); }), "runden", true);
+      if (ff.length) give(ff, "Frischfleisch", "bad", "Erst " + ff[0].runden + (ff[0].runden === 1 ? " Runde" : " Runden") + " dabei und schon Mimik");
+      var gm = topF(fr.filter(function (x) { return x.runden >= 4 && x.top === 0 && x.mim === 0; }), "runden");
+      if (gm.length) give(gm, "Graue Maus", "ice", "Nie Erster, nie Letzter, immer schön Mittelmaß");
+      var fg = topF(fr.filter(function (x) { return x.runden >= 3 && x.taken === 0; }), "runden");
+      if (fg.length) give(fg, "Feigling", "bad", "Hat sich noch nie Doppelt getraut");
+      var hs = topF(fr.filter(function (x) { return x.tips >= 3 && x.hits >= 1; }).map(function (x) { x.hq = x.hits / x.tips; return x; }), "hq");
+      if (hs.length) give(hs, "Hellseher", "good", hs[0].hits + " von " + hs[0].tips + " Tipps richtig");
+    }
+    /* Spaß-Titel aus den Blitz-Spieldaten */
+    var md = statData(statMatches(best ? "all" : "season")).filter(function (r) { return r.n >= 3; });
+    if (md.length >= 2) {
+      function mx(key, low) { return topF(md.map(function (r) { return Object.assign({ p: r.p }, r); }), key, low); }
+      var kz = mx("d"); give(kz, "Kamikaze", "bad", "Stirbt am häufigsten: " + fx1(kz[0].d) + " Tode pro Spiel");
+      var pz = mx("k", true); give(pz, "Pazifist", "ice", "Die wenigsten Kills: " + fx1(pz[0].k) + " pro Spiel");
+      var tr = mx("kp", true); give(tr, "Tourist", "bad", "War beim Teamfight nur zu Besuch: " + Math.round(tr[0].kp * 100) + " % Kill-Beteiligung");
+      md.forEach(function (r) { r.steal = r.share ? r.ks / r.share : 0; });
+      var kk = mx("steal"); if (kk.length && kk[0].steal > 1.15) give(kk, "Kill-Klauer", "bad", "Holt sich mehr Kills, als sein Schaden hergibt");
     }
     return out;
   }
+  /* Erzfeinde: wer bei einer Mimik direkt davor war (oder im Gleichstand davongekommen ist) */
+  function renderFoes(rounds) {
+    var pairs = {}, vic = {};
+    rounds.forEach(function (r) {
+      if (!r.mimik.length || r.entries.length < 2) return;
+      var others = r.entries.filter(function (e) { return r.mimik.indexOf(e.id) < 0; });
+      if (!others.length) return;
+      r.mimik.forEach(function (v) {
+        var me = r.entries.filter(function (e) { return e.id === v; })[0]; if (!me) return;
+        var mates = others.filter(function (e) { return e.punkte === me.punkte; });
+        var minO = Math.min.apply(null, others.map(function (e) { return e.punkte; }));
+        var snd = mates.length ? mates : others.filter(function (e) { return e.punkte === minO; });
+        vic[v] = (vic[v] || 0) + 1;
+        snd.forEach(function (e) { var k = v + "|" + e.id; pairs[k] = (pairs[k] || 0) + 1; });
+      });
+    });
+    var box = $("#foes"), wrap = $("#foe-wrap");
+    box.textContent = "";
+    var ids = Object.keys(vic).sort(function (a, b) { return vic[b] - vic[a]; });
+    wrap.hidden = !ids.length;
+    ids.forEach(function (v) {
+      var list = Object.keys(pairs).filter(function (k) { return k.split("|")[0] === v; }).map(function (k) { return { id: k.split("|")[1], n: pairs[k] }; }).sort(function (a, b) { return b.n - a.n; });
+      if (!list.length) return;
+      var p = S.players.filter(function (x) { return x.id === v; })[0];
+      var d = document.createElement("div");
+      d.className = "card panel foe";
+      d.innerHTML = '<span class="av"></span><div><div class="fn"></div><div class="fe"></div><div class="fa"></div></div>';
+      if (p) setAvatar(d.querySelector(".av"), p);
+      d.querySelector(".fn").textContent = playerName(v) + " · " + vic[v] + (vic[v] === 1 ? " Mimik" : " Mimiks");
+      d.querySelector(".fe").innerHTML = "Erzfeind: <b>" + esc(playerName(list[0].id)) + "</b> · " + list[0].n + "× knapp vor ihm";
+      d.querySelector(".fa").textContent = list.length > 1 ? "Auch: " + list.slice(1, 4).map(function (x) { return playerName(x.id) + " " + x.n + "×"; }).join(", ") : "";
+      box.appendChild(d);
+    });
+  }
+  function renderTipStats(rounds, best) {
+    var fs = funStats(rounds), body = $("#tip-body");
+    var ids = Object.keys(fs).filter(function (id) { return fs[id].tips > 0; }).sort(function (a, b) { return fs[b].hits / fs[b].tips - fs[a].hits / fs[a].tips || fs[b].hits - fs[a].hits; });
+    $("#tip-wrap").hidden = !ids.length;
+    body.textContent = "";
+    var lastR = rounds.filter(function (r) { return r.tipps && Object.keys(r.tipps).length; }).sort(function (a, b) { return a.at < b.at ? 1 : -1; })[0];
+    ids.forEach(function (id) {
+      var x = fs[id], tr = document.createElement("tr");
+      var lt = lastR && lastR.tipps[id] ? (lastR.mimik.indexOf(lastR.tipps[id]) >= 0 ? "✓ " : "✗ ") + playerName(lastR.tipps[id]) : "–";
+      tr.innerHTML = '<td class="name-cell"><div class="who"><span class="av"></span><span class="pname"></span></div></td><td>' + x.tips + "</td><td>" + x.hits + '</td><td class="num1">' + Math.round(x.hits / x.tips * 100) + " %</td><td></td>";
+      var p = S.players.filter(function (q) { return q.id === id; })[0];
+      if (p) setAvatar(tr.querySelector(".av"), p);
+      tr.querySelector(".pname").textContent = playerName(id);
+      tr.lastChild.textContent = lt;
+      body.appendChild(tr);
+    });
+    $("#tip-scope").textContent = (best ? "alle Zeiten" : "diese Rangliste") + " · ohne Punkte, nur Ehre";
+  }
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest && e.target.closest("#rank-body .ttl[title]");
+    if (!t) return;
+    var old = document.querySelector(".ttl-pop"); if (old) old.remove();
+    var pop = document.createElement("div");
+    pop.className = "ttl-pop note"; pop.style.cssText = "margin-top:4px;color:var(--gold-hi);font-size:13px";
+    pop.textContent = t.textContent + ": " + t.title;
+    t.parentNode.parentNode.appendChild(pop);
+  });
   function renderRecords(rounds, rows, best) {
     var box = $("#records");
     box.textContent = "";
@@ -5428,7 +5931,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       var bt = th.querySelector(".sort-btn");
       bt.textContent = bt.textContent.replace(/ [↓↑]$/, "") + (th.dataset.k === key ? (dir < 0 ? " ↓" : " ↑") : "");
     });
-    var body = $("#rank-body"), titles = shameTitles(rows);
+    var body = $("#rank-body"), titles = shameTitles(rows, best ? S.rounds : cur, best);
     body.textContent = "";
     if (!rows.length) {
       var tr0 = document.createElement("tr");
@@ -5448,7 +5951,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
       setAvatar(c[0].querySelector(".av"), a.p);
       c[0].querySelector(".pname").textContent = a.p.name;
       (titles.get(a.p.id) || []).forEach(function (tt) {
-        var sp = document.createElement("span"); sp.className = "ttl " + tt[1]; sp.textContent = tt[0];
+        var sp = document.createElement("span"); sp.className = "ttl " + tt[1]; sp.textContent = tt[0]; if (tt[2]) sp.title = tt[2];
         c[0].querySelector(".titles").appendChild(sp);
       });
       c[1].textContent = a.spiele;
@@ -5498,6 +6001,8 @@ td.extra { background: rgba(229, 88, 95, .07); }
     $("#end-season-btn").disabled = locked || !cur.length || !t.top.length;
     $("#es-warn").textContent = !cur.length ? "Diese Rangliste hat noch keine Runde." : !t.top.length ? "Noch hat niemand eine Mimik – es gibt nichts zu entscheiden." : "";
     renderRecords(best ? S.rounds : cur, rows, best);
+    renderFoes(best ? S.rounds : cur);
+    renderTipStats(best ? S.rounds : cur, best);
     renderHall(best);
     renderHistoryList(best, cur);
   }
@@ -6004,7 +6509,7 @@ td.extra { background: rgba(229, 88, 95, .07); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 
   /* a tab that stays open for hours keeps old code: look for a newer version and offer (or do) a reload */
-  var BUILD = "2026-11-18a";
+  var BUILD = "2026-11-18b";
   (function () {
     if (!/github\.io$/.test(location.hostname) || !window.fetch) return;
     var bar = null, busy = false;
